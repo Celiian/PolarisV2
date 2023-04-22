@@ -1,0 +1,11 @@
+video {
+    @apply -z-10 fixed top-0 left-0 w-full h-full object-cover;
+}
+
+.container-main {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+}
