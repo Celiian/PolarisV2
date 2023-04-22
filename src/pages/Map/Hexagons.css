@@ -1,0 +1,12 @@
+.void {
+  fill-opacity: 0.1;
+}
+
+.void:hover {
+  fill: aliceblue;
+  fill-opacity: 0.5;
+}
+
+.planet:hover {
+  fill-opacity: 0.7;
+}
