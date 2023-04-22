@@ -58,4 +58,5 @@ img.players_logo {
     width: 300px;
     justify-content: space-between;
     padding-top: 50px;
+    align-items: center;
 }

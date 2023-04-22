@@ -1,5 +1,6 @@
 button.button-start {
     width: 150px;
+    height: 50px;
     background-color: #5f316b;
     cursor: pointer;
 }
