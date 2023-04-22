@@ -94,11 +94,6 @@ function GameLobby() {
     }, []);
 
     const copyInviteLink = () => {
-        var getLinkLocalStorage = localStorage.getItem("linkInviteGameRoom")
-        if (getLinkLocalStorage) {
-            console.log("Le lien a déjà été copié :", getLinkLocalStorage);
-            return;
-        }
         let linkInvite = `${window.location.origin}/lobby?room=${TokenAccessGame}=1`
         navigator.clipboard.writeText(linkInvite).then(
             () => {
