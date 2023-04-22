@@ -173,24 +173,20 @@ function Map() {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -209,6 +205,9 @@ function Map() {
 
   return (
     <div className="app">
+      <div class="navbar">
+        <p>Navbar</p>
+      </div>
       <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
       <HexGrid
         width={"100vw"}
@@ -223,6 +222,10 @@ function Map() {
         </Layout>
         <Patterns />
       </HexGrid>
+
+      <div class="controlls-container">
+        <p>Controlls Container</p>
+      </div>
 
       {isHexModalOpen && <HexModal hex={selectedHex} handleClose={() => setIsHexModalOpen(false)} />}
       {/*
