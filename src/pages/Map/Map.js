@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout } from "react-hexgrid";
+import { HexGrid, HexUtils, Layout } from "react-hexgrid";
 import axios from "axios";
 import "./Map.css";
 import Hexagon from "./Hexagons";
@@ -62,16 +62,17 @@ function Map() {
     setScale(newZoom);
   };
 
-  const handleHexClick = (type) => {
+  const handleHexClick = (hexa) => {
+    console.log(HexUtils.distance(hexa, { q: 0, r: 0, s: 0 }));
     var desc = "";
     var img = "";
-    if (type == "void") {
+    if (hexa.fill == "void") {
       desc = "Well it's just plain void, what were you expecting ? ";
       img =
         "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
     }
 
-    const hex = { name: type, image: img, description: desc };
+    const hex = { name: hexa.fill, image: img, description: desc };
     setSelectedHex(hex);
     setIsHexModalOpen(true);
   };
@@ -89,7 +90,7 @@ function Map() {
     const viewBoxWidth = parseFloat(viewBoxValues[2]);
     const viewBoxHeight = parseFloat(viewBoxValues[3]);
 
-    const distanceThreshold = hexagonSize.x * 4; // adjust this to set the distance threshold
+    const distanceThreshold = hexagonSize.x * 4;
 
     if (
       hexaCoord.x >= viewBoxX - distanceThreshold &&
@@ -116,7 +117,7 @@ function Map() {
               style={"void"}
               fill=""
               hexa={hexa}
-              handleClick={() => handleHexClick(hexa.fill)}
+              handleClick={() => handleHexClick(hexa)}
               key={index}
               index={index}
             ></Hexagon>
@@ -127,7 +128,7 @@ function Map() {
               style={"planet"}
               fill={hexa.fill}
               hexa={hexa}
-              handleClick={() => handleHexClick(hexa.fill)}
+              handleClick={() => handleHexClick(hexa)}
               key={index}
               index={index}
             ></Hexagon>
