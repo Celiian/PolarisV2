@@ -27,7 +27,6 @@ function Home() {
     const createRoomGame = async (namePlayer, token_game_room) => {
         try {
             const response = await axios.post(baseUrl + `create/game_room/${namePlayer}/${token_game_room}`);
-            console.log(response);
             return response.data;
         } catch (error) {
             console.log(error);

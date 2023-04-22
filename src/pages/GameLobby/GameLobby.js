@@ -21,61 +21,67 @@ function GameLobby() {
 
     const baseUrl = "http://127.0.0.1:8000/";
 
-
     const joinRoomGame = async (player_name, token_game_room) => {
-        await axios
-            .post(baseUrl + `join/game_room/${player_name}/${token_game_room}`)
-            .then((response) => {
-                console.log(response.data);
-                // localStorage.setItem("userUid", res.data.userUid)
-                // localStorage.setItem("user", JSON.stringify(res.data.user))
-                // accountAuthService.saveTokens(res.data.token, res.data.refreshToken);
-                // navigate("/");
-            })
-            .catch((error) => {
-                return error;
-            });
-    }
-
-    const getGameRoomById = async (roomId) => {
-        await axios
-            .get(baseUrl + `game_room/${roomId}`)
-            .then((response) => {
-                console.log(response.data);
-            })
-            .catch((error) => {
-                return error;
-            });
+        try {
+            const response = await axios.post(baseUrl + `join/game_room/${player_name}/${token_game_room}`)
+            console.log(response)
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
     }
 
     useEffect(() => {
-        setPlayerOwner(localStorage.getItem("playerOwner"))
-        setGameRoomID(localStorage.getItem("GameRoomID"));
-        setTokenAccessGame(localStorage.getItem("TokenAccessGame"))
+        const storedGameRoomID = localStorage.getItem("GameRoomID");
+        if (storedGameRoomID) {
+            setGameRoomID(storedGameRoomID);
+        }
+    }, []);
 
-        console.log("Starting connection to WebSocket Server");
-        var ws = new WebSocket("ws://localhost:8000/gameroom/" + GameRoomID);
+    useEffect(() => {
+        setPlayerOwner(localStorage.getItem("playerOwner"));
+        setTokenAccessGame(localStorage.getItem("TokenAccessGame"));
+        console.log(GameRoomID);
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setPlayers(data.players);
-        };
+        const connectWebSocket = () => {
+            console.log("Starting connection to WebSocket Server");
+            var ws = new WebSocket("ws://localhost:8000/gameroom/" + GameRoomID);
 
-        ws.onopen = function (event) {
-            console.log(event);
-            console.log("Successfully connected to the echo websocket server...");
-            if (localStorage.getItem("GameRoomID")) {
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                setPlayers(data.players);
+            };
+
+            ws.onopen = function (event) {
+                console.log(event);
+                console.log("Successfully connected to the echo websocket server...");
+                if (GameRoomID) {
+                    const message = JSON.stringify({
+                        request: "/game_room",
+                        GameRoomID: GameRoomID,
+                    });
+                    ws.send(message);
+                    console.log("GameRoomID sent");
+                } else {
+                    console.log("GameRoomID is not defined");
+                }
+            };
+            setInterval(() => {
                 const message = JSON.stringify({
                     request: "/game_room",
                     GameRoomID: localStorage.getItem("GameRoomID"),
                 });
                 ws.send(message);
-                console.log("GameRoomID sent");
-            } else {
-                console.log("GameRoomID is not defined");
-            }
+            }, 1000);
         };
-    }, []);
+
+        if (GameRoomID) {
+            connectWebSocket();
+        }
+
+    }, [GameRoomID]);
+
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -86,7 +92,6 @@ function GameLobby() {
             setShowModal(false);
         }
     }, []);
-
 
     const copyInviteLink = () => {
         var getLinkLocalStorage = localStorage.getItem("linkInviteGameRoom")
@@ -113,19 +118,8 @@ function GameLobby() {
     const submitFormJoin = (event) => {
         event.preventDefault();
         setIsRedirecting(true);
-        const message = JSON.stringify({
-            request: "/join_game",
-            GameRoomID: GameRoomID,
-            name: namePlayer,
-        });
-        const ws = new WebSocket("ws://localhost:8000/gameroom/" + GameRoomID);
-        ws.onopen = () => ws.send(message);
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.status === "success") {
-                console.log(data.token);
-            }
-        };
+        joinRoomGame(namePlayer, TokenAccessGame);
+        setShowModal(false)
     };
 
     return (
