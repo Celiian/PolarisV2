@@ -1,0 +1,25 @@
+/* Modal.css */
+.modal-overlay {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.modal-content {
+  position: relative;
+  background-color: black;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}

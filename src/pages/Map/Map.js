@@ -1,110 +1,246 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, Layout, Hexagon } from "react-hexgrid";
+import { HexGrid, HexUtils, Layout } from "react-hexgrid";
+import axios from "axios";
+import "./Map.css";
+import Hexagon from "./Hexagons";
+import Controls from "./Controls";
+import Patterns from "./Patterns";
+import HexModal from "./HexModal";
+//import MiniMap from "./MiniMap";
+//import styled from "styled-components";
 
 function Map() {
-  const hexagonCount = 1000;
-  const hexagons = [];
-  const [viewBox, setViewBox] = useState("-50 -50 100 100");
-  const [speed, setSpeed] = useState(10);
+  const [selectedHex, setSelectedHex] = useState(null);
+  const [hexagons, setHexagons] = useState([]);
+  const hexagonSize = { x: 12, y: 12 };
+  const [speed, setSpeed] = useState(100);
   const [scale, setScale] = useState(0.6);
+  const [map, setMap] = useState([]);
+  const [mapSize, setMapSize] = useState(0);
+  const [mouseDown, setMouseDown] = useState(false);
+  const [lastMouseX, setLastMouseX] = useState(null);
+  const [lastMouseY, setLastMouseY] = useState(null);
+  const [isHexModalOpen, setIsHexModalOpen] = useState(false);
 
-  const handleKeyDown = (event) => {
-    const { keyCode } = event;
-    let newViewBox = viewBox;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
 
-    switch (keyCode) {
-      case 37: // Left arrow key
-        newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]} ${
-          viewBox.split(" ")[3]
-        }`;
-        break;
-      case 38: // Up arrow key
-        newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${viewBox.split(" ")[2]} ${
-          viewBox.split(" ")[3]
-        }`;
-        break;
-      case 39: // Right arrow key
-        newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]} ${
-          viewBox.split(" ")[3]
-        }`;
-        break;
-      case 40: // Down arrow key
-        newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${viewBox.split(" ")[2]} ${
-          viewBox.split(" ")[3]
-        }`;
-        break;
-      default:
-        break;
+  const viewBoxWidth = screenWidth;
+  const viewBoxHeight = screenHeight;
+  const viewBoxX = 0 - viewBoxWidth / 2;
+  const viewBoxY = 0 - viewBoxHeight / 2;
+
+  const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
+  const [viewBox, setViewBox] = useState(initialViewBox);
+
+  const handleMouseDown = (event) => {
+    setMouseDown(true);
+    setLastMouseX(event.clientX);
+    setLastMouseY(event.clientY);
+  };
+
+  const handleMouseMove = (event) => {
+    if (mouseDown) {
+      const deltaX = event.clientX - lastMouseX;
+      const deltaY = event.clientY - lastMouseY;
+      setLastMouseX(event.clientX);
+      setLastMouseY(event.clientY);
+
+      const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
+      const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+      setViewBox(newViewBox);
     }
+  };
 
-    setViewBox(newViewBox);
+  const handleMouseUp = () => {
+    setMouseDown(false);
   };
 
   const handleZoom = (event) => {
     const newZoom = event.target.value;
-    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
-    const newWidth = 100 / newZoom;
-    const newHeight = 100 / newZoom;
     setScale(newZoom);
-    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
-    setViewBox(newViewBox);
   };
 
-  const handleMouseDown = (event) => {
-    const startX = event.clientX;
-    const startY = event.clientY;
+  const handleHexClick = (hexa) => {
+    console.log(HexUtils.distance(hexa, { q: 0, r: 0, s: 0 }));
+    var desc = "";
+    var img = "";
+    if (hexa.fill == "void") {
+      desc = "Well it's just plain void, what were you expecting ? ";
+      img =
+        "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
+    }
 
-    const handleMouseMove = (event) => {
-      const deltaX = event.clientX - startX;
-      const deltaY = event.clientY - startY;
-      setViewBox(
-        `${parseFloat(viewBox.split(" ")[0]) - deltaX} ${parseFloat(viewBox.split(" ")[1]) - deltaY} ${
-          viewBox.split(" ")[2]
-        } ${viewBox.split(" ")[3]}`
-      );
-    };
+    const hex = { name: hexa.fill, image: img, description: desc };
+    setSelectedHex(hex);
+    setIsHexModalOpen(true);
+  };
 
-    const handleMouseUp = () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
+  const hexToPixel = (q, r, size) => {
+    const x = size * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
+    const y = size * ((3 / 2) * r);
+    return { x, y };
+  };
+  const isVisible = (hexa) => {
+    const hexaCoord = hexToPixel(hexa.q, hexa.r, hexagonSize.x);
+    const viewBoxValues = viewBox.split(" ");
+    const viewBoxX = parseFloat(viewBoxValues[0]);
+    const viewBoxY = parseFloat(viewBoxValues[1]);
+    const viewBoxWidth = parseFloat(viewBoxValues[2]);
+    const viewBoxHeight = parseFloat(viewBoxValues[3]);
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    const distanceThreshold = hexagonSize.x * 4;
+
+    if (
+      hexaCoord.x >= viewBoxX - distanceThreshold &&
+      hexaCoord.x <= viewBoxX + viewBoxWidth + distanceThreshold &&
+      hexaCoord.y >= viewBoxY - distanceThreshold &&
+      hexaCoord.y <= viewBoxY + viewBoxHeight + distanceThreshold
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const drawMap = () => {
+    var newHexagons = [];
+    map.forEach((item, index) => {
+      const hexa = JSON.parse(item);
+
+      if (isVisible(hexa)) {
+        var hexagon = null;
+        if (hexa.fill === "void") {
+          hexagon = (
+            <Hexagon
+              style={"void"}
+              fill=""
+              hexa={hexa}
+              handleClick={() => handleHexClick(hexa)}
+              key={index}
+              index={index}
+            ></Hexagon>
+          );
+        } else {
+          hexagon = (
+            <Hexagon
+              style={"planet"}
+              fill={hexa.fill}
+              hexa={hexa}
+              handleClick={() => handleHexClick(hexa)}
+              key={index}
+              index={index}
+            ></Hexagon>
+          );
+        }
+        newHexagons.push(hexagon);
+      }
+    });
+    setHexagons(newHexagons);
   };
 
   useEffect(() => {
+    if (map.length > 0) {
+      drawMap();
+    }
+  }, [map, viewBox]);
+
+  useEffect(() => {
+    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    const newWidth = 100 / scale;
+    const newHeight = 100 / scale;
+    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
+    setViewBox(newViewBox);
+  }, [scale]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await axios.get("http://127.0.0.1:8000/map/TxFsTzIMUEbQOsquv7vr");
+      const data = response.data;
+      setMapSize(data.size);
+      setMap(data.map);
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      setSpeed(100);
+      const { keyCode } = event;
+      let newViewBox = viewBox;
+      switch (keyCode) {
+        case 37: // Left arrow key
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
+          break;
+        case 38: // Up arrow key
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
+          break;
+        case 39: // Right arrow key
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
+          break;
+        case 40: // Down arrow key
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${viewBox.split(" ")[2]
+            } ${viewBox.split(" ")[3]}`;
+          break;
+        default:
+          break;
+      }
+      setViewBox(newViewBox);
+    };
+
     window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [viewBox, speed]);
 
-  const handleClick = (event, q, r, s) => {
-    console.log(`Clicked hexagon at q:${q}, r:${r}, s:${s}`);
-  };
-  var map_size = 50;
-  var minZoom = 0.2 / (map_size / 10);
-  for (let q = -map_size; q <= map_size; q++) {
-    const r1 = Math.max(-map_size, -q - map_size);
-    const r2 = Math.min(map_size, -q + map_size);
-    for (let r = r1; r <= r2; r++) {
-      const s = -q - r;
-      const hexagon = <Hexagon q={q} r={r} s={s} key={`${q}-${r}-${s}`} onClick={() => handleClick(q, r, s)} />;
-      hexagons.push(hexagon);
-    }
-  }
+  var minZoom = 0.25 / (mapSize / 10);
+
   return (
-    <div>
-      <div className="controls">
-        <input type="range" min={minZoom} max="1.5" step="0.1" value={scale} onChange={handleZoom} />
+    <div className="app">
+      <div class="navbar">
+        <p>Navbar</p>
       </div>
-      <HexGrid width={1200} height={800} viewBox={viewBox}>
-        <Layout size={{ x: 12, y: 12 }} flat={false} spacing={1.15} origin={{ x: -6, y: -6 }}>
+      <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
+      <HexGrid
+        width={"100vw"}
+        height={"100vh"}
+        viewBox={viewBox}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
           {hexagons}
         </Layout>
+        <Patterns />
       </HexGrid>
+
+      <div class="controlls-container">
+        <p>Controlls Container</p>
+      </div>
+
+      {isHexModalOpen && <HexModal hex={selectedHex} handleClose={() => setIsHexModalOpen(false)} />}
+      {/*
+      Commented because of optimisations, the minimap can be done but the map will feel to laggy.
+      <MiniMap
+
+       <h2>{hexaType}</h2>
+        <button onClick={() => setIsHexModalOpen(false)}>Close</button>
+
+        miniMap={map}
+        hexaSize={[hexagonSize.x / 4, hexagonSize.y / 4]}
+        isOpen={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
+      ></MiniMap>
+      */}
     </div>
   );
 }
