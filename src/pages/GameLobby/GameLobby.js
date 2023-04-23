@@ -19,9 +19,20 @@ function GameLobby() {
     const [TokenAccessGame, setTokenAccessGame] = useState("");
     const [showModal, setShowModal] = useState(false)
     const [accessStartBtn, setAccessStartBtn] = useState(true)
-    
+
 
     const baseUrl = "http://127.0.0.1:8000/";
+
+    const getGameRoomByToken = async (token_game_room) => {
+        try {
+            const response = await axios.get(baseUrl + `game_room/token/${token_game_room}`)
+            console.log(response)
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    }
 
     const joinRoomGame = async (player_name, token_game_room) => {
         try {
@@ -35,21 +46,11 @@ function GameLobby() {
     }
 
     useEffect(() => {
-        const storedGameRoomID = localStorage.getItem("GameRoomID");
-        if (storedGameRoomID) {
-            setGameRoomID(storedGameRoomID);
-        }
-    }, []);
-
-    useEffect(() => {
-        setPlayerOwner(localStorage.getItem("playerOwner"));
-        setTokenAccessGame(localStorage.getItem("TokenAccessGame"));
-        console.log(GameRoomID);
-
         const connectWebSocket = () => {
             console.log("Starting connection to WebSocket Server");
-            var ws = new WebSocket("ws://localhost:8000/gameroom/" + GameRoomID);
+            var ws = new WebSocket("ws://localhost:8000/gameroom/" + TokenAccessGame);
 
+            console.log(GameRoomID)
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 setPlayers(data.players);
@@ -95,7 +96,19 @@ function GameLobby() {
             setShowModal(false);
             setAccessStartBtn(true)
         }
-    }, []);
+        const cleanToken = token.slice(0, -2);
+        setTokenAccessGame(cleanToken)
+
+        if (TokenAccessGame) {
+            (async () => {
+                const response = await getGameRoomByToken(TokenAccessGame);
+                setGameRoomID(response.id_doc_game_room)
+                setPlayerOwner(response.room_game_owner);
+            })();
+        }
+    }, [TokenAccessGame]);
+
+
 
     const copyInviteLink = () => {
         let linkInvite = `${window.location.origin}/lobby?room=${TokenAccessGame}=1`
@@ -155,7 +168,7 @@ function GameLobby() {
                             <div className="main-buttons-actions">
 
                                 <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-                                {accessStartBtn === true && ( <StartButton message={"Launch"} onClickFunction={startGame} />)}
+                                {accessStartBtn === true && (<StartButton message={"Launch"} onClickFunction={startGame} />)}
                             </div>
                         </div>
                     </div>
