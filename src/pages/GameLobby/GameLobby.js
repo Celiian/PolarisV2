@@ -17,7 +17,9 @@ function GameLobby() {
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [GameRoomID, setGameRoomID] = useState("");
     const [TokenAccessGame, setTokenAccessGame] = useState("");
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false)
+    const [accessStartBtn, setAccessStartBtn] = useState(true)
+    
 
     const baseUrl = "http://127.0.0.1:8000/";
 
@@ -88,8 +90,10 @@ function GameLobby() {
         const token = params.get("room");
         if (token && token.endsWith("1")) {
             setShowModal(true);
+            setAccessStartBtn(false)
         } else {
             setShowModal(false);
+            setAccessStartBtn(true)
         }
     }, []);
 
@@ -151,7 +155,7 @@ function GameLobby() {
                             <div className="main-buttons-actions">
 
                                 <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-                                <StartButton message={"Launch"} onClickFunction={startGame} />
+                                {accessStartBtn === true && ( <StartButton message={"Launch"} onClickFunction={startGame} />)}
                             </div>
                         </div>
                     </div>
