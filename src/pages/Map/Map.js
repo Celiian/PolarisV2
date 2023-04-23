@@ -10,6 +10,8 @@ import HexModal from "./HexModal";
 //import styled from "styled-components";
 
 function Map() {
+  const [hexagonFills, setHexagonFills] = useState({});
+  const [hexagonClassNames, setHexagonClassNames] = useState({});
   const [selectedHex, setSelectedHex] = useState(null);
   const [hexagons, setHexagons] = useState([]);
   const hexagonSize = { x: 12, y: 12 };
@@ -62,7 +64,7 @@ function Map() {
     setScale(newZoom);
   };
 
-  const handleHexClick = (hexa) => {
+  const handleHexClick = (hexa, index) => {
     console.log(HexUtils.distance(hexa, { q: 0, r: 0, s: 0 }));
     var desc = "";
     var img = "";
@@ -74,7 +76,18 @@ function Map() {
 
     const hex = { name: hexa.fill, image: img, description: desc };
     setSelectedHex(hex);
-    setIsHexModalOpen(true);
+    //setIsHexModalOpen(true);
+
+    setHexagonClassNames((prev) => {
+      const updated = { ...prev };
+      updated[index] = "clicked";
+      return updated;
+    });
+    setHexagonFills((prev) => {
+      const updated = { ...prev };
+      updated[index] = "ship1";
+      return updated;
+    });
   };
 
   const hexToPixel = (q, r, size) => {
@@ -112,23 +125,25 @@ function Map() {
       if (isVisible(hexa)) {
         var hexagon = null;
         if (hexa.fill === "void") {
+          var style = "void";
           hexagon = (
             <Hexagon
-              style={"void"}
-              fill=""
+              className={hexagonClassNames[index] || style}
+              fill={hexagonFills[index]}
               hexa={hexa}
-              handleClick={() => handleHexClick(hexa)}
+              handleClick={() => handleHexClick(hexa, index)}
               key={index}
               index={index}
             ></Hexagon>
           );
         } else {
+          var style = "planet";
           hexagon = (
             <Hexagon
-              style={"planet"}
-              fill={hexa.fill}
+              className={hexagonClassNames[index] || style}
+              fill={hexagonFills[index] || hexa.fill}
               hexa={hexa}
-              handleClick={() => handleHexClick(hexa)}
+              handleClick={() => handleHexClick(hexa, index)}
               key={index}
               index={index}
             ></Hexagon>
@@ -167,26 +182,34 @@ function Map() {
   }, []);
 
   useEffect(() => {
+    drawMap();
+  }, [hexagonFills]);
+
+  useEffect(() => {
     const handleKeyDown = (event) => {
       setSpeed(100);
       const { keyCode } = event;
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
