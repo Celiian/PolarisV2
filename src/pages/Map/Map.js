@@ -10,6 +10,8 @@ import HexModal from "./HexModal";
 //import styled from "styled-components";
 
 function Map() {
+  const [playerName, setPlayerName] = useState("");
+  const [playerNumber, setPlayerNumber] = useState(0);
   const [selectedHex, setSelectedHex] = useState(null);
   const [hexagons, setHexagons] = useState([]);
   const hexagonSize = { x: 12, y: 12 };
@@ -156,37 +158,30 @@ function Map() {
   }, [scale]);
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await axios.get("http://127.0.0.1:8000/map/TxFsTzIMUEbQOsquv7vr");
-      const data = response.data;
-      setMapSize(data.size);
-      setMap(data.map);
-    }
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     const handleKeyDown = (event) => {
       setSpeed(100);
       const { keyCode } = event;
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${viewBox.split(" ")[2]
-            } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -200,6 +195,44 @@ function Map() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [viewBox, speed]);
+
+  useEffect(() => {
+    const connectWebSocket = () => {
+      console.log("Starting connection to WebSocket Server");
+      var ws = new WebSocket("ws://localhost:8000/map/");
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(data);
+      };
+
+      ws.onopen = function (event) {
+        console.log(event);
+        console.log("Successfully connected to the websocket server...");
+        if (localStorage.getItem("GameRoomID")) {
+          var playerName = localStorage.getItem("namePlayer");
+          setPlayerName(playerName);
+          var playerNumber = localStorage.getItem("numberPlayer");
+          setPlayerNumber(playerNumber);
+          const message = JSON.stringify({
+            request: "/map",
+            playerNumber: playerNumber,
+            GameRoomID: localStorage.getItem("GameRoomID"),
+          });
+          ws.send(message);
+          console.log("data sent");
+        } else {
+          console.log("GameRoomID is not defined");
+        }
+      };
+    };
+
+    if (localStorage.getItem("GameRoomID")) {
+      connectWebSocket();
+    } else {
+      console.log("WebSocket is not yet open, cannot send message");
+    }
+  }, []);
 
   var minZoom = 0.25 / (mapSize / 10);
 
@@ -232,7 +265,7 @@ function Map() {
       Commented because of optimisations, the minimap can be done but the map will feel to laggy.
       <MiniMap
 
-       <h2>{hexaType}</h2>
+      <h2>{hexaType}</h2>
         <button onClick={() => setIsHexModalOpen(false)}>Close</button>
 
         miniMap={map}
