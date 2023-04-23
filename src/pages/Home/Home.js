@@ -56,13 +56,6 @@ function Home() {
         const tokenRoom = generatedToken;
         createRoomGame(namePlayerInput, tokenRoom)
             .then((response) => {
-                const playerOwner = response.owner_room_game;
-                const createdGameRoomId = response.room_id;
-                const generatedTokenGameRoom = response.token_game_room;
-                localStorage.setItem("playerOwner", playerOwner);
-                localStorage.setItem("GameRoomID", createdGameRoomId);
-                localStorage.setItem("TokenAccessGame", generatedTokenGameRoom);
-                console.log(lien)
                 window.location.href = lien
             })
             .catch((error) => {
