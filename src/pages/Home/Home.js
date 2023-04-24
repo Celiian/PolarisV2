@@ -3,6 +3,7 @@ import axios from "axios";
 
 import "./Home.css";
 import BackGroundVideo from "../../assets/video/background-home.webm";
+import GameLogo from "../../assets/img/icons/logo.png"
 
 function Home() {
   const [nameOwnerPlayer, setNameOwnerPlayer] = useState("");
@@ -75,9 +76,9 @@ function Home() {
           <video autoPlay loop muted src={BackGroundVideo}></video>
         </div>
         <div className="p-8 main-content">
-          <h1 className="flex w-full justify-center font-bold text-center text-lime-400 text-6xl mb-8">
-            Bienvenue sur Colons de Polaris
-          </h1>
+            <div className="logo-container">
+                <img className="game-logo-img" src={GameLogo} alt="logo-game" />
+            </div>
           <div className="container-main">
             <div className="bg-white rounded-md shadow-md p-4 mb-4 dark:bg-gray-800">
               <form
@@ -96,7 +97,7 @@ function Home() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
+                  className="custom-button"
                 >
                   Create GameRoom
                 </button>
