@@ -10,8 +10,6 @@ import HexModal from "./HexModal";
 //import styled from "styled-components";
 
 function Map() {
-  const [playerName, setPlayerName] = useState("");
-  const [playerNumber, setPlayerNumber] = useState(0);
   const [selectedHex, setSelectedHex] = useState(null);
   const [hexagons, setHexagons] = useState([]);
   const hexagonSize = { x: 12, y: 12 };
@@ -62,10 +60,11 @@ function Map() {
   const handleZoom = (event) => {
     const newZoom = event.target.value;
     setScale(newZoom);
+    updateViewBox();
   };
 
   const handleHexClick = (hexa) => {
-    console.log(HexUtils.distance(hexa, { q: 0, r: 0, s: 0 }));
+    console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
     var desc = "";
     var img = "";
     if (hexa.fill == "void") {
@@ -82,8 +81,10 @@ function Map() {
   const hexToPixel = (q, r, size) => {
     const x = size * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
     const y = size * ((3 / 2) * r);
+
     return { x, y };
   };
+
   const isVisible = (hexa) => {
     const hexaCoord = hexToPixel(hexa.q, hexa.r, hexagonSize.x);
     const viewBoxValues = viewBox.split(" ");
@@ -110,15 +111,25 @@ function Map() {
     var newHexagons = [];
     map.forEach((item, index) => {
       const hexa = JSON.parse(item);
-
-      if (isVisible(hexa)) {
+      if (isVisible(hexa.coord)) {
         var hexagon = null;
         if (hexa.fill === "void") {
           hexagon = (
             <Hexagon
               style={"void"}
               fill=""
-              hexa={hexa}
+              hexa={hexa.coord}
+              handleClick={() => handleHexClick(hexa)}
+              key={index}
+              index={index}
+            ></Hexagon>
+          );
+        } else if (hexa.type == "base") {
+          hexagon = (
+            <Hexagon
+              style={"planet"}
+              fill={hexa.fill}
+              hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
               key={index}
               index={index}
@@ -129,7 +140,7 @@ function Map() {
             <Hexagon
               style={"planet"}
               fill={hexa.fill}
-              hexa={hexa}
+              hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
               key={index}
               index={index}
@@ -148,14 +159,14 @@ function Map() {
     }
   }, [map, viewBox]);
 
-  useEffect(() => {
+  const updateViewBox = () => {
     const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
     const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
     const newWidth = 100 / scale;
     const newHeight = 100 / scale;
     const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
-  }, [scale]);
+  };
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -203,17 +214,13 @@ function Map() {
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        console.log(data);
+        setMap(data.map);
       };
 
       ws.onopen = function (event) {
-        console.log(event);
         console.log("Successfully connected to the websocket server...");
         if (localStorage.getItem("GameRoomID")) {
-          var playerName = localStorage.getItem("namePlayer");
-          setPlayerName(playerName);
           var playerNumber = localStorage.getItem("numberPlayer");
-          setPlayerNumber(playerNumber);
           const message = JSON.stringify({
             request: "/map",
             playerNumber: playerNumber,
@@ -238,7 +245,7 @@ function Map() {
 
   return (
     <div className="app">
-      <div class="navbar">
+      <div className="navbar">
         <p>Navbar</p>
       </div>
       <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
@@ -256,7 +263,7 @@ function Map() {
         <Patterns />
       </HexGrid>
 
-      <div class="controlls-container">
+      <div className="controlls-container">
         <p>Controlls Container</p>
       </div>
 
