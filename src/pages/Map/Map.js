@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HexGrid, HexUtils, Layout } from "react-hexgrid";
+import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
 import "./Map.css";
 import Hexagon from "./Hexagons";
 import Controls from "./Controls";
@@ -112,9 +112,9 @@ function Map() {
     const newMap = [...map];
     const index1 = newMap.findIndex(
       (item) =>
-        JSON.parse(item).coord.q === hex1.q &&
-        JSON.parse(item).coord.r === hex1.r &&
-        JSON.parse(item).coord.s === hex1.s
+        JSON.parse(item).coord.q === hex1.coord.q &&
+        JSON.parse(item).coord.r === hex1.coord.r &&
+        JSON.parse(item).coord.s === hex1.coord.s
     );
     const index2 = newMap.findIndex(
       (item) =>
@@ -132,6 +132,8 @@ function Map() {
       hex1Data.coord = hex2Data.coord;
       hex2Data.coord = tempShipCoord;
 
+      hex1Data.fill = hex1.fill;
+
       newMap[index1] = JSON.stringify(hex1Data);
       newMap[index2] = JSON.stringify(hex2Data);
       setMap(newMap);
@@ -141,32 +143,65 @@ function Map() {
     }
   };
 
-  useEffect(() => {
-    if (selectedShip) {
-      moveShip(selectedShip);
-    }
-  }, [selectedShip]);
+  const getRotationDegree = (hex1, hex2) => {
+    const directionVectors = {
+      "1,-1,0": "45",
+      "0,-1,1": "-45",
+      "1,0,-1": "90",
+      "-1,0,1": "-90",
+      "-1,1,0": "-135",
+      "0,1,-1": "135",
+    };
 
-  const handleHexClick = (hexa) => {
+    const hexDifference = new Hex(hex2.q - hex1.q, hex2.r - hex1.r, hex2.s - hex1.s);
+    const hexDifferenceKey = `${hexDifference.q},${hexDifference.r},${hexDifference.s}`;
+    for (const [key, value] of Object.entries(directionVectors)) {
+      if (key === hexDifferenceKey) {
+        return parseInt(value, 10);
+      }
+    }
+
+    // Return -1 if the hexagons are not neighbors
+    return -1;
+  };
+
+  const handleHexClick = async (hexa) => {
     if (moving) {
       if (
         hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "movable" ||
         hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "path"
       ) {
-        var path = findPath(selectedShip.coord, hexa.coord);
-        setSelectedShip(swapHexagons(selectedShip.coord, path.pop())[0]);
-        var newHexagonClassNames = {};
-        let updateHexagonClassNames = { ...hexagonClassNames }; // make a copy of the current classNames object
-        for (var index in updateHexagonClassNames) {
-          if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
-            newHexagonClassNames[index] = updateHexagonClassNames[index];
+        let path = findPath(selectedShip.coord, hexa.coord);
+        path.shift();
+        let ship = selectedShip;
+        setHexagonInPath([]);
+        for (let indexPath in path) {
+          let nextCase = path[indexPath];
+          let rotation = getRotationDegree(ship.coord, nextCase);
+          ship = selectedShip;
+          if (ship.fill.split("/").length > 1) {
+            ship.fill = ship.fill.split("/")[0] + "/" + rotation;
+          } else {
+            ship.fill += "/" + rotation;
           }
+          let newHexas = swapHexagons(ship, nextCase);
+          setSelectedShip(newHexas[0]);
+          ship = newHexas[0];
+          let newHexagonClassNames = {};
+          let updateHexagonClassNames = { ...hexagonClassNames };
+          for (let index in updateHexagonClassNames) {
+            if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
+              newHexagonClassNames[index] = updateHexagonClassNames[index];
+            }
+          }
+
+          setHexagonClassNames(newHexagonClassNames);
+          await delay(500);
         }
-      } else {
-        console.log("you can't");
+        setMoving(false);
+        setSelectedShip(null);
       }
     } else {
-      console.log(hexa);
       console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
       var desc = "";
       var img = "";
@@ -181,6 +216,8 @@ function Map() {
       setIsHexModalOpen(true);
     }
   };
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleShipClick = (hexa) => {
     setSelectedShip(hexa);
@@ -295,7 +332,7 @@ function Map() {
   // Call drawMap() after updating classNames
   useEffect(() => {
     drawMap();
-  }, [hexagonClassNames]);
+  }, [hexagonClassNames, selectedShip]);
 
   const drawMap = () => {
     var newHexagons = [];
