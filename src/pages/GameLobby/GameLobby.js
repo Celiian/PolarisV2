@@ -26,7 +26,9 @@ function GameLobby() {
 
   const getGameRoomByToken = async (token_game_room) => {
     try {
-      const response = await axios.get(baseUrl + `game_room/token/${token_game_room}`);
+      const response = await axios.get(
+        baseUrl + `game_room/token/${token_game_room}`
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -37,7 +39,9 @@ function GameLobby() {
 
   const joinRoomGame = async (player_name, token_game_room) => {
     try {
-      const response = await axios.post(baseUrl + `join/game_room/${player_name}/${token_game_room}`);
+      const response = await axios.post(
+        baseUrl + `join/game_room/${player_name}/${token_game_room}`
+      );
       const { name, number } = response.data.player_data;
       setNamePlayer(name);
       setNumberPlayer(number);
@@ -50,7 +54,9 @@ function GameLobby() {
 
   const startRoomGame = async (GameRoomID) => {
     try {
-      const response = await axios.post(baseUrl + `start/game_room/${GameRoomID}`);
+      const response = await axios.post(
+        baseUrl + `start/game_room/${GameRoomID}`
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -61,7 +67,9 @@ function GameLobby() {
 
   const generateMap = async (GameRoomID) => {
     try {
-      const response = await axios.post(baseUrl + `map/generate/40/${GameRoomID}`);
+      const response = await axios.post(
+        baseUrl + `map/generate/40/${GameRoomID}`
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -165,19 +173,29 @@ function GameLobby() {
           <video autoPlay loop muted src={BackGroundVideo}></video>
         </div>
         <div className="p-20 flex flex-col">
-          <h1 className="text-white text-center font-bold text-2xl">Bienvenue dans votre GameLobby</h1>
+          <h1 className="text-white text-center font-bold text-2xl">
+            Bienvenue dans votre GameLobby
+          </h1>
           <div className="flex flex-row p-14 justify-around">
             <div className="players-list-container">
-              <div className="flex flex-col w-9/12 h-full justify-around">
+              <div className="flex flex-col w-9/12 h-full">
                 <p className="owner-player-p">
-                  <img className="owner_player_logo" src={CrownAstronautLogo} alt="Logo Owner Astronaut" />
+                  <img
+                    className="owner_player_logo"
+                    src={CrownAstronautLogo}
+                    alt="Logo Owner Astronaut"
+                  />
                   {playerOwner}
                 </p>
                 {players.map((player, index) => (
-                  <div key={index}>
+                  <div key={index} className="pt-5">
                     {player.name ? (
                       <p className="players_logos_lobby">
-                        <img className="players_logo" src={AstronautLogo} alt="Logo Astronaut" />
+                        <img
+                          className="players_logo"
+                          src={AstronautLogo}
+                          alt="Logo Astronaut"
+                        />
                         {player.name}
                       </p>
                     ) : (
@@ -196,8 +214,13 @@ function GameLobby() {
                 <li>Voleur</li>
               </ul>
               <div className="main-buttons-actions">
-                <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-                {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={startGame} />}
+                <InviteButton
+                  message={"Invite"}
+                  onClickFunction={copyInviteLink}
+                />
+                {accessStartBtn === true && (
+                  <StartButton message={"Launch"} onClickFunction={startGame} />
+                )}
               </div>
             </div>
           </div>
@@ -218,7 +241,10 @@ function GameLobby() {
               >
                 <div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <h3 className="text-lg leading-6 font-medium text-white" id="modal-headline">
+                    <h3
+                      className="text-lg leading-6 font-medium text-white"
+                      id="modal-headline"
+                    >
                       Entrez votre nom pour rejoindre la partie
                     </h3>
                     <div className="mt-2">
