@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { HexGrid, HexUtils, Layout } from "react-hexgrid";
-import axios from "axios";
 import "./Map.css";
 import Hexagon from "./Hexagons";
 import Controls from "./Controls";
 import Patterns from "./Patterns";
 import HexModal from "./HexModal";
+import ShipModal from "./ShipModal";
 //import MiniMap from "./MiniMap";
 //import styled from "styled-components";
 
 function Map() {
+  const [hexagonClassNames, setHexagonClassNames] = useState({});
+  const [hexagonInPath, setHexagonInPath] = useState({});
+  const [isShipModalOpen, setIsShipModalOpen] = useState(false);
+  const [selectedShip, setSelectedShip] = useState(null);
   const [selectedHex, setSelectedHex] = useState(null);
   const [hexagons, setHexagons] = useState([]);
   const hexagonSize = { x: 12, y: 12 };
@@ -63,7 +67,42 @@ function Map() {
     updateViewBox();
   };
 
+  const moveShip = (ship) => {
+    // Get the ship's current hexagon
+    const shipHex = ship.coord;
+
+    // Iterate over all hexagons in the map
+    map.forEach((item) => {
+      const hexa = JSON.parse(item);
+      if (hexa.fill == "void") {
+        const hex = hexa.coord;
+
+        // Check the distance between the ship's hexagon and the current hexagon
+        const distance = HexUtils.distance(shipHex, hex);
+
+        // If the distance is less than or equal to 5, update the hexagon's class
+        if (distance <= 5) {
+          const hexKey = `${hex.q},${hex.r},${hex.s}`;
+
+          setHexagonClassNames((prev) => {
+            const updated = { ...prev };
+            updated[hexKey] = "movable";
+            return updated;
+          });
+
+          setHexagonInPath((prev) => {
+            const updated = { ...prev };
+            updated[hexKey] = true;
+            return updated;
+          });
+        }
+      }
+    });
+    drawMap();
+  };
+
   const handleHexClick = (hexa) => {
+    console.log(hexa);
     console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
     var desc = "";
     var img = "";
@@ -76,6 +115,76 @@ function Map() {
     const hex = { name: hexa.fill, image: img, description: desc };
     setSelectedHex(hex);
     setIsHexModalOpen(true);
+  };
+
+  const handleShipClick = (hexa) => {
+    setSelectedShip(hexa);
+    setIsShipModalOpen(true);
+  };
+
+  const findPath = (hexStart, hexEnd) => {
+    // Create a list of open and closed hexagons
+    const openSet = [hexStart];
+    const closedSet = [];
+
+    // Create a dictionary to keep track of the parent of each hexagon
+    const cameFrom = {};
+
+    // Create a dictionary to keep track of the cost of getting to each hexagon
+    const gScore = {};
+    gScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = 0;
+
+    // Create a dictionary to keep track of the estimated cost to get from the start to the end via each hexagon
+    const fScore = {};
+    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(hexStart, hexEnd);
+
+    while (openSet.length > 0) {
+      // Get the hexagon with the lowest fScore value
+      const current = openSet.reduce((a, b) =>
+        fScore[`${a.q},${a.r},${a.s}`] < fScore[`${b.q},${b.r},${b.s}`] ? a : b
+      );
+
+      // If we have reached the end hexagon, reconstruct the path and return it
+      if (current.q === hexEnd.q && current.r === hexEnd.r && current.s === hexEnd.s) {
+        const path = [current];
+        while (cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]) {
+          path.unshift(cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]);
+        }
+        return path;
+      }
+
+      // Remove the current hexagon from the open set and add it to the closed set
+      openSet.splice(openSet.indexOf(current), 1);
+      closedSet.push(current);
+
+      // Check all neighboring hexagons
+      const neighbors = HexUtils.neighbors(current);
+      neighbors.forEach((neighbor) => {
+        // If the neighbor is already in the closed set, skip it
+        if (closedSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
+          return;
+        }
+
+        // Calculate the tentative gScore value for the neighbor
+        const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
+
+        // If the neighbor is not in the open set, add it
+        if (!openSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
+          openSet.push(neighbor);
+        } else if (tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]) {
+          // If the tentative gScore is not better than the current gScore for the neighbor, skip it
+          return;
+        }
+
+        // This path is the best until now. Record it!
+        cameFrom[`${neighbor.q},${neighbor.r},${neighbor.s}`] = current;
+        gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore;
+        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore + HexUtils.distance(neighbor, hexEnd);
+      });
+    }
+
+    // If we have not found a path, return null
+    return null;
   };
 
   const hexToPixel = (q, r, size) => {
@@ -107,43 +216,84 @@ function Map() {
     }
   };
 
+  const handleHexagonMouseEnter = (hexa) => {
+    console.log("enter");
+
+    var newHexagonClassNames = {};
+    let updateHexagonClassNames = { ...hexagonClassNames }; // make a copy of the current classNames object
+    for (var hex in updateHexagonClassNames) {
+      if (updateHexagonClassNames[hex] != "path") {
+        newHexagonClassNames[hex] = updateHexagonClassNames[hex];
+      } else {
+        newHexagonClassNames[hex] = "movable";
+      }
+    }
+    console.log(newHexagonClassNames);
+    setHexagonClassNames(newHexagonClassNames);
+
+    var hexaPath = findPath(selectedShip.coord, hexa.coord);
+    hexaPath.shift();
+
+    for (var hex of hexaPath) {
+      const hexKey = `${hex.q},${hex.r},${hex.s}`;
+      newHexagonClassNames[hexKey] = "path"; // update only the class name for hexagons along the path
+    }
+
+    setHexagonClassNames(newHexagonClassNames); // set the updated classNames object
+  };
+
+  const handleHexagonMouseLeave = (hexa) => {};
+
+  // Call drawMap() after updating classNames
+  useEffect(() => {
+    drawMap();
+  }, [hexagonClassNames]);
+
   const drawMap = () => {
     var newHexagons = [];
     map.forEach((item, index) => {
       const hexa = JSON.parse(item);
       if (isVisible(hexa.coord)) {
         var hexagon = null;
+        const key = `${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`;
+
         if (hexa.fill === "void") {
           hexagon = (
             <Hexagon
-              style={"void"}
+              style={hexagonClassNames[key] || "void"}
               fill=""
               hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
-              key={index}
-              index={index}
+              key={key}
+              index={key}
+              onMouseEnter={hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null}
+              onMouseLeave={hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null}
             ></Hexagon>
           );
         } else if (hexa.type == "base") {
           hexagon = (
             <Hexagon
-              style={"planet"}
-              fill={hexa.fill}
+              style="planet"
+              fill={hexa.type + "/" + hexa.fill}
               hexa={hexa.coord}
-              handleClick={() => handleHexClick(hexa)}
-              key={index}
-              index={index}
+              handleClick={() => handleShipClick(hexa)}
+              key={key}
+              index={key}
+              onMouseEnter={null}
+              onMouseLeave={null}
             ></Hexagon>
           );
         } else {
           hexagon = (
             <Hexagon
-              style={"planet"}
+              style={hexagonClassNames[key] || "planet"}
               fill={hexa.fill}
               hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
-              key={index}
-              index={index}
+              key={key}
+              index={key}
+              onMouseEnter={null}
+              onMouseLeave={null}
             ></Hexagon>
           );
         }
@@ -266,7 +416,13 @@ function Map() {
       <div className="controlls-container">
         <p>Controlls Container</p>
       </div>
-
+      {isShipModalOpen && (
+        <ShipModal
+          ship={selectedShip}
+          handleMove={() => moveShip(selectedShip)}
+          handleClose={() => setIsShipModalOpen(false)}
+        />
+      )}
       {isHexModalOpen && <HexModal hex={selectedHex} handleClose={() => setIsHexModalOpen(false)} />}
       {/*
       Commented because of optimisations, the minimap can be done but the map will feel to laggy.

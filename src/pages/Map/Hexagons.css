@@ -2,6 +2,10 @@
   fill-opacity: 0.1;
 }
 
+.highlight {
+  fill: rgba(0, 255, 0, 0.5);
+}
+
 .void:hover {
   fill: aliceblue;
   fill-opacity: 0.5;
@@ -9,6 +13,16 @@
 
 .planet:hover {
   fill-opacity: 0.7;
+}
+
+.movable {
+  fill: rgb(209, 210, 212);
+  fill-opacity: 0.3;
+}
+
+.path {
+  fill: aliceblue;
+  fill-opacity: 0.5;
 }
 
 .d1 {
