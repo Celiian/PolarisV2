@@ -196,7 +196,7 @@ function Map() {
           }
 
           setHexagonClassNames(newHexagonClassNames);
-          await delay(500);
+          await delay(600);
         }
         setMoving(false);
         setSelectedShip(null);
