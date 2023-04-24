@@ -5,7 +5,7 @@ import Agri from "../../assets/img/planets/planet-agri.webp";
 import Mine from "../../assets/img/planets/planet-mine.webp";
 import Indu from "../../assets/img/planets/planet-indu.webp";
 import Atmo from "../../assets/img/planets/planet-atmo.webp";
-import Base1 from "../../assets/img/ships/ship1/base.png";
+import Base1 from "../../assets/img/ships/ship1/base/base.png";
 
 const Patterns = () => (
   <>
