@@ -9,6 +9,7 @@ import "./GameLobby.css";
 import CrownAstronautLogo from "../../assets/img/icons/crown_astronaut.png";
 import AstronautLogo from "../../assets/img/icons/astronaut.png";
 import BackGroundVideo from "../../assets/video/background-home.webm";
+import GameLogo from "../../assets/img/icons/logo.png"
 
 function GameLobby() {
   const [started, setStarted] = useState(false);
@@ -172,11 +173,11 @@ function GameLobby() {
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideo}></video>
         </div>
-        <div className="p-20 flex flex-col">
-          <h1 className="text-white text-center font-bold text-2xl">
-            Bienvenue dans votre GameLobby
-          </h1>
-          <div className="flex flex-row p-14 justify-around">
+        <div className="p-10 flex flex-col">
+        <div className="logo-container">
+                <img className="game-logo-img" src={GameLogo} alt="logo-game" />
+            </div>
+          <div className="flex flex-row justify-around">
             <div className="players-list-container">
               <div className="flex flex-col w-9/12 h-full">
                 <p className="owner-player-p">
