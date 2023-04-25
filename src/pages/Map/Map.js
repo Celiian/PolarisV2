@@ -99,19 +99,25 @@ function Map() {
         const distance = HexUtils.distance(shipHex, hex);
 
         if (distance <= 5) {
-          const hexKey = `${hex.q},${hex.r},${hex.s}`;
+          var path = [];
+          if (distance == 5) {
+            path = findPath(shipHex, hex);
+          }
+          if (path.length < 7) {
+            const hexKey = `${hex.q},${hex.r},${hex.s}`;
 
-          setHexagonClassNames((prev) => {
-            const updated = { ...prev };
-            updated[hexKey] = "movable";
-            return updated;
-          });
+            setHexagonClassNames((prev) => {
+              const updated = { ...prev };
+              updated[hexKey] = "movable";
+              return updated;
+            });
 
-          setHexagonInPath((prev) => {
-            const updated = { ...prev };
-            updated[hexKey] = true;
-            return updated;
-          });
+            setHexagonInPath((prev) => {
+              const updated = { ...prev };
+              updated[hexKey] = true;
+              return updated;
+            });
+          }
         }
       }
     });
@@ -232,44 +238,47 @@ function Map() {
         hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "path"
       ) {
         let path = findPath(selectedShip.coord, hexa.coord);
-        path.shift();
-        let ship = selectedShip;
-        setHexagonInPath([]);
-        for (let indexPath in path) {
-          let nextCase = path[indexPath];
-          let rotation = getRotationDegree(ship.coord, nextCase);
-          ship = selectedShip;
-          if (ship.fill.split("/").length > 1) {
-            ship.fill = ship.fill.split("/")[0] + "/" + rotation;
-          } else {
-            ship.fill += "/" + rotation;
-          }
-          let newHexas = swapHexagons(ship, nextCase);
-          setSelectedShip(newHexas[0]);
-          ship = newHexas[0];
-          let newHexagonClassNames = {};
-          let updateHexagonClassNames = { ...hexagonClassNames };
-          for (let index in updateHexagonClassNames) {
-            if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
-              newHexagonClassNames[index] = updateHexagonClassNames[index];
+        console.log(path);
+        if (path.length < 7) {
+          path.shift();
+          let ship = selectedShip;
+          setHexagonInPath([]);
+          for (let indexPath in path) {
+            let nextCase = path[indexPath];
+            let rotation = getRotationDegree(ship.coord, nextCase);
+            ship = selectedShip;
+            if (ship.fill.split("/").length > 1) {
+              ship.fill = ship.fill.split("/")[0] + "/" + rotation;
+            } else {
+              ship.fill += "/" + rotation;
             }
-          }
+            let newHexas = swapHexagons(ship, nextCase);
+            setSelectedShip(newHexas[0]);
+            ship = newHexas[0];
+            let newHexagonClassNames = {};
+            let updateHexagonClassNames = { ...hexagonClassNames };
+            for (let index in updateHexagonClassNames) {
+              if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
+                newHexagonClassNames[index] = updateHexagonClassNames[index];
+              }
+            }
 
-          if (playerData) {
-            var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
-            updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
-            setPlayerData(updatedPlayerData);
-            updatePlayerData(
-              localStorage.getItem("GameRoomID"),
-              updatedPlayerData.number,
-              updatedPlayerData.player_map
-            );
+            if (playerData) {
+              var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
+              updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
+              setPlayerData(updatedPlayerData);
+              updatePlayerData(
+                localStorage.getItem("GameRoomID"),
+                updatedPlayerData.number,
+                updatedPlayerData.player_map
+              );
+            }
+            setHexagonClassNames(newHexagonClassNames);
+            await delay(600);
           }
-          setHexagonClassNames(newHexagonClassNames);
-          await delay(600);
+          setMoving(false);
+          setSelectedShip(null);
         }
-        setMoving(false);
-        setSelectedShip(null);
       }
     } else {
       console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
@@ -326,6 +335,17 @@ function Map() {
       neighbors.forEach((neighbor) => {
         if (closedSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
           return;
+        }
+
+        // Check if the neighbor is an obstacle
+
+        for (let i = 0; i < map.length; i++) {
+          const hex = JSON.parse(map[i]);
+          if (hex.coord.q === neighbor.q && hex.coord.r === neighbor.r && hex.coord.s === neighbor.s) {
+            if (hex.type == "planet" || hex.type == "base" || hex.type == "ship" || hex.type == "miner") {
+              return;
+            }
+          }
         }
 
         const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
@@ -387,6 +407,9 @@ function Map() {
     setHexagonClassNames(newHexagonClassNames);
 
     var hexaPath = findPath(selectedShip.coord, hexa.coord);
+    while (hexaPath.length >= 7) {
+      hexaPath.pop();
+    }
     hexaPath.shift();
 
     for (var hex of hexaPath) {
@@ -549,11 +572,13 @@ function Map() {
             });
             setFirst(false);
           }
-
+          console.log("map data retrieved");
           setMap(response.data.map);
         } else if (response.type == "player") {
+          console.log("player data retrieved");
           setPlayerData(response.data);
         } else if (response.type == "room") {
+          console.log("room data retrieved");
           setRoomData(response.data);
         }
       };
@@ -638,12 +663,14 @@ function Map() {
         <p>Controlls Container</p>
       </div>
       */}
-      {isShipModalOpen && (
+      {isShipModalOpen && selectedShip ? (
         <ShipModal
           ship={selectedShip}
           handleMove={() => moveShip(selectedShip)}
           handleClose={() => setIsShipModalOpen(false)}
         />
+      ) : (
+        <></>
       )}
       {isHexModalOpen && <HexModal showModal={true} handleModalClose={() => setIsHexModalOpen(false)} />}
       {/*
