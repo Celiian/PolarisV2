@@ -5,6 +5,7 @@ import Agri from "../../assets/img/planets/planet-agri.webp";
 import Mine from "../../assets/img/planets/planet-mine.webp";
 import Indu from "../../assets/img/planets/planet-indu.webp";
 import Atmo from "../../assets/img/planets/planet-atmo.webp";
+import Ship1 from "../../assets/img/ships/ship1/ship.png";
 
 import Base1 from "../../assets/img/ships/ship1/base/base.png";
 import Base145 from "../../assets/img/ships/ship1/base/base45.png";
@@ -58,6 +59,7 @@ const Patterns = () => (
     <Pattern id="indu" link={Indu} size={{ x: 10, y: 12 }} />
     <Pattern id="atmo" link={Atmo} size={{ x: 10, y: 12 }} />
 
+
     <Pattern id="base/1" link={Base1} size={{ x: 10, y: 12 }} />
     <Pattern id="base/1/45" link={Base145} size={{ x: 10, y: 12 }} />
     <Pattern id="base/1/-90" link={Base190} size={{ x: 10, y: 12 }} />
@@ -105,6 +107,7 @@ const Patterns = () => (
     <Pattern id="miner/2/-45" link={Miner2_45} size={{ x: 10, y: 12 }} />
     <Pattern id="miner/2/-90" link={Miner2_90} size={{ x: 10, y: 12 }} />
     <Pattern id="miner/2/-135" link={Miner2_135} size={{ x: 10, y: 12 }} />
+
   </>
 );
 

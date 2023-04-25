@@ -41,6 +41,7 @@ const ressourceImages = {
 };
 
 function Map() {
+
   const [hexagonClassNames, setHexagonClassNames] = useState({});
   const [hexagonInPath, setHexagonInPath] = useState({});
   const [isShipModalOpen, setIsShipModalOpen] = useState(false);
@@ -353,6 +354,7 @@ function Map() {
     }
   };
 
+
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleShipClick = (hexa) => {
@@ -420,6 +422,7 @@ function Map() {
     }
 
     return null;
+
   };
 
   const hexToPixel = (q, r, size) => {
@@ -508,8 +511,10 @@ function Map() {
           }
         }
         if (hexa.fill === "void") {
+          var style = "void";
           hexagon = (
             <Hexagon
+
               style={hexagonClassNames[key] || style}
               stroke={stroke}
               fill={fill ? "" : ""}
@@ -536,8 +541,10 @@ function Map() {
             ></Hexagon>
           );
         } else {
+          var style = "planet";
           hexagon = (
             <Hexagon
+
               style={hexagonClassNames[key] || style}
               stroke={stroke}
               fill={fill ? "" : hexa.fill}
@@ -547,6 +554,7 @@ function Map() {
               index={key}
               onMouseEnter={null}
               onMouseLeave={null}
+
             ></Hexagon>
           );
         }
@@ -570,6 +578,10 @@ function Map() {
     const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
   };
+
+  useEffect(() => {
+    drawMap();
+  }, [hexagonFills]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
