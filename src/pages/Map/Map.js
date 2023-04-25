@@ -498,9 +498,9 @@ function Map() {
         <Patterns />
       </HexGrid>
 
-      <div className="controlls-container">
+      {/*  <div className="controlls-container">
         <p>Controlls Container</p>
-      </div>
+      </div>*/}
       {isShipModalOpen && (
         <ShipModal
           ship={selectedShip}
@@ -508,7 +508,7 @@ function Map() {
           handleClose={() => setIsShipModalOpen(false)}
         />
       )}
-      {isHexModalOpen && <HexModal hex={selectedHex} handleClose={() => setIsHexModalOpen(false)} />}
+      {isHexModalOpen && <HexModal showModal={true} handleModalClose={() => setIsHexModalOpen(false)} />}
       {/*
       Commented because of optimisations, the minimap can be done but the map will feel to laggy.
       <MiniMap
