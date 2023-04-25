@@ -16,6 +16,13 @@ import Ship2 from "../../assets/img/ships/ship2/ship/ship.png";
 import Ship3 from "../../assets/img/ships/ship3/ship/ship.png";
 import Ship4 from "../../assets/img/ships/ship4/ship/ship.png";
 
+const ships = {
+  Ship1,
+  Ship2,
+  Ship3,
+  Ship4,
+};
+
 function Map() {
   const [hexagonClassNames, setHexagonClassNames] = useState({});
   const [hexagonInPath, setHexagonInPath] = useState({});
@@ -35,6 +42,8 @@ function Map() {
   const [moving, setMoving] = useState(false);
   const [playerData, setPlayerData] = useState({});
   const [roomData, setRoomData] = useState({});
+  const [players, setPlayers] = useState([]);
+  const [ressources, setRessources] = useState({});
 
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
@@ -62,7 +71,9 @@ function Map() {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
+        viewBox.split(" ")[3]
+      }`;
       setViewBox(newViewBox);
     }
   };
@@ -84,7 +95,10 @@ function Map() {
     var newHexagonClassNames = {};
     let updateHexagonClassNames = { ...hexagonClassNames }; // make a copy of the current classNames object
     for (var index in updateHexagonClassNames) {
-      if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
+      if (
+        updateHexagonClassNames[index] != "movable" &&
+        updateHexagonClassNames[index] != "path"
+      ) {
         newHexagonClassNames[index] = updateHexagonClassNames[index];
       }
     }
@@ -162,7 +176,11 @@ function Map() {
       "0,1,-1": "135",
     };
 
-    const hexDifference = new Hex(hex2.q - hex1.q, hex2.r - hex1.r, hex2.s - hex1.s);
+    const hexDifference = new Hex(
+      hex2.q - hex1.q,
+      hex2.r - hex1.r,
+      hex2.s - hex1.s
+    );
     const hexDifferenceKey = `${hexDifference.q},${hexDifference.r},${hexDifference.s}`;
     for (const [key, value] of Object.entries(directionVectors)) {
       if (key === hexDifferenceKey) {
@@ -177,8 +195,10 @@ function Map() {
   const handleHexClick = async (hexa) => {
     if (moving) {
       if (
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "movable" ||
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "path"
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
+          "movable" ||
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
+          "path"
       ) {
         let path = findPath(selectedShip.coord, hexa.coord);
         path.shift();
@@ -199,7 +219,10 @@ function Map() {
           let newHexagonClassNames = {};
           let updateHexagonClassNames = { ...hexagonClassNames };
           for (let index in updateHexagonClassNames) {
-            if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
+            if (
+              updateHexagonClassNames[index] != "movable" &&
+              updateHexagonClassNames[index] != "path"
+            ) {
               newHexagonClassNames[index] = updateHexagonClassNames[index];
             }
           }
@@ -243,14 +266,21 @@ function Map() {
     gScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = 0;
 
     const fScore = {};
-    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(hexStart, hexEnd);
+    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(
+      hexStart,
+      hexEnd
+    );
 
     while (openSet.length > 0) {
       const current = openSet.reduce((a, b) =>
         fScore[`${a.q},${a.r},${a.s}`] < fScore[`${b.q},${b.r},${b.s}`] ? a : b
       );
 
-      if (current.q === hexEnd.q && current.r === hexEnd.r && current.s === hexEnd.s) {
+      if (
+        current.q === hexEnd.q &&
+        current.r === hexEnd.r &&
+        current.s === hexEnd.s
+      ) {
         const path = [current];
         while (cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]) {
           path.unshift(cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]);
@@ -263,21 +293,39 @@ function Map() {
 
       const neighbors = HexUtils.neighbors(current);
       neighbors.forEach((neighbor) => {
-        if (closedSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
+        if (
+          closedSet.some(
+            (hex) =>
+              hex.q === neighbor.q &&
+              hex.r === neighbor.r &&
+              hex.s === neighbor.s
+          )
+        ) {
           return;
         }
 
-        const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
+        const tentativeGScore =
+          gScore[`${current.q},${current.r},${current.s}`] + 1;
 
-        if (!openSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
+        if (
+          !openSet.some(
+            (hex) =>
+              hex.q === neighbor.q &&
+              hex.r === neighbor.r &&
+              hex.s === neighbor.s
+          )
+        ) {
           openSet.push(neighbor);
-        } else if (tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]) {
+        } else if (
+          tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]
+        ) {
           return;
         }
 
         cameFrom[`${neighbor.q},${neighbor.r},${neighbor.s}`] = current;
         gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore;
-        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore + HexUtils.distance(neighbor, hexEnd);
+        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] =
+          tentativeGScore + HexUtils.distance(neighbor, hexEnd);
       });
     }
 
@@ -360,8 +408,12 @@ function Map() {
               handleClick={() => handleHexClick(hexa)}
               key={key}
               index={key}
-              onMouseEnter={hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null}
-              onMouseLeave={hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null}
+              onMouseEnter={
+                hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null
+              }
+              onMouseLeave={
+                hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null
+              }
             ></Hexagon>
           );
         } else if (hexa.type == "base") {
@@ -404,11 +456,15 @@ function Map() {
   }, [map, viewBox]);
 
   const updateViewBox = () => {
-    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    const centerX =
+      parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY =
+      parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
     const newWidth = 100 / scale;
     const newHeight = 100 / scale;
-    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
+    const newViewBox = `${centerX - newWidth / 2} ${
+      centerY - newHeight / 2
+    } ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
   };
 
@@ -419,24 +475,24 @@ function Map() {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
+            viewBox.split(" ")[1]
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${
+            parseFloat(viewBox.split(" ")[1]) - speed
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
+            viewBox.split(" ")[1]
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${
+            parseFloat(viewBox.split(" ")[1]) + speed
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -464,6 +520,7 @@ function Map() {
           setPlayerData(response.data);
         } else if (response.type == "room") {
           setRoomData(response.data);
+          setPlayers(response.data.players);
         }
       };
 
@@ -493,37 +550,43 @@ function Map() {
 
   var minZoom = 0.25 / (mapSize / 10);
 
+  console.log(roomData);
+
   return (
     <div className="app">
       <div className="navbar">
         <div className="player-list-container">
           <div className="players">
             <div className="player-container">
-              <img className="img-ship-players" src={Ship1} alt="ship-player1" />
+              <img
+                className="img-ship-players"
+                src={Ship1}
+                alt="ship-player1"
+              />
             </div>
             <p>{playerData.name}</p>
           </div>
-          <div className="players">
-            <div className="player-container">
-              <img className="img-ship-players" src={Ship2} alt="ship-player1" />
+          {players.map((player, index) => (
+            <div key={index} className="players">
+              {player.name ? (
+                <>
+                  <div className="player-container">
+                    <img
+                      className="img-ship-players"
+                      src={ships[`Ship${player.number}`]}
+                      alt={`ship-player${player.number}`}
+                    />
+                  </div>
+                  <p>{player.name}</p>
+                </>
+              ) : (
+                <div className="player-container"></div>
+              )}
             </div>
-            <p>Player2</p>
-          </div>
-          <div className="players">
-            <div className="player-container">
-              <img className="img-ship-players" src={Ship3} alt="ship-player1" />
-            </div>
-            <p>Player3</p>
-          </div>
-          <div className="players">
-            <div className="player-container">
-              <img className="img-ship-players" src={Ship4} alt="ship-player1" />
-            </div>
-            <p>Player4</p>
-          </div>
+          ))}
         </div>
         <div>
-          <div className="ressources-list"></div>)
+          <div className="ressources-list"></div>
         </div>
       </div>
 
@@ -536,7 +599,12 @@ function Map() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
+        <Layout
+          size={hexagonSize}
+          flat={false}
+          spacing={1}
+          origin={{ x: -6, y: -6 }}
+        >
           {hexagons}
         </Layout>
         <Patterns />
@@ -554,7 +622,12 @@ function Map() {
           handleClose={() => setIsShipModalOpen(false)}
         />
       )}
-      {isHexModalOpen && <HexModal showModal={true} handleModalClose={() => setIsHexModalOpen(false)} />}
+      {isHexModalOpen && (
+        <HexModal
+          showModal={true}
+          handleModalClose={() => setIsHexModalOpen(false)}
+        />
+      )}
       {/*
       Commented because of optimisations, the minimap can be done but the map will feel to laggy.
       <MiniMap
