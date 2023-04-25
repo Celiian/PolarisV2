@@ -94,10 +94,9 @@ img.ressource-img {
 .controlls-container {
   position: fixed;
   bottom: 10px;
-  left: 10px;
-  width: 450px;
-  height: 350px;
-  background-color: rgba(255, 255, 255, 0.5);
-  border: 1px solid #ccc;
+  right: 10px;
+  width: 10%;
+  height: 10%;
+
   z-index: 1;
 }

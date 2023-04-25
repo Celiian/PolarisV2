@@ -23,6 +23,7 @@ import water from "../../assets/img/ressources/foods/water.png";
 import diamonds from "../../assets/img/ressources/mine/diamonds.png";
 import iron from "../../assets/img/ressources/mine/iron.png";
 import uranium from "../../assets/img/ressources/mine/uranium.png";
+import CyberButton from "../../components/cyberButton/CyberButton";
 
 const ressourceImages = {
   diamonds: diamonds,
@@ -587,11 +588,15 @@ function Map() {
         <Patterns />
       </HexGrid>
 
-      {/*
       <div className="controlls-container">
-        <p>Controlls Container</p>
+        <CyberButton
+          message={"Next Turn"}
+          onClick={() => {
+            console.log("clicked");
+          }}
+          turn="Turn 21"
+        ></CyberButton>
       </div>
-      */}
       {isShipModalOpen && selectedShip ? (
         <ShipModal
           ship={selectedShip}
