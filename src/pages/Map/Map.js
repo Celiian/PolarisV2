@@ -16,11 +16,29 @@ import Ship2 from "../../assets/img/ships/ship2/ship/ship.png";
 import Ship3 from "../../assets/img/ships/ship3/ship/ship.png";
 import Ship4 from "../../assets/img/ships/ship4/ship/ship.png";
 
+import food from "../../assets/img/ressources/foods/food.png";
+import water from "../../assets/img/ressources/foods/water.png";
+
+import diamonds from '../../assets/img/ressources/mine/diamonds.png'
+import iron from '../../assets/img/ressources/mine/iron.png'
+import uranium from '../../assets/img/ressources/mine/uranium.png'
+
 const ships = {
   Ship1,
   Ship2,
   Ship3,
   Ship4,
+};
+
+const ressourceImages = {
+  "diamonds": diamonds,
+  "uranium": uranium,
+  "energy": uranium,
+  "freeze-dried": food,
+  "steel": iron,
+  water: water,
+  "hydrogene": uranium,
+
 };
 
 function Map() {
@@ -518,6 +536,7 @@ function Map() {
           setMap(response.data.map);
         } else if (response.type == "player") {
           setPlayerData(response.data);
+          setRessources(response.data.resources);
         } else if (response.type == "room") {
           setRoomData(response.data);
           setPlayers(response.data.players);
@@ -550,7 +569,7 @@ function Map() {
 
   var minZoom = 0.25 / (mapSize / 10);
 
-  console.log(roomData);
+  console.log(ressources);
 
   return (
     <div className="app">
@@ -585,8 +604,15 @@ function Map() {
             </div>
           ))}
         </div>
-        <div>
-          <div className="ressources-list"></div>
+        <div className="ressources-list-container">
+          <div className="ressources-list">
+            {Object.entries(ressources).map(([key, value]) => (
+              <div className="resources" key={key}>
+                <img className="ressource-img" src={ressourceImages[key]} alt={key} />
+                <p>{value}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

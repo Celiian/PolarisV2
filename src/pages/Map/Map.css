@@ -5,6 +5,9 @@
 }
 
 .navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
@@ -35,6 +38,9 @@
   align-items: center;
   color: white;
   font-weight: bold;
+  background: #161f2a;
+  padding: 10px;
+  border-radius: 15px;
 }
 
 .players-ship {
@@ -44,9 +50,29 @@
   color: white;
 }
 
-.player-container {
-  padding: 10px;
+.ressources-list-container {
+  display: flex;
+  width: 60%;
+  height: 100%;
+  justify-content: space-around;
 }
+
+.ressources-list {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.resources {
+  display: flex;
+  align-items: center;
+}
+
+img.ressource-img {
+  width: 40px;
+}
+
 .controls {
   position: absolute;
   bottom: 10px;
