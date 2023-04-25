@@ -19,9 +19,9 @@ import Ship4 from "../../assets/img/ships/ship4/ship/ship.png";
 import food from "../../assets/img/ressources/foods/food.png";
 import water from "../../assets/img/ressources/foods/water.png";
 
-import diamonds from '../../assets/img/ressources/mine/diamonds.png'
-import iron from '../../assets/img/ressources/mine/iron.png'
-import uranium from '../../assets/img/ressources/mine/uranium.png'
+import diamonds from "../../assets/img/ressources/mine/diamonds.png";
+import iron from "../../assets/img/ressources/mine/iron.png";
+import uranium from "../../assets/img/ressources/mine/uranium.png";
 
 const ships = {
   Ship1,
@@ -31,14 +31,13 @@ const ships = {
 };
 
 const ressourceImages = {
-  "diamonds": diamonds,
-  "uranium": uranium,
-  "energy": uranium,
+  diamonds: diamonds,
+  uranium: uranium,
+  energy: uranium,
   "freeze-dried": food,
-  "steel": iron,
+  steel: iron,
   water: water,
-  "hydrogene": uranium,
-
+  hydrogene: uranium,
 };
 
 function Map() {
@@ -91,9 +90,7 @@ function Map() {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
-        viewBox.split(" ")[3]
-      }`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
       setViewBox(newViewBox);
     }
   };
@@ -116,10 +113,7 @@ function Map() {
     var newHexagonClassNames = {};
     let updateHexagonClassNames = { ...hexagonClassNames }; // make a copy of the current classNames object
     for (var index in updateHexagonClassNames) {
-      if (
-        updateHexagonClassNames[index] != "movable" &&
-        updateHexagonClassNames[index] != "path"
-      ) {
+      if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
         newHexagonClassNames[index] = updateHexagonClassNames[index];
       }
     }
@@ -218,11 +212,7 @@ function Map() {
       "0,1,-1": "135",
     };
 
-    const hexDifference = new Hex(
-      hex2.q - hex1.q,
-      hex2.r - hex1.r,
-      hex2.s - hex1.s
-    );
+    const hexDifference = new Hex(hex2.q - hex1.q, hex2.r - hex1.r, hex2.s - hex1.s);
     const hexDifferenceKey = `${hexDifference.q},${hexDifference.r},${hexDifference.s}`;
     for (const [key, value] of Object.entries(directionVectors)) {
       if (key === hexDifferenceKey) {
@@ -272,10 +262,8 @@ function Map() {
   const handleHexClick = async (hexa) => {
     if (moving) {
       if (
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
-          "movable" ||
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
-          "path"
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "movable" ||
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "path"
       ) {
         let path = findPath(selectedShip.coord, hexa.coord);
 
@@ -302,7 +290,6 @@ function Map() {
               if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
                 newHexagonClassNames[index] = updateHexagonClassNames[index];
               }
-
             }
 
             if (playerData) {
@@ -324,39 +311,43 @@ function Map() {
       }
     } else {
       console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
+      // If visible
+
+      // If At least 1 neighbour is a planet add a button to build a miner (with cost)
       var desc = "";
       var img = "";
-      var style =  ""
+      var style = "";
       if (hexa.fill == "void") {
         desc = "Well it's just plain void, what were you expecting ? ";
         img =
           "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
       }
-      if(hexa.fill == "mine"){
-        desc = "Mineral planets are rich in valuable minerals and ores, making them prime locations for mining and resource extraction. However, they may also be home to dangerous environmental conditions and hostile alien species.";
-        img =
-          "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
-          style = "mine";
+      if (hexa.fill == "mine") {
+        desc =
+          "Mineral planets are rich in valuable minerals and ores, making them prime locations for mining and resource extraction. However, they may also be home to dangerous environmental conditions and hostile alien species.";
+        img = "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
+        style = "mine";
       }
-      if(hexa.fill == "agri"){
-        desc = "Agricultural planets are characterized by their fertile soil and abundant plant life, making them ideal for farming and food production. These planets are often highly populated and feature bustling cities and agricultural communities.";
-        img =
-          "https://4kwallpapers.com/images/walls/thumbs_3t/8758.jpg";
-          style="agri"
+      if (hexa.fill == "agri") {
+        desc =
+          "Agricultural planets are characterized by their fertile soil and abundant plant life, making them ideal for farming and food production. These planets are often highly populated and feature bustling cities and agricultural communities.";
+        img = "https://4kwallpapers.com/images/walls/thumbs_3t/8758.jpg";
+        style = "agri";
       }
-      if(hexa.fill == "atmo"){
-        desc = "Atmospheric planets in the game are characterized by their thick atmospheres and often feature unique weather patterns, making them challenging to explore but also rich in resources.";
+      if (hexa.fill == "atmo") {
+        desc =
+          "Atmospheric planets in the game are characterized by their thick atmospheres and often feature unique weather patterns, making them challenging to explore but also rich in resources.";
         img =
           "https://w0.peakpx.com/wallpaper/538/645/HD-wallpaper-planet-124d-alien-black-cosmos-darkness-light-neon-space-ufo-violet-thumbnail.jpg";
-        style= 'atmo'
+        style = "atmo";
       }
-      if(hexa.fill == "indu"){
-        desc = "Industrial planets are highly developed, with advanced infrastructure and a focus on manufacturing and production. Players can expect to find a wide range of industrial resources and technology on these planets.";
-        img =
-          "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
-        style="indu"
+      if (hexa.fill == "indu") {
+        desc =
+          "Industrial planets are highly developed, with advanced infrastructure and a focus on manufacturing and production. Players can expect to find a wide range of industrial resources and technology on these planets.";
+        img = "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
+        style = "indu";
       }
-      const hex = { name: hexa.fill, image: img, description: desc, style : style };
+      const hex = { name: hexa.fill, image: img, description: desc, style: style };
       setSelectedHex(hex);
       setIsHexModalOpen(true);
     }
@@ -379,21 +370,14 @@ function Map() {
     gScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = 0;
 
     const fScore = {};
-    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(
-      hexStart,
-      hexEnd
-    );
+    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(hexStart, hexEnd);
 
     while (openSet.length > 0) {
       const current = openSet.reduce((a, b) =>
         fScore[`${a.q},${a.r},${a.s}`] < fScore[`${b.q},${b.r},${b.s}`] ? a : b
       );
 
-      if (
-        current.q === hexEnd.q &&
-        current.r === hexEnd.r &&
-        current.s === hexEnd.s
-      ) {
+      if (current.q === hexEnd.q && current.r === hexEnd.r && current.s === hexEnd.s) {
         const path = [current];
         while (cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]) {
           path.unshift(cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]);
@@ -406,17 +390,9 @@ function Map() {
 
       const neighbors = HexUtils.neighbors(current);
       neighbors.forEach((neighbor) => {
-        if (
-          closedSet.some(
-            (hex) =>
-              hex.q === neighbor.q &&
-              hex.r === neighbor.r &&
-              hex.s === neighbor.s
-          )
-        ) {
+        if (closedSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
           return;
         }
-
 
         // Check if the neighbor is an obstacle
 
@@ -432,18 +408,14 @@ function Map() {
         const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
 
         if (!openSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
-
           openSet.push(neighbor);
-        } else if (
-          tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]
-        ) {
+        } else if (tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]) {
           return;
         }
 
         cameFrom[`${neighbor.q},${neighbor.r},${neighbor.s}`] = current;
         gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore;
-        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] =
-          tentativeGScore + HexUtils.distance(neighbor, hexEnd);
+        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore + HexUtils.distance(neighbor, hexEnd);
       });
     }
 
@@ -545,12 +517,8 @@ function Map() {
               handleClick={() => handleHexClick(hexa)}
               key={key}
               index={key}
-              onMouseEnter={
-                hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null
-              }
-              onMouseLeave={
-                hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null
-              }
+              onMouseEnter={hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null}
+              onMouseLeave={hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null}
             ></Hexagon>
           );
         } else if (hexa.type == "base") {
@@ -595,15 +563,11 @@ function Map() {
   }, [map, viewBox]);
 
   const updateViewBox = () => {
-    const centerX =
-      parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY =
-      parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
     const newWidth = 100 / scale;
     const newHeight = 100 / scale;
-    const newViewBox = `${centerX - newWidth / 2} ${
-      centerY - newHeight / 2
-    } ${newWidth} ${newHeight}`;
+    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
   };
 
@@ -614,24 +578,24 @@ function Map() {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) - speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) + speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -704,8 +668,7 @@ function Map() {
 
   var minZoom = 0.25 / (mapSize / 10);
 
-
-  console.log(selectedHex)
+  console.log(selectedHex);
 
   return (
     <div className="app">
@@ -713,11 +676,7 @@ function Map() {
         <div className="player-list-container">
           <div className="players">
             <div className="player-container">
-              <img
-                className="img-ship-players"
-                src={Ship1}
-                alt="ship-player1"
-              />
+              <img className="img-ship-players" src={Ship1} alt="ship-player1" />
             </div>
             <p>{playerData.name}</p>
           </div>
@@ -761,12 +720,7 @@ function Map() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Layout
-          size={hexagonSize}
-          flat={false}
-          spacing={1}
-          origin={{ x: -6, y: -6 }}
-        >
+        <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
           {hexagons}
         </Layout>
         <Patterns />
@@ -787,11 +741,7 @@ function Map() {
         <></>
       )}
       {isHexModalOpen && (
-        <HexModal
-          hexa = {selectedHex}
-          showModal={true}
-          handleModalClose={() => setIsHexModalOpen(false)}
-        />
+        <HexModal hexa={selectedHex} showModal={true} handleModalClose={() => setIsHexModalOpen(false)} />
       )}
       {/*
       Commented because of optimisations, the minimap can be done but the map will feel to laggy.

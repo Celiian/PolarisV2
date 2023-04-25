@@ -2,7 +2,6 @@ import React from "react";
 import "./HexModal.css";
 
 function HexModal({ showModal, handleModalClose, hexa }) {
-  console.log(hexa.style);
   return (
     <div className={hexa.name}>
       <button
@@ -20,8 +19,8 @@ function HexModal({ showModal, handleModalClose, hexa }) {
         aria-describedby="modal-desc"
         aria-hidden={!showModal}
       >
-        <div className="handle" data-augmented-ui >
-          <span className="handle-details" >
+        <div className="handle" data-augmented-ui>
+          <span className="handle-details">
             <a href="" target="_blank">
               Ƽᕓ ԖΛĦ ĦⴿᕓƵϷԖΛϺ╥
             </a>
@@ -30,22 +29,17 @@ function HexModal({ showModal, handleModalClose, hexa }) {
             </a>
           </span>
         </div>
-        <div className="img-frame" data-augmented-ui >
+        <div className="img-frame" data-augmented-ui>
           <img src={hexa.image} alt="placeholder" />
           <div className="under-text-detail" aria-hidden="true"></div>
         </div>
-        <div className="details" data-augmented-ui >
+        <div className="details" data-augmented-ui>
           <h2 id="modal-title">{hexa.name}</h2>
-          <p id="modal-desc" >{hexa.description}</p>
-          <button
-            className="button"
-            type="button"
-            title="close modal"
-            onClick={handleModalClose}
-          >
+          <p id="modal-desc">{hexa.description}</p>
+          <button className="button" type="button" title="close modal" onClick={handleModalClose}>
             X
           </button>
-          <div className="under-text-detail" aria-hidden="true" ></div>
+          <div className="under-text-detail" aria-hidden="true"></div>
         </div>
       </div>
     </div>
