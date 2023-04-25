@@ -60,6 +60,8 @@ function Map() {
   const [moving, setMoving] = useState(false);
   const [playerData, setPlayerData] = useState({});
   const [roomData, setRoomData] = useState({});
+
+  const [first, setFirst] = useState(true);
   const [players, setPlayers] = useState([]);
   const [ressources, setRessources] = useState({});
 
@@ -108,6 +110,7 @@ function Map() {
 
   const moveShip = (ship) => {
     setMoving(true);
+    setIsShipModalOpen(false);
     const shipHex = ship.coord;
 
     var newHexagonClassNames = {};
@@ -130,23 +133,44 @@ function Map() {
         const distance = HexUtils.distance(shipHex, hex);
 
         if (distance <= 5) {
-          const hexKey = `${hex.q},${hex.r},${hex.s}`;
+          var path = [];
+          if (distance == 5) {
+            path = findPath(shipHex, hex);
+          }
+          if (path.length < 7) {
+            const hexKey = `${hex.q},${hex.r},${hex.s}`;
 
-          setHexagonClassNames((prev) => {
-            const updated = { ...prev };
-            updated[hexKey] = "movable";
-            return updated;
-          });
+            setHexagonClassNames((prev) => {
+              const updated = { ...prev };
+              updated[hexKey] = "movable";
+              return updated;
+            });
 
-          setHexagonInPath((prev) => {
-            const updated = { ...prev };
-            updated[hexKey] = true;
-            return updated;
-          });
+            setHexagonInPath((prev) => {
+              const updated = { ...prev };
+              updated[hexKey] = true;
+              return updated;
+            });
+          }
         }
       }
     });
     drawMap();
+  };
+  const centerViewBoxAroundCoord = (q, r, hexSize, currentViewBox) => {
+    // Get pixel coordinates from hexagonal coordinates
+    const { x, y } = hexToPixel(q, r, hexSize);
+
+    // Get current viewBox values
+    const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = currentViewBox.split(" ").map(parseFloat);
+
+    // Calculate new viewBox values
+    const newViewBoxX = x - viewBoxWidth / 2;
+    const newViewBoxY = y - viewBoxHeight / 2;
+
+    // Set the new viewBox
+    const newViewBox = `${newViewBoxX} ${newViewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
+    return newViewBox;
   };
 
   const swapHexagons = (hex1, hex2) => {
@@ -210,6 +234,41 @@ function Map() {
     return -1;
   };
 
+  const isWithinDistance = (hex1, hex2, distance) => {
+    return HexUtils.distance(hex1, hex2) <= distance;
+  };
+
+  const updatePlayerMapStatus = (selectedHex, playerData, distance, status) => {
+    const updatedPlayerMap = playerData.player_map.map((hexData, index) => {
+      const hex = JSON.parse(map[index]);
+
+      if (isWithinDistance(selectedHex.coord, hex.coord, distance)) {
+        const updatedHexData = { ...JSON.parse(hexData) };
+        updatedHexData.status = status;
+        return JSON.stringify(updatedHexData);
+      } else {
+        return hexData;
+      }
+    });
+
+    return { ...playerData, player_map: updatedPlayerMap };
+  };
+
+  const updatePlayerData = async (gameRoomId, playerNumber, updatedPlayerDataMap) => {
+    try {
+      // updatedPlayerData is a list of string (JSON formatted string)
+      const response = await axios.put("http://127.0.0.1:8000/player/map", {
+        game_room_id: gameRoomId,
+        player_number: playerNumber,
+        updated_player_data: updatedPlayerDataMap,
+      });
+
+      console.log("Player data updated successfully", response);
+    } catch (error) {
+      console.error("Error updating player data", error);
+    }
+  };
+
   const handleHexClick = async (hexa) => {
     if (moving) {
       if (
@@ -219,37 +278,49 @@ function Map() {
           "path"
       ) {
         let path = findPath(selectedShip.coord, hexa.coord);
-        path.shift();
-        let ship = selectedShip;
-        setHexagonInPath([]);
-        for (let indexPath in path) {
-          let nextCase = path[indexPath];
-          let rotation = getRotationDegree(ship.coord, nextCase);
-          ship = selectedShip;
-          if (ship.fill.split("/").length > 1) {
-            ship.fill = ship.fill.split("/")[0] + "/" + rotation;
-          } else {
-            ship.fill += "/" + rotation;
-          }
-          let newHexas = swapHexagons(ship, nextCase);
-          setSelectedShip(newHexas[0]);
-          ship = newHexas[0];
-          let newHexagonClassNames = {};
-          let updateHexagonClassNames = { ...hexagonClassNames };
-          for (let index in updateHexagonClassNames) {
-            if (
-              updateHexagonClassNames[index] != "movable" &&
-              updateHexagonClassNames[index] != "path"
-            ) {
-              newHexagonClassNames[index] = updateHexagonClassNames[index];
-            }
-          }
 
-          setHexagonClassNames(newHexagonClassNames);
-          await delay(600);
+        console.log(path);
+        if (path.length < 7) {
+          path.shift();
+          let ship = selectedShip;
+          setHexagonInPath([]);
+          for (let indexPath in path) {
+            let nextCase = path[indexPath];
+            let rotation = getRotationDegree(ship.coord, nextCase);
+            ship = selectedShip;
+            if (ship.fill.split("/").length > 1) {
+              ship.fill = ship.fill.split("/")[0] + "/" + rotation;
+            } else {
+              ship.fill += "/" + rotation;
+            }
+            let newHexas = swapHexagons(ship, nextCase);
+            setSelectedShip(newHexas[0]);
+            ship = newHexas[0];
+            let newHexagonClassNames = {};
+            let updateHexagonClassNames = { ...hexagonClassNames };
+            for (let index in updateHexagonClassNames) {
+              if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
+                newHexagonClassNames[index] = updateHexagonClassNames[index];
+              }
+
+            }
+
+            if (playerData) {
+              var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
+              updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
+              setPlayerData(updatedPlayerData);
+              updatePlayerData(
+                localStorage.getItem("GameRoomID"),
+                updatedPlayerData.number,
+                updatedPlayerData.player_map
+              );
+            }
+            setHexagonClassNames(newHexagonClassNames);
+            await delay(600);
+          }
+          setMoving(false);
+          setSelectedShip(null);
         }
-        setMoving(false);
-        setSelectedShip(null);
       }
     } else {
       console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
@@ -346,17 +417,22 @@ function Map() {
           return;
         }
 
-        const tentativeGScore =
-          gScore[`${current.q},${current.r},${current.s}`] + 1;
 
-        if (
-          !openSet.some(
-            (hex) =>
-              hex.q === neighbor.q &&
-              hex.r === neighbor.r &&
-              hex.s === neighbor.s
-          )
-        ) {
+        // Check if the neighbor is an obstacle
+
+        for (let i = 0; i < map.length; i++) {
+          const hex = JSON.parse(map[i]);
+          if (hex.coord.q === neighbor.q && hex.coord.r === neighbor.r && hex.coord.s === neighbor.s) {
+            if (hex.type == "planet" || hex.type == "base" || hex.type == "ship" || hex.type == "miner") {
+              return;
+            }
+          }
+        }
+
+        const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
+
+        if (!openSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
+
           openSet.push(neighbor);
         } else if (
           tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]
@@ -416,6 +492,9 @@ function Map() {
     setHexagonClassNames(newHexagonClassNames);
 
     var hexaPath = findPath(selectedShip.coord, hexa.coord);
+    while (hexaPath.length >= 7) {
+      hexaPath.pop();
+    }
     hexaPath.shift();
 
     for (var hex of hexaPath) {
@@ -428,7 +507,6 @@ function Map() {
 
   const handleHexagonMouseLeave = (hexa) => {};
 
-  // Call drawMap() after updating classNames
   useEffect(() => {
     drawMap();
   }, [hexagonClassNames, selectedShip]);
@@ -439,13 +517,30 @@ function Map() {
       const hexa = JSON.parse(item);
       if (isVisible(hexa.coord)) {
         var hexagon = null;
+        var fill = "";
+        var style = "";
+        var stroke = "#fff";
         const key = `${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`;
-
+        if (playerData) {
+          if (JSON.parse(playerData.player_map[index]).status == "hidden") {
+            fill = " ";
+            style = " ";
+            stroke = "#fff7";
+          } else if (JSON.parse(playerData.player_map[index]).status == "discover") {
+            style = "discover";
+          } else {
+            style = hexa.type;
+            if (style == "asteroid") {
+              style = "void";
+            }
+          }
+        }
         if (hexa.fill === "void") {
           hexagon = (
             <Hexagon
-              style={hexagonClassNames[key] || "void"}
-              fill=""
+              style={hexagonClassNames[key] || style}
+              stroke={stroke}
+              fill={fill ? "" : ""}
               hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
               key={key}
@@ -461,8 +556,9 @@ function Map() {
         } else if (hexa.type == "base") {
           hexagon = (
             <Hexagon
-              style="planet"
-              fill={hexa.type + "/" + hexa.fill}
+              style={style}
+              stroke={stroke}
+              fill={fill ? "" : hexa.type + "/" + hexa.fill}
               hexa={hexa.coord}
               handleClick={() => handleShipClick(hexa)}
               key={key}
@@ -474,8 +570,9 @@ function Map() {
         } else {
           hexagon = (
             <Hexagon
-              style={hexagonClassNames[key] || "planet"}
-              fill={hexa.fill}
+              style={hexagonClassNames[key] || style}
+              stroke={stroke}
+              fill={fill ? "" : hexa.fill}
               hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
               key={key}
@@ -557,11 +654,25 @@ function Map() {
       ws.onmessage = (event) => {
         const response = JSON.parse(event.data);
         if (response.type == "map") {
+          if (first) {
+            response.data.map.forEach((item, index) => {
+              const hexa = JSON.parse(item);
+
+              if (hexa.type == "base" && hexa.fill == localStorage.getItem("numberPlayer")) {
+                const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
+                setViewBox(newViewBox);
+              }
+            });
+            setFirst(false);
+          }
+          console.log("map data retrieved");
           setMap(response.data.map);
         } else if (response.type == "player") {
+          console.log("player data retrieved");
           setPlayerData(response.data);
           setRessources(response.data.resources);
         } else if (response.type == "room") {
+          console.log("room data retrieved");
           setRoomData(response.data);
           setPlayers(response.data.players);
         }
@@ -666,12 +777,14 @@ function Map() {
         <p>Controlls Container</p>
       </div>
       */}
-      {isShipModalOpen && (
+      {isShipModalOpen && selectedShip ? (
         <ShipModal
           ship={selectedShip}
           handleMove={() => moveShip(selectedShip)}
           handleClose={() => setIsShipModalOpen(false)}
         />
+      ) : (
+        <></>
       )}
       {isHexModalOpen && (
         <HexModal

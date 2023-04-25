@@ -1,10 +1,10 @@
 import React from "react";
 import { Hexagon } from "react-hexgrid";
 import "./Hexagons.css";
-const CustomHexagon = ({ style, hexa, fill, handleClick, index, highlight, onMouseEnter, onMouseLeave }) => (
+const CustomHexagon = ({ style, stroke, hexa, fill, handleClick, index, onMouseEnter, onMouseLeave }) => (
   <Hexagon
-    className={highlight ? "highlight" : style}
-    stroke="#fff"
+    className={style}
+    stroke={stroke}
     strokeWidth="0.1"
     fill={fill}
     q={hexa.q}
