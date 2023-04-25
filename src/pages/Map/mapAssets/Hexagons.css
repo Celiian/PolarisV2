@@ -20,11 +20,6 @@
   fill-opacity: 0.7;
 }
 
-.toHide {
-  fill: black;
-  fill-opacity: 1;
-}
-
 .movable {
   fill: rgb(209, 210, 212);
   fill-opacity: 0.3;

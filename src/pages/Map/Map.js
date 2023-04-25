@@ -3,11 +3,11 @@ import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
 
 import axios from "axios";
 import "./Map.css";
-import Hexagon from "./Hexagons";
-import Controls from "./Controls";
-import Patterns from "./Patterns";
-import HexModal from "./HexModal";
-import ShipModal from "./ShipModal";
+import Hexagon from "./mapAssets/Hexagons";
+import Controls from "./mapAssets/Controls";
+import Patterns from "./mapAssets/Patterns";
+import HexModal from "../../components/HexModal/HexModal";
+import ShipModal from "../../components/ShipModal/ShipModal";
 //import MiniMap from "./MiniMap";
 //import styled from "styled-components";
 
@@ -41,7 +41,6 @@ const ressourceImages = {
 };
 
 function Map() {
-
   const [hexagonClassNames, setHexagonClassNames] = useState({});
   const [hexagonInPath, setHexagonInPath] = useState({});
   const [isShipModalOpen, setIsShipModalOpen] = useState(false);
@@ -354,7 +353,6 @@ function Map() {
     }
   };
 
-
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleShipClick = (hexa) => {
@@ -422,7 +420,6 @@ function Map() {
     }
 
     return null;
-
   };
 
   const hexToPixel = (q, r, size) => {
@@ -511,15 +508,13 @@ function Map() {
           }
         }
         if (hexa.fill === "void") {
-          var style = "void";
           hexagon = (
             <Hexagon
-
               style={hexagonClassNames[key] || style}
               stroke={stroke}
               fill={fill ? "" : ""}
               hexa={hexa.coord}
-              handleClick={() => handleHexClick(hexa)}
+              handleClick={fill ? () => {} : () => handleHexClick(hexa)}
               key={key}
               index={key}
               onMouseEnter={hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null}
@@ -533,7 +528,7 @@ function Map() {
               stroke={stroke}
               fill={fill ? "" : hexa.type + "/" + hexa.fill}
               hexa={hexa.coord}
-              handleClick={() => handleShipClick(hexa)}
+              handleClick={fill ? () => {} : () => handleShipClick(hexa)}
               key={key}
               index={key}
               onMouseEnter={null}
@@ -544,17 +539,15 @@ function Map() {
           var style = "planet";
           hexagon = (
             <Hexagon
-
               style={hexagonClassNames[key] || style}
               stroke={stroke}
               fill={fill ? "" : hexa.fill}
               hexa={hexa.coord}
-              handleClick={() => handleHexClick(hexa)}
+              handleClick={fill ? () => {} : () => handleHexClick(hexa)}
               key={key}
               index={key}
               onMouseEnter={null}
               onMouseLeave={null}
-
             ></Hexagon>
           );
         }
@@ -578,10 +571,6 @@ function Map() {
     const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
   };
-
-  useEffect(() => {
-    drawMap();
-  }, [hexagonFills]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -680,8 +669,6 @@ function Map() {
 
   var minZoom = 0.25 / (mapSize / 10);
 
-  console.log(selectedHex);
-
   return (
     <div className="app">
       <div className="navbar">
@@ -699,7 +686,7 @@ function Map() {
                   <div className="player-container">
                     <img
                       className="img-ship-players"
-                      src={ships[`Ship${player.number}`]}
+                      src={`ships[Ship${player.number}]`}
                       alt={`ship-player${player.number}`}
                     />
                   </div>
