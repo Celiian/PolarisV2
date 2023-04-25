@@ -9,13 +9,46 @@
   font-family: "Orbitron";
 }
 
-body {
+.mine {
   --palletHR: 0deg;
   --pallet1: #131323;
-  --pallet2: #335512;
-  --pallet3: #329d2a;
+  --pallet2: #c3570f;
+  --pallet3: #c32502;
   --pallet4: #00edff;
 }
+
+.indu {
+  --palletHR: 0deg;
+  --pallet1: #131323;
+  --pallet2: #393939;
+  --pallet3: #5f5f5f;
+  --pallet4: #00edff;
+}
+
+.atmo {
+  --palletHR: 0deg;
+  --pallet1: #131323;
+  --pallet2: #74056b;
+  --pallet3: #8b0797;
+  --pallet4: #00edff;
+}
+
+.agri {
+  --palletHR: 0deg;
+  --pallet1: #131323;
+  --pallet2: #5dc30f;
+  --pallet3: #08c302;
+  --pallet4: #00edff;
+}
+
+.void {
+  --palletHR: 0deg;
+  --pallet1: #030306;
+  --pallet2: #181b17;
+  --pallet3: #272727;
+  --pallet4: #00edff;
+}
+
 
 h1 {
   color: var(--pallet4);
@@ -91,17 +124,19 @@ h1 {
 }
 
 .img-frame {
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThf-05L24e0d6BCcKwo8rhjue71V8I6J9oRA&usqp=CAU");
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
 }
 
-.img-frame .under-text-detail {
-  bottom: max(-2%, -1.75vh);
+.img-frame img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding-top: 0.25vw;
+  height: 100%;
+  object-fit: cover;
 }
 
 .details .under-text-detail {
