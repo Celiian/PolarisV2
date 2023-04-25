@@ -255,13 +255,37 @@ function Map() {
       console.log(HexUtils.distance(hexa.coord, { q: 0, r: 0, s: 0 }));
       var desc = "";
       var img = "";
+      var style =  ""
       if (hexa.fill == "void") {
         desc = "Well it's just plain void, what were you expecting ? ";
         img =
           "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
       }
-
-      const hex = { name: hexa.fill, image: img, description: desc };
+      if(hexa.fill == "mine"){
+        desc = "Mineral planets are rich in valuable minerals and ores, making them prime locations for mining and resource extraction. However, they may also be home to dangerous environmental conditions and hostile alien species.";
+        img =
+          "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
+          style = "mine";
+      }
+      if(hexa.fill == "agri"){
+        desc = "Agricultural planets are characterized by their fertile soil and abundant plant life, making them ideal for farming and food production. These planets are often highly populated and feature bustling cities and agricultural communities.";
+        img =
+          "https://4kwallpapers.com/images/walls/thumbs_3t/8758.jpg";
+          style="agri"
+      }
+      if(hexa.fill == "atmo"){
+        desc = "Atmospheric planets in the game are characterized by their thick atmospheres and often feature unique weather patterns, making them challenging to explore but also rich in resources.";
+        img =
+          "https://w0.peakpx.com/wallpaper/538/645/HD-wallpaper-planet-124d-alien-black-cosmos-darkness-light-neon-space-ufo-violet-thumbnail.jpg";
+        style= 'atmo'
+      }
+      if(hexa.fill == "indu"){
+        desc = "Industrial planets are highly developed, with advanced infrastructure and a focus on manufacturing and production. Players can expect to find a wide range of industrial resources and technology on these planets.";
+        img =
+          "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
+        style="indu"
+      }
+      const hex = { name: hexa.fill, image: img, description: desc, style : style };
       setSelectedHex(hex);
       setIsHexModalOpen(true);
     }
@@ -569,7 +593,8 @@ function Map() {
 
   var minZoom = 0.25 / (mapSize / 10);
 
-  console.log(ressources);
+
+  console.log(selectedHex)
 
   return (
     <div className="app">
@@ -650,6 +675,7 @@ function Map() {
       )}
       {isHexModalOpen && (
         <HexModal
+          hexa = {selectedHex}
           showModal={true}
           handleModalClose={() => setIsHexModalOpen(false)}
         />
