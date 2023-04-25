@@ -3,8 +3,7 @@ import './StartButton.css'
 export default function StartButton({ message, onClickFunction }) {
     return (
         <>
-
-            <button className="button-start" onClick={onClickFunction}>
+            <button className="btn-start" onClick={onClickFunction}>
                 <span className="icon">
 
                     <svg height="303.09363" width="187.41829" version="1.1">
