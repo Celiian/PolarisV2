@@ -1,55 +1,201 @@
-.hex-modal {
+@import "https://unpkg.com/augmented-ui@2.0.0/aug-core.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Orbitron&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Orbitron";
+}
+
+body {
+  --palletHR: 0deg;
+  --pallet1: #131323;
+  --pallet2: #335512;
+  --pallet3: #329d2a;
+  --pallet4: #00edff;
+}
+
+h1 {
+  color: var(--pallet4);
+  --ts: 0 0 2vw var(--pallet1);
+  text-shadow: var(--ts), var(--ts), var(--ts);
+  text-align: center;
+  font-size: 3vw;
+  font-weight: bold;
+  margin-top: 2vw;
+}
+
+#modalbg {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  border: none;
+  opacity: 0.9;
+}
+
+#window-pane {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 750px, 120vh);
+  display: grid;
+  grid-template-columns: 6% min(40vh, 35%) 1fr;
+  padding-bottom: 4vw;
+}
+
+#window-pane .handle {
+  --aug-border: initial;
+  --aug-border-all: 0.125vw;
+  --aug-border-bg: var(--pallet3);
+  --aug-clip-tl1: initial;
+  --aug-tl1: 1.5vw;
+  --aug-clip-r1: initial;
+  --aug-clip-r2: initial;
+  --aug-r-extend1: 70%;
+  --aug-r1: 0.25vw;
+  --aug-r2: 0.25vw;
+  --aug-clip-bl1: initial;
+  --aug-bl-inset2: 1.5vw;
+  --aug-bl1-alt-join-out: initial;
+  --aug-bl1: 1vw;
+  --aug-inlay: initial;
+  --aug-inlay-all: 0px;
+  --aug-inlay-bg: var(--pallet2);
+  --aug-inlay-opacity: 0.5;
+}
+
+.handle-details {
+  display: flex;
+  white-space: nowrap;
+  border: 0.125vw solid var(--pallet3);
+  position: absolute;
+  top: 95%;
+  left: min(0.75vw, 1.25vh);
+  transform-origin: left top;
+  transform: rotateZ(-90deg);
+  opacity: 0.75;
+}
+.handle-details a {
+  font-size: min(0.667vw, 1vh);
+  color: var(--pallet3);
+  text-decoration: none;
+  padding-top: 0.125vw;
+  padding-left: 0.5vw;
+  padding-right: 0.75vw;
+  padding-bottom: min(0.667vw, 1vh);
+}
+.handle-details a:first-child {
+  border-right: inherit;
+}
+
+.img-frame {
+  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThf-05L24e0d6BCcKwo8rhjue71V8I6J9oRA&usqp=CAU");
+  background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.hex-content {
-  position: relative;
-  background-color: #fff;
-  padding: 20px;
-  width: 80%;
-  max-width: 600px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.img-frame .under-text-detail {
+  bottom: max(-2%, -1.75vh);
+  width: 100%;
+  padding-top: 0.25vw;
 }
 
-.hex-close {
+.details .under-text-detail {
+  bottom: 6%;
+  right: 1vw;
+  width: 88%;
+  padding-top: 0.5vw;
+}
+
+.under-text-detail {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 30px;
+  border-top: 0.125vw solid var(--pallet3);
+}
+
+.under-text-detail::after {
+  content: "Ƽᕓ ԖΛĦ ĦⴿᕓƵϷԖΛϺ╥ ƓƼᕓ ӨƵϺ╥┍Ƶ╥ᕓ ՆЦ ╥ՆЩĦ";
+  text-align: left;
+  color: var(--pallet3);
+  white-space: pre;
+  font-size: min(1vh, 0.6vw);
+  position: absolute;
+  right: 0;
+}
+
+#window-pane .img-frame {
+  position: relative;
+  --aug-border: initial;
+  --aug-border-all: 0.124vw;
+  --aug-border-bg: var(--pallet3);
+  font-size: 0;
+}
+
+#window-pane img {
+  width: 100%;
+  max-height: 90vh;
+}
+
+#window-pane .details {
+  background: linear-gradient(to right, transparent 0 1vw, var(--pallet3) 1vw 1.125vw, transparent 1.125vw),
+    var(--pallet1);
+  margin-left: 2%;
+  margin-top: -0.25vw;
+  margin-bottom: max(-8vh, -4vw);
+  padding: min(8vh, 4vw) 5vw;
+  --aug-border: initial;
+  --aug-border-all: 0.125vw;
+  --aug-border-bg: var(--pallet3);
+  --aug-clip-tr1: initial;
+  --aug-tr1: 0.25vw;
+  --aug-tr-inset2: 85%;
+  --aug-clip-br1: initial;
+  --aug-br1: 1vw;
+  --aug-rect-l1: initial;
+  --aug-rect-l2: initial;
+  --aug-l1: 0.125vw;
+  --aug-l2: 0.125vw;
+  --aug-l-extend1: 1vw;
+  --aug-l-center: 97%;
+}
+
+#modal-title {
+  color: var(--pallet4);
+  font-weight: normal;
+  margin-bottom: 4vw;
+  text-transform: uppercase;
+  font-size: min(3vw, 4vh, 20px);
+}
+
+#modal-desc {
+  color: var(--pallet3);
+  text-shadow: 0 0 1vw var(--pallet2);
+  font-size: min(18px, 2.25vw, 3vh);
+}
+#modal-desc a {
+  color: var(--pallet4);
+}
+
+#window-pane .details button {
+  position: absolute;
+  right: 1vw;
+  top: 1.25vw;
+  padding: 1vw;
+  font-weight: bold;
+  color: var(--pallet2);
+  background: transparent;
+  border: none;
   cursor: pointer;
 }
 
-.hex-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
+#modalbg[aria-hidden="true"],
+#window-pane[aria-hidden="true"] {
+  display: none;
 }
 
-.hex-info img {
-  max-width: 100%;
-  height: auto;
-  margin-bottom: 10px;
-}
-
-.hex-info h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.hex-info p {
-  font-size: 16px;
-  line-height: 1.5;
-  text-align: center;
+.button {
+  all: unset;
 }
