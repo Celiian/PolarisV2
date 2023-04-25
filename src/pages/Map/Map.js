@@ -210,6 +210,21 @@ function Map() {
     return { ...playerData, player_map: updatedPlayerMap };
   };
 
+  const updatePlayerData = async (gameRoomId, playerNumber, updatedPlayerDataMap) => {
+    try {
+      // updatedPlayerData is a list of string (JSON formatted string)
+      const response = await axios.put("http://127.0.0.1:8000/player/map", {
+        game_room_id: gameRoomId,
+        player_number: playerNumber,
+        updated_player_data: updatedPlayerDataMap,
+      });
+
+      console.log("Player data updated successfully", response);
+    } catch (error) {
+      console.error("Error updating player data", error);
+    }
+  };
+
   const handleHexClick = async (hexa) => {
     if (moving) {
       if (
@@ -244,6 +259,11 @@ function Map() {
             var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
             updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
             setPlayerData(updatedPlayerData);
+            updatePlayerData(
+              localStorage.getItem("GameRoomID"),
+              updatedPlayerData.number,
+              updatedPlayerData.player_map
+            );
           }
           setHexagonClassNames(newHexagonClassNames);
           await delay(600);
@@ -391,11 +411,13 @@ function Map() {
         var hexagon = null;
         var fill = "";
         var style = "";
+        var stroke = "#fff";
         const key = `${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`;
         if (playerData) {
           if (JSON.parse(playerData.player_map[index]).status == "hidden") {
             fill = " ";
             style = " ";
+            stroke = "#fff7";
           } else if (JSON.parse(playerData.player_map[index]).status == "discover") {
             style = "discover";
           } else {
@@ -409,6 +431,7 @@ function Map() {
           hexagon = (
             <Hexagon
               style={hexagonClassNames[key] || style}
+              stroke={stroke}
               fill={fill ? "" : ""}
               hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
@@ -422,6 +445,7 @@ function Map() {
           hexagon = (
             <Hexagon
               style={style}
+              stroke={stroke}
               fill={fill ? "" : hexa.type + "/" + hexa.fill}
               hexa={hexa.coord}
               handleClick={() => handleShipClick(hexa)}
@@ -435,6 +459,7 @@ function Map() {
           hexagon = (
             <Hexagon
               style={hexagonClassNames[key] || style}
+              stroke={stroke}
               fill={fill ? "" : hexa.fill}
               hexa={hexa.coord}
               handleClick={() => handleHexClick(hexa)}
