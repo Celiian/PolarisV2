@@ -33,6 +33,8 @@ function Map() {
   const [lastMouseY, setLastMouseY] = useState(null);
   const [isHexModalOpen, setIsHexModalOpen] = useState(false);
   const [moving, setMoving] = useState(false);
+  const [playerData, setPlayerData] = useState({});
+  const [roomData, setRoomData] = useState({});
 
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
@@ -44,49 +46,6 @@ function Map() {
 
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   const [viewBox, setViewBox] = useState(initialViewBox);
-
-  const [players, setPlayers] = useState([]);
-  const [playerOwner, setPlayerOwner] = useState("");
-
-  const baseUrl = "http://127.0.0.1:8000/";
-
-  var GameRoomID = "";
-
-  const getGamePlayers = async (room_id) => {
-    try {
-      const response = await axios.get(
-        baseUrl + `game_room/playerslist/${room_id}`
-      );
-      console.log(response);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  };
-
-  const getPlayerRessources = async (room_id) => {
-    try {
-      const response = await axios.get(
-        baseUrl + `game_room/owner/ressources/${room_id}`
-      );
-      console.log(response);
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  };
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const GameRoomID = localStorage.getItem("GameRoomID");
-    const responsePlayers = await getGamePlayers(GameRoomID);
-    setPlayerOwner(responsePlayers.room_game_owner);
-    setPlayers(responsePlayers.players)
-    const responseRessources = await getPlayerRessources(GameRoomID);
-    
-  }, [GameRoomID]);
 
   const handleMouseDown = (event) => {
     setMouseDown(true);
@@ -103,9 +62,7 @@ function Map() {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
-        viewBox.split(" ")[3]
-      }`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
       setViewBox(newViewBox);
     }
   };
@@ -127,10 +84,7 @@ function Map() {
     var newHexagonClassNames = {};
     let updateHexagonClassNames = { ...hexagonClassNames }; // make a copy of the current classNames object
     for (var index in updateHexagonClassNames) {
-      if (
-        updateHexagonClassNames[index] != "movable" &&
-        updateHexagonClassNames[index] != "path"
-      ) {
+      if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
         newHexagonClassNames[index] = updateHexagonClassNames[index];
       }
     }
@@ -208,11 +162,7 @@ function Map() {
       "0,1,-1": "135",
     };
 
-    const hexDifference = new Hex(
-      hex2.q - hex1.q,
-      hex2.r - hex1.r,
-      hex2.s - hex1.s
-    );
+    const hexDifference = new Hex(hex2.q - hex1.q, hex2.r - hex1.r, hex2.s - hex1.s);
     const hexDifferenceKey = `${hexDifference.q},${hexDifference.r},${hexDifference.s}`;
     for (const [key, value] of Object.entries(directionVectors)) {
       if (key === hexDifferenceKey) {
@@ -227,10 +177,8 @@ function Map() {
   const handleHexClick = async (hexa) => {
     if (moving) {
       if (
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
-          "movable" ||
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
-          "path"
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "movable" ||
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "path"
       ) {
         let path = findPath(selectedShip.coord, hexa.coord);
         path.shift();
@@ -251,10 +199,7 @@ function Map() {
           let newHexagonClassNames = {};
           let updateHexagonClassNames = { ...hexagonClassNames };
           for (let index in updateHexagonClassNames) {
-            if (
-              updateHexagonClassNames[index] != "movable" &&
-              updateHexagonClassNames[index] != "path"
-            ) {
+            if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
               newHexagonClassNames[index] = updateHexagonClassNames[index];
             }
           }
@@ -298,21 +243,14 @@ function Map() {
     gScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = 0;
 
     const fScore = {};
-    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(
-      hexStart,
-      hexEnd
-    );
+    fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(hexStart, hexEnd);
 
     while (openSet.length > 0) {
       const current = openSet.reduce((a, b) =>
         fScore[`${a.q},${a.r},${a.s}`] < fScore[`${b.q},${b.r},${b.s}`] ? a : b
       );
 
-      if (
-        current.q === hexEnd.q &&
-        current.r === hexEnd.r &&
-        current.s === hexEnd.s
-      ) {
+      if (current.q === hexEnd.q && current.r === hexEnd.r && current.s === hexEnd.s) {
         const path = [current];
         while (cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]) {
           path.unshift(cameFrom[`${path[0].q},${path[0].r},${path[0].s}`]);
@@ -325,39 +263,21 @@ function Map() {
 
       const neighbors = HexUtils.neighbors(current);
       neighbors.forEach((neighbor) => {
-        if (
-          closedSet.some(
-            (hex) =>
-              hex.q === neighbor.q &&
-              hex.r === neighbor.r &&
-              hex.s === neighbor.s
-          )
-        ) {
+        if (closedSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
           return;
         }
 
-        const tentativeGScore =
-          gScore[`${current.q},${current.r},${current.s}`] + 1;
+        const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
 
-        if (
-          !openSet.some(
-            (hex) =>
-              hex.q === neighbor.q &&
-              hex.r === neighbor.r &&
-              hex.s === neighbor.s
-          )
-        ) {
+        if (!openSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
           openSet.push(neighbor);
-        } else if (
-          tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]
-        ) {
+        } else if (tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]) {
           return;
         }
 
         cameFrom[`${neighbor.q},${neighbor.r},${neighbor.s}`] = current;
         gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore;
-        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] =
-          tentativeGScore + HexUtils.distance(neighbor, hexEnd);
+        fScore[`${neighbor.q},${neighbor.r},${neighbor.s}`] = tentativeGScore + HexUtils.distance(neighbor, hexEnd);
       });
     }
 
@@ -440,12 +360,8 @@ function Map() {
               handleClick={() => handleHexClick(hexa)}
               key={key}
               index={key}
-              onMouseEnter={
-                hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null
-              }
-              onMouseLeave={
-                hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null
-              }
+              onMouseEnter={hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null}
+              onMouseLeave={hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null}
             ></Hexagon>
           );
         } else if (hexa.type == "base") {
@@ -488,15 +404,11 @@ function Map() {
   }, [map, viewBox]);
 
   const updateViewBox = () => {
-    const centerX =
-      parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY =
-      parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
     const newWidth = 100 / scale;
     const newHeight = 100 / scale;
-    const newViewBox = `${centerX - newWidth / 2} ${
-      centerY - newHeight / 2
-    } ${newWidth} ${newHeight}`;
+    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
   };
 
@@ -507,24 +419,24 @@ function Map() {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) - speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) + speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -545,8 +457,14 @@ function Map() {
       var ws = new WebSocket("ws://localhost:8000/map/");
 
       ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        setMap(data.map);
+        const response = JSON.parse(event.data);
+        if (response.type == "map") {
+          setMap(response.data.map);
+        } else if (response.type == "player") {
+          setPlayerData(response.data);
+        } else if (response.type == "room") {
+          setRoomData(response.data);
+        }
       };
 
       ws.onopen = function (event) {
@@ -579,44 +497,33 @@ function Map() {
     <div className="app">
       <div className="navbar">
         <div className="player-list-container">
-          <ul className="players-list">
-            <p className="owner-player">
-              <img
-                className="img-ship-players"
-                src={Ship1}
-                alt="ship-player1"
-              />
-              {playerOwner}
-              <p className="">1</p>
-            </p>
-            <li className="players-ship">
-              <img
-                className="img-ship-players"
-                src={Ship2}
-                alt="ship-player2"
-              />
-              Player 1
-            </li>
-            <li className="players-ship">
-              <img
-                className="img-ship-players"
-                src={Ship3}
-                alt="ship-player3"
-              />
-              Player 2
-            </li>
-            <li className="players-ship">
-              <img
-                className="img-ship-players"
-                src={Ship4}
-                alt="ship-player4"
-              />
-              Player 3
-            </li>
-          </ul>
+          <div className="players">
+            <div className="player-container">
+              <img className="img-ship-players" src={Ship1} alt="ship-player1" />
+            </div>
+            <p>{playerData.name}</p>
+          </div>
+          <div className="players">
+            <div className="player-container">
+              <img className="img-ship-players" src={Ship2} alt="ship-player1" />
+            </div>
+            <p>Player2</p>
+          </div>
+          <div className="players">
+            <div className="player-container">
+              <img className="img-ship-players" src={Ship3} alt="ship-player1" />
+            </div>
+            <p>Player3</p>
+          </div>
+          <div className="players">
+            <div className="player-container">
+              <img className="img-ship-players" src={Ship4} alt="ship-player1" />
+            </div>
+            <p>Player4</p>
+          </div>
         </div>
         <div>
-          <ul className="ressources-list"></ul>
+          <div className="ressources-list"></div>)
         </div>
       </div>
 
@@ -629,20 +536,17 @@ function Map() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Layout
-          size={hexagonSize}
-          flat={false}
-          spacing={1}
-          origin={{ x: -6, y: -6 }}
-        >
+        <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
           {hexagons}
         </Layout>
         <Patterns />
       </HexGrid>
 
-      {/*  <div className="controlls-container">
+      {/*
+      <div className="controlls-container">
         <p>Controlls Container</p>
-      </div>*/}
+      </div>
+      */}
       {isShipModalOpen && (
         <ShipModal
           ship={selectedShip}

@@ -15,7 +15,7 @@ function GameLobby() {
   const [players, setPlayers] = useState([]);
   const [playerOwner, setPlayerOwner] = useState("");
   const [namePlayer, setNamePlayer] = useState("");
-  const [numberPlayer, setNumberPlayer] = useState(0);
+  const [numberPlayer, setNumberPlayer] = useState(1);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [GameRoomID, setGameRoomID] = useState("");
   const [TokenAccessGame, setTokenAccessGame] = useState("");
@@ -143,7 +143,7 @@ function GameLobby() {
   const startGame = async () => {
     startRoomGame(GameRoomID); // update started true
     if (GameRoomID) {
-      console.log(namePlayer);
+      console.log(numberPlayer);
       localStorage.setItem("GameRoomID", GameRoomID);
       localStorage.setItem("namePlayer", namePlayer);
       localStorage.setItem("numberPlayer", numberPlayer);
