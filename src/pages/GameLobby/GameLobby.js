@@ -27,7 +27,9 @@ function GameLobby() {
 
   const getGameRoomByToken = async (token_game_room) => {
     try {
-      const response = await axios.get(baseUrl + `game_room/token/${token_game_room}`);
+      const response = await axios.get(
+        baseUrl + `game_room/token/${token_game_room}`
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -38,7 +40,9 @@ function GameLobby() {
 
   const joinRoomGame = async (player_name, token_game_room) => {
     try {
-      const response = await axios.post(baseUrl + `join/game_room/${player_name}/${token_game_room}`);
+      const response = await axios.post(
+        baseUrl + `join/game_room/${player_name}/${token_game_room}`
+      );
       const { name, number } = response.data.player_data;
       setNamePlayer(name);
       setNumberPlayer(number);
@@ -51,7 +55,9 @@ function GameLobby() {
 
   const startRoomGame = async (GameRoomID) => {
     try {
-      const response = await axios.post(baseUrl + `start/game_room/${GameRoomID}`);
+      const response = await axios.post(
+        baseUrl + `start/game_room/${GameRoomID}`
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -62,7 +68,9 @@ function GameLobby() {
 
   const generateMap = async (GameRoomID) => {
     try {
-      const response = await axios.post(baseUrl + `map/generate/40/${GameRoomID}`);
+      const response = await axios.post(
+        baseUrl + `map/generate/40/${GameRoomID}`
+      );
       console.log(response);
       return response.data;
     } catch (error) {
@@ -177,7 +185,7 @@ function GameLobby() {
           <div className="logo-container">
             <img className="game-logo-img" src={GameLogo} alt="logo-game" />
           </div>
-          <div className="flex flex-row justify-around">
+          <div className="flex flex-col items-center">
             <div className="players-list-container">
               <div className="flex flex-col w-9/12 h-full">
                 {players.map((player, index) => (
@@ -185,9 +193,17 @@ function GameLobby() {
                     {player.name ? (
                       <p className="players_logos_lobby">
                         {player.number == 1 ? (
-                          <img className="owner_player_logo" src={CrownAstronautLogo} alt="Logo Owner Astronaut" />
+                          <img
+                            className="owner_player_logo"
+                            src={CrownAstronautLogo}
+                            alt="Logo Owner Astronaut"
+                          />
                         ) : (
-                          <img className="players_logo" src={AstronautLogo} alt="Logo Astronaut" />
+                          <img
+                            className="players_logo"
+                            src={AstronautLogo}
+                            alt="Logo Astronaut"
+                          />
                         )}
                         {player.name}
                       </p>
@@ -198,18 +214,14 @@ function GameLobby() {
                 ))}
               </div>
             </div>
-            <div className="options-container">
-              <p>Voici tous les options</p>
-              <ul>
-                <li>Taille de la Carte</li>
-                <li>Nombre de joueurs</li>
-                <li>Durée de partie</li>
-                <li>Voleur</li>
-              </ul>
-              <div className="main-buttons-actions">
-                <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-                {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={startGame} />}
-              </div>
+            <div className="main-buttons-actions">
+              <InviteButton
+                message={"Invite"}
+                onClickFunction={copyInviteLink}
+              />
+              {accessStartBtn === true && (
+                <StartButton message={"Launch"} onClickFunction={startGame} />
+              )}
             </div>
           </div>
         </div>
@@ -229,8 +241,11 @@ function GameLobby() {
               >
                 <div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <h3 className="text-lg leading-6 font-medium text-white" id="modal-headline">
-                      Entrez votre nom pour rejoindre la partie
+                    <h3
+                      className="text-lg leading-6 font-medium text-white"
+                      id="modal-headline"
+                    >
+                    Join Game
                     </h3>
                     <div className="mt-2">
                       <form onSubmit={submitFormJoin}>
@@ -241,7 +256,7 @@ function GameLobby() {
                             value={namePlayer}
                             onChange={(e) => setNamePlayer(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                            placeholder="Entrez votre nom"
+                            placeholder="Enter name"
                           />
                         </div>
                         <div className="flex justify-center">
@@ -249,7 +264,7 @@ function GameLobby() {
                             type="submit"
                             className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
                           >
-                            Rejoindre la partie
+                            Join
                           </button>
                         </div>
                       </form>
