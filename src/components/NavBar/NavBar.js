@@ -38,11 +38,7 @@ export default function NavBar({ players, ressources }) {
             {player.name ? (
               <>
                 <div className="player-container">
-                  <img
-                    className="img-ship-players"
-                    src={ships[`Base${player.number}`]}
-                    alt={`ship-player${player.number}`}
-                  />
+                  <img className="img-ship-players" src={ships[`Base${player.id}`]} alt={`ship-player${player.id}`} />
                 </div>
                 <p>{player.name}</p>
               </>

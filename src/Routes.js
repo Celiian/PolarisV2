@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import Map from "./pages/Map/Map"
-import GameLobby from "./pages/GameLobby/GameLobby"
-import Home  from "./pages/Home/Home"
+import Map from "./pages/Map/MapTest";
+import GameLobby from "./pages/GameLobby/GameLobby";
+import Home from "./pages/Home/Home";
 
 function RoutesProvider() {
   return (

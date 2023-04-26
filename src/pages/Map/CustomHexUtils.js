@@ -1,8 +1,23 @@
-// hexUtils.js
+// CustomHexUtils.js
 import { HexUtils, Hex } from "react-hexgrid";
+import TinyQueue from "tinyqueue";
 
-export const findPath = (hexStart, hexEnd, map) => {
-  const openSet = [hexStart];
+export const memoize = (func) => {
+  const cache = new Map();
+  return (...args) => {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const result = func(...args);
+    cache.set(key, result);
+    return result;
+  };
+};
+const priorityQueueComparator = (a, b) => a.f - b.f;
+
+export const findPath = memoize((hexStart, hexEnd, map) => {
+  const openSet = new TinyQueue([{ hex: hexStart, f: 0 }], priorityQueueComparator);
   const closedSet = [];
 
   const cameFrom = {};
@@ -14,7 +29,7 @@ export const findPath = (hexStart, hexEnd, map) => {
   fScore[`${hexStart.q},${hexStart.r},${hexStart.s}`] = HexUtils.distance(hexStart, hexEnd);
 
   while (openSet.length > 0) {
-    const current = openSet.reduce((a, b) => (fScore[`${a.q},${a.r},${a.s}`] < fScore[`${b.q},${b.r},${b.s}`] ? a : b));
+    const current = openSet.pop().hex;
 
     if (current.q === hexEnd.q && current.r === hexEnd.r && current.s === hexEnd.s) {
       const path = [current];
@@ -24,7 +39,6 @@ export const findPath = (hexStart, hexEnd, map) => {
       return path;
     }
 
-    openSet.splice(openSet.indexOf(current), 1);
     closedSet.push(current);
 
     const neighbors = HexUtils.neighbors(current);
@@ -33,12 +47,16 @@ export const findPath = (hexStart, hexEnd, map) => {
         return;
       }
 
-      // Check if the neighbor is an obstacle
-
       for (let i = 0; i < map.length; i++) {
-        const hex = JSON.parse(map[i]);
+        const hex = map[i];
         if (hex.coord.q === neighbor.q && hex.coord.r === neighbor.r && hex.coord.s === neighbor.s) {
-          if (hex.type == "planet" || hex.type == "base" || hex.type == "ship" || hex.type == "miner") {
+          if (
+            hex.type == "planet" ||
+            hex.type == "base" ||
+            hex.type == "ship" ||
+            hex.type == "miner" ||
+            hex.type == "asteroids"
+          ) {
             return;
           }
         }
@@ -46,8 +64,12 @@ export const findPath = (hexStart, hexEnd, map) => {
 
       const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
 
-      if (!openSet.some((hex) => hex.q === neighbor.q && hex.r === neighbor.r && hex.s === neighbor.s)) {
-        openSet.push(neighbor);
+      if (
+        !openSet.data.some(
+          (item) => item.hex.q === neighbor.q && item.hex.r === neighbor.r && item.hex.s === neighbor.s
+        )
+      ) {
+        openSet.push({ hex: neighbor, f: tentativeGScore + HexUtils.distance(neighbor, hexEnd) });
       } else if (tentativeGScore >= gScore[`${neighbor.q},${neighbor.r},${neighbor.s}`]) {
         return;
       }
@@ -59,7 +81,7 @@ export const findPath = (hexStart, hexEnd, map) => {
   }
 
   return null;
-};
+});
 
 export const hexToPixel = (q, r, size) => {
   const x = size * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
@@ -113,17 +135,13 @@ export const getRotationDegree = (hex1, hex2) => {
 };
 
 export const centerViewBoxAroundCoord = (q, r, hexSize, currentViewBox) => {
-  // Get pixel coordinates from hexagonal coordinates
   const { x, y } = hexToPixel(q, r, hexSize);
 
-  // Get current viewBox values
   const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = currentViewBox.split(" ").map(parseFloat);
 
-  // Calculate new viewBox values
   const newViewBoxX = x - viewBoxWidth / 2;
   const newViewBoxY = y - viewBoxHeight / 2;
 
-  // Set the new viewBox
   const newViewBox = `${newViewBoxX} ${newViewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   return newViewBox;
 };

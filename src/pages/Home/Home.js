@@ -1,76 +1,54 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-
+import React, { useState, useEffect } from "react";
+import { ref, onValue, off, set } from "firebase/database";
 import "./Home.css";
+import db from "../../firebaseConfig";
+
 import BackGroundVideo from "../../assets/video/background-home.webm";
 import GameLogo from "../../assets/img/icons/logo.png";
 
-function Home() {
+const Home = () => {
   const [nameOwnerPlayer, setNameOwnerPlayer] = useState("");
-  const [generatedToken, setGeneratedToken] = useState("");
-  const [lien, setLien] = useState("");
 
-  const baseUrl = "http://127.0.0.1:8000/";
-
-  useEffect(() => {
-    console.log(lien);
-  }, [lien]);
-
-  useEffect(() => {
-    if (generatedToken !== "") {
-      setLien("/lobby?room=" + generatedToken + "=0");
-    } else {
-      generateLink();
-    }
-  }, [generatedToken, nameOwnerPlayer]);
-
-  const createRoomGame = async (namePlayer, token_game_room) => {
-    try {
-      const response = await axios.post(
-        baseUrl + `create/game_room/${namePlayer}/${token_game_room}`
-      );
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  };
-
-  const generateLink = async () => {
+  const generateLink = () => {
     const lienGenere = localStorage.getItem("lienGenere");
     if (lienGenere) {
       console.log("Le lien a déjà été généré :", lienGenere);
       return;
     }
-    const caracteres =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let generatedToken = "";
     for (let i = 0; i < 15; i++) {
-      generatedToken += caracteres.charAt(
-        Math.floor(Math.random() * caracteres.length)
-      );
+      generatedToken += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
     }
-    setGeneratedToken(generatedToken);
+    return generatedToken;
   };
 
-  const submitFormCreate = async (event) => {
-    event.preventDefault();
-    const namePlayerInput = nameOwnerPlayer;
-    await generateLink();
-    const tokenRoom = generatedToken;
-    createRoomGame(namePlayerInput, tokenRoom)
-      .then((response) => {
-        window.location.href = lien;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const submitFormCreate = async () => {
+    var token = generateLink();
+    await setDataInDatabase(
+      {
+        players: [{ name: nameOwnerPlayer, id: 1, ready: false }],
+        started: false,
+        token_game_room: token,
+        turn: 0,
+      },
+      "/game_room/" + token
+    );
+    localStorage.setItem("player_id", 1);
+
+    window.location.href = "/lobby?room=" + token + "0";
+  };
+
+  const setDataInDatabase = async (data, path) => {
+    const databaseRef = ref(db, path);
+
+    await set(databaseRef, data);
   };
 
   localStorage.clear();
 
   return (
-    <>
+    <div>
       <div className="h-screen">
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideo}></video>
@@ -99,7 +77,7 @@ function Home() {
                       placeholder="Enter name"
                     />
                   </div>
-                  <button type="submit" className="custom-button">
+                  <button  onClick={submitFormCreate} className="custom-button">
                     Create
                   </button>
                 </form>
@@ -161,8 +139,8 @@ function Home() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
-}
+};
 
 export default Home;

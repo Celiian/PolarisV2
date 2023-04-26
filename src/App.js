@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import backgroundSound from "./assets/sound/ost.mp3";
 
 import RoutesProvider from "./Routes";
+import DeleteAll from "./Delete";
 
 function App() {
   useEffect(() => {
