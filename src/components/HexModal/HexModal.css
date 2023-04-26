@@ -206,15 +206,16 @@ h1 {
 }
 
 #modal-desc {
-  color: var(--pallet3);
+  color: white;
   text-shadow: 0 0 1vw var(--pallet2);
   font-size: min(18px, 2.25vw, 3vh);
+  margin-bottom: 30px;
 }
 #modal-desc a {
   color: var(--pallet4);
 }
 
-#window-pane .details button {
+#window-pane .details .button {
   position: absolute;
   right: 1vw;
   top: 1.25vw;
@@ -233,4 +234,20 @@ h1 {
 
 .button {
   all: unset;
+}
+
+.btn-miner {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 16px;
+
+}
+
+.btn-miner:hover {
+  background-color: #0056b3;
 }

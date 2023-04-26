@@ -69,7 +69,7 @@ function GameLobby() {
   const generateMap = async (GameRoomID) => {
     try {
       const response = await axios.post(
-        baseUrl + `map/generate/40/${GameRoomID}`
+        baseUrl + `map/generate/10/${GameRoomID}`
       );
       console.log(response);
       return response.data;
