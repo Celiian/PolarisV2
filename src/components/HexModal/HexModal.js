@@ -1,9 +1,9 @@
 import React from "react";
 import "./HexModal.css";
 
-function HexModal({ showModal, handleModalClose, hexa }) {
+function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
   return (
-    <div className={hexa.name}>
+    <div className={hexa.fill}>
       <button
         type="button"
         aria-hidden={!showModal}
@@ -35,8 +35,18 @@ function HexModal({ showModal, handleModalClose, hexa }) {
         </div>
         <div className="details" data-augmented-ui>
           <h2 id="modal-title">{hexa.name}</h2>
-          <p id="modal-desc">{hexa.description}</p>
-          <button className="button" type="button" title="close modal" onClick={handleModalClose}>
+          <div className="test">
+            <p id="modal-desc">{hexa.description}</p>
+            {hexa.voidSpace === true && (
+              <button onClick={handleAddMiner} className="btn-miner">AddMiner</button>
+            )}
+          </div>
+          <button
+            className="button"
+            type="button"
+            title="close modal"
+            onClick={handleModalClose}
+          >
             X
           </button>
           <div className="under-text-detail" aria-hidden="true"></div>
