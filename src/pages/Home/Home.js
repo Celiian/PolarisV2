@@ -3,7 +3,7 @@ import axios from "axios";
 
 import "./Home.css";
 import BackGroundVideo from "../../assets/video/background-home.webm";
-import GameLogo from "../../assets/img/icons/logo.png"
+import GameLogo from "../../assets/img/icons/logo.png";
 
 function Home() {
   const [nameOwnerPlayer, setNameOwnerPlayer] = useState("");
@@ -75,47 +75,93 @@ function Home() {
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideo}></video>
         </div>
-        <div className="p-8 main-content">
-            <div className="logo-container">
-                <img className="game-logo-img" src={GameLogo} alt="logo-game" />
-            </div>
+        <div className="main-content">
+          <div className="logo-container">
+            <img className="game-logo-img" src={GameLogo} alt="logo-game" />
+          </div>
           <div className="container-main">
-            <div className="bg-white rounded-md shadow-md p-4 mb-4 dark:bg-gray-800">
-              <form
-                className="flex flex-col items-center"
-                onSubmit={submitFormCreate}
-              >
-                <div className="mb-4">
-                  <input
-                    type="text"
-                    id="name"
-                    value={nameOwnerPlayer}
-                    onChange={(e) => setNameOwnerPlayer(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    placeholder="Entrez votre nom"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="custom-button"
+            <div className="container-form-create-game">
+              <div className="bg-white rounded-md shadow-md p-4 mb-4 dark:bg-gray-800 w-full">
+              <h2 className="text-center" style={{color:"white"}}>Create GameRoom</h2>
+                <form
+                  className="flex flex-col items-center h-full justify-center"
+                  onSubmit={submitFormCreate}
                 >
-                  Create GameRoom
-                </button>
-              </form>
+                  <div className="mb-4">
+                    <input
+                      type="text"
+                      id="name"
+                      value={nameOwnerPlayer}
+                      onChange={(e) => setNameOwnerPlayer(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Entrez votre nom"
+                    />
+                  </div>
+                  <button type="submit" className="custom-button">
+                    Create
+                  </button>
+                </form>
+              </div>
             </div>
 
-            <div className="bg-gray-800 rounded-md shadow-md p-4">
-              <h2 className="text-lg font-bold mb-2 text-white">
-                Règles du jeu
-              </h2>
-              <ul className="list-disc list-inside text-white">
-                <li>Le jeu se joue à deux joueurs.</li>
-                <li>Chaque joueur a 21 pièces.</li>
-                <li>
-                  Les joueurs se relaient pour placer une pièce sur le plateau.
-                </li>
-                <li>Le premier joueur à aligner 4 pièces gagne.</li>
-              </ul>
+            <div className="container-rules">
+              <div className="bg-gray-800 rounded-md shadow-md p-4">
+                <h2 className="text-lg font-bold mb-2 text-white">
+                  Règles du jeu
+                </h2>
+                <ul className="list-disc list-inside text-white p-3">
+                  <li>4 joueurs maximum pour jouer une partie</li>
+                  <li>
+                    Les joueurs collectent des ressources pour construire des
+                    <br />
+                    vaisseaux, des stations spatiales ...
+                  </li>
+                  <li>
+                    Les joueurs peuvent construire des vaisseaux spatiaux
+                    équipés
+                    <br />
+                    pour explorer, conquérir.
+                  </li>
+                  <li>
+                    Les joueurs peuvent construire des stations de minage pour
+                    collecter des
+                    <br />
+                    ressources, produire de l'énergie et protéger leur
+                    territoire.
+                  </li>
+                  <li>
+                    Les joueurs investissent dans des technologies avancées pour
+                    <br />
+                    améliorer leurs vaisseaux spatiaux, leurs bases et leurs
+                    mineurs.
+                  </li>
+                  <li>
+                    Les joueurs envoient des vaisseaux pour explorer de nouveaux
+                    <br />
+                    territoires, découvrir des ressources et trouver des
+                    minerais rares.
+                  </li>
+                  <li>
+                    Les joueurs échangent des ressources, des technologies et
+                    des
+                    <br />
+                    minerais rares.
+                  </li>
+                  <li>
+                    Condition de Victoire : Le joueur qui atteint en premier le
+                    nombre
+                    <br />
+                    de total de 10 points de victoire remporte la partie
+                  </li>
+                  <li>
+                    Les joueurs peuvent gagner des points de victoire en<br></br>
+                    construisant des éléments spatiaux (bases, vaisseaux, <br></br>
+                    mineurs), en découvrant des ressources et des minerais<br></br>
+                    rares, et en échangeant des ressources, des technologies et<br></br>
+                    des minerais avec les autres joueurs.
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
