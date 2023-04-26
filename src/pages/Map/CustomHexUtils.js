@@ -50,7 +50,13 @@ export const findPath = memoize((hexStart, hexEnd, map) => {
       for (let i = 0; i < map.length; i++) {
         const hex = map[i];
         if (hex.coord.q === neighbor.q && hex.coord.r === neighbor.r && hex.coord.s === neighbor.s) {
-          if (hex.type == "planet" || hex.type == "base" || hex.type == "ship" || hex.type == "miner") {
+          if (
+            hex.type == "planet" ||
+            hex.type == "base" ||
+            hex.type == "ship" ||
+            hex.type == "miner" ||
+            hex.type == "asteroids"
+          ) {
             return;
           }
         }
@@ -129,17 +135,13 @@ export const getRotationDegree = (hex1, hex2) => {
 };
 
 export const centerViewBoxAroundCoord = (q, r, hexSize, currentViewBox) => {
-  // Get pixel coordinates from hexagonal coordinates
   const { x, y } = hexToPixel(q, r, hexSize);
 
-  // Get current viewBox values
   const [viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight] = currentViewBox.split(" ").map(parseFloat);
 
-  // Calculate new viewBox values
   const newViewBoxX = x - viewBoxWidth / 2;
   const newViewBoxY = y - viewBoxHeight / 2;
 
-  // Set the new viewBox
   const newViewBox = `${newViewBoxX} ${newViewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   return newViewBox;
 };

@@ -105,14 +105,22 @@ export const generate_map = (MAP_SIZE, players) => {
             }
           }
         }
-
-        var data = JSON.parse(`{
+        if (type == "base" || type == "ship") {
+          var data = JSON.parse(`{
+          "type": "${type}",
+          "fill": "${fill}",
+          "coord": ${JSON.stringify(P2(x, y, -x - y))},
+          "data_players" : ${JSON.stringify(data_players)},
+          "moved" : ${moved}
+        }`);
+        } else {
+          var data = JSON.parse(`{
           "type": "${type}",
           "fill": "${fill}",
           "coord": ${JSON.stringify(P2(x, y, -x - y))},
           "data_players" : ${JSON.stringify(data_players)}
         }`);
-
+        }
         map.push(data);
       }
     }
@@ -135,7 +143,8 @@ export const drawMap = (
   pathHexa,
   setPathPossibleHexa,
   setDataInDatabase,
-  setMap
+  token,
+  turn
 ) => {
   var Hexagons = [];
   map.forEach((hexa, index) => {
@@ -176,7 +185,17 @@ export const drawMap = (
               fill
                 ? () => {}
                 : pathHexa.includes(index)
-                ? () => moveShip(selectedShip, map, pathHexa, setDataInDatabase, setPathPossibleHexa, setPathHexa)
+                ? () =>
+                    moveShip(
+                      selectedShip,
+                      map,
+                      pathHexa,
+                      setDataInDatabase,
+                      setPathPossibleHexa,
+                      setPathHexa,
+                      token,
+                      turn
+                    )
                 : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
             }
             key={index}
@@ -201,9 +220,11 @@ export const drawMap = (
             fill={fill ? fill : hexa.type + "/" + hexa.fill}
             hexa={hexa.coord}
             handleClick={
-              fill || pathPossibleHexa.includes(index)
+              pathPossibleHexa.includes(index)
                 ? () => {}
-                : () => handleShipClick(hexa, setSelectedShip, setIsShipModalOpen)
+                : hexa.moved < turn
+                ? () => handleShipClick(hexa, setSelectedShip, setIsShipModalOpen)
+                : () => {}
             }
             key={index}
             index={index}
@@ -335,7 +356,7 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa) => {
   var pathPossible = [];
   var distanceMax = 0;
   if (ship.type == "base") {
-    distanceMax = 5;
+    distanceMax = 2;
   } else if (ship.type == "ship") {
     distanceMax = 5;
   }
@@ -350,7 +371,7 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa) => {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleHexa, setPathHexa) => {
+const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleHexa, setPathHexa, token, turn) => {
   const shipIndex = map.findIndex(
     (hex) => hex.coord.q === ship.coord.q && hex.coord.r === ship.coord.r && hex.coord.s === ship.coord.s
   );
@@ -373,16 +394,17 @@ const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleH
       fill: ship.fill.charAt(0) + "/" + rotate,
       type: ship.type,
       coord: hex.coord,
+      moved: turn,
     };
 
     ship.coord = hex.coord;
     const lastMap = updateVisible(ship, newMap);
-    await setDataInDatabase(lastMap, "/game_room/" + localStorage.getItem("room_token") + "/map/");
+    await setDataInDatabase(lastMap, "/game_room/" + token + "/map/");
   }
 };
 
 const updateVisible = (ship, map) => {
-  const distanceMax = ship.type === "base" ? 5 : 5;
+  const distanceMax = ship.type === "base" ? 10 : 5;
   const newMap = map.map((hex) => {
     const actualDistance = HexUtils.distance(hex.coord, ship.coord);
     if (actualDistance <= distanceMax) {
@@ -422,4 +444,36 @@ const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa,
 
   setPathPossibleHexa(newPathPossibleHexa);
   setPathHexa(pathIndexes);
+};
+
+export const handleNextTurn = async (players, setDataInDatabase, token, turn) => {
+  var allReady = true;
+  players.forEach((player) => {
+    if (player.ready == false && player.id != localStorage.getItem("player_id")) {
+      allReady = false;
+    }
+  });
+
+  var newPlayers = [];
+  if (!allReady) {
+    newPlayers = players.map((player) => {
+      if (player.id === localStorage.getItem("player_id")) {
+        return {
+          ...player,
+          ready: true,
+        };
+      }
+      return player;
+    });
+  } else {
+    newPlayers = players.map((player) => {
+      return {
+        ...player,
+        ready: false,
+      };
+    });
+    await setDataInDatabase(turn + 1, "/game_room/" + token + "/turn/"); // update the database with the new players array
+  }
+
+  await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/"); // update the database with the new players array
 };

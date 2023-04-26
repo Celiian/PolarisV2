@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
-import { findPath, hexToPixel, isVisible, getRotationDegree, centerViewBoxAroundCoord } from "./CustomHexUtils";
+import { centerViewBoxAroundCoord } from "./CustomHexUtils";
 import { ref, onValue, off, set } from "firebase/database";
 import db from "../../firebaseConfig";
-import { drawMap, prepareMoveShip } from "../../utils/utils";
+import { drawMap, prepareMoveShip, handleNextTurn } from "../../utils/utils";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
@@ -22,9 +22,10 @@ const Map = () => {
   const [players, setPlayers] = useState([]);
   const [turn, setTurn] = useState(0);
   const [speed, setSpeed] = useState(100);
-  const [scale, setScale] = useState(0.6);
+  const [scale, setScale] = useState(0.3);
   const [mapSize, setMapSize] = useState(0);
   const [hexagons, setHexagons] = useState([]);
+  const [token, setToken] = useState("");
 
   const [selectedHex, setSelectedHex] = useState(null);
   const [selectedShip, setSelectedShip] = useState(null);
@@ -94,12 +95,13 @@ const Map = () => {
   useEffect(() => {
     const token = localStorage.getItem("room_token");
     const databaseRef = ref(db, "/game_room/" + token);
+    setToken(token);
     onValue(databaseRef, (snapshot) => {
       var data = snapshot.val();
       setMap(data.map);
       if (first) {
         data.map.forEach((hexa, index) => {
-          if (hexa.type == "base" && hexa.fill == localStorage.getItem("numberPlayer")) {
+          if (hexa.type == "base" && hexa.fill == localStorage.getItem("player_id")) {
             const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
             setViewBox(newViewBox);
           }
@@ -131,7 +133,8 @@ const Map = () => {
       pathHexa,
       setPathPossibleHexa,
       setDataInDatabase,
-      setMap
+      token,
+      turn
     );
     setHexagons(hexas);
   }, [map, viewBox, pathPossibleHexa, pathHexa]);
@@ -206,7 +209,11 @@ const Map = () => {
           <Patterns />
         </HexGrid>
         <div className="controlls-container">
-          <CyberButton message={"Ready"} onClick={() => {}} turn={`Turn ${turn} `}></CyberButton>
+          <CyberButton
+            message={"Ready"}
+            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn)}
+            turn={`Turn ${turn} `}
+          ></CyberButton>
         </div>
       </div>
       {isShipModalOpen && selectedShip ? (
