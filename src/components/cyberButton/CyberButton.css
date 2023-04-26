@@ -1,5 +1,5 @@
 :root {
-  --glitched-duration: 3s;
+  --glitched-duration: 0.9s;
 }
 
 body {
@@ -22,7 +22,7 @@ a.cyberpunk2077 {
   text-transform: uppercase;
   font-weight: 600;
   font-family: "Advent Pro", arial;
-  padding: 10% 10%;
+  padding: 15% 15%;
   margin: 10px;
   position: relative;
   color: #fff;

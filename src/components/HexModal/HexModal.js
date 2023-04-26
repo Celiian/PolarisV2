@@ -3,7 +3,7 @@ import "./HexModal.css";
 
 function HexModal({ showModal, handleModalClose, hexa }) {
   return (
-    <div className={hexa.name}>
+    <div className={hexa.fill}>
       <button
         type="button"
         aria-hidden={!showModal}
