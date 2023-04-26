@@ -12,20 +12,12 @@ import ShipModal from "../../components/ShipModal/ShipModal";
 //import MiniMap from "./MiniMap";
 //import styled from "styled-components";
 
-import Ship1 from "../../assets/img/ships/ship1/ship/ship.png";
-import Ship2 from "../../assets/img/ships/ship2/ship/ship.png";
-import Ship3 from "../../assets/img/ships/ship3/ship/ship.png";
-import Ship4 from "../../assets/img/ships/ship4/ship/ship.png";
+
 
 import CyberButton from "../../components/cyberButton/CyberButton";
 import NavBar from "../../components/NavBar/NavBar";
 
-const ships = {
-  Ship1,
-  Ship2,
-  Ship3,
-  Ship4,
-};
+
 
 function Map() {
   const [hexagonClassNames, setHexagonClassNames] = useState({});
