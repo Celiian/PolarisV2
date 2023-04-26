@@ -35,6 +35,9 @@ const GameLobby = () => {
     const databaseRef = ref(db, path + token);
     onValue(databaseRef, (snapshot) => {
       setRoomData(snapshot.val());
+      if (snapshot.val().started) {
+        window.location.href = "/map";
+      }
     });
 
     return () => {
@@ -80,6 +83,7 @@ const GameLobby = () => {
   const startGame = async () => {
     const map = generate_map(40, roomData.players);
     await setDataInDatabase(map, path + localStorage.getItem("room_token") + "/map/");
+    await setDataInDatabase(true, path + localStorage.getItem("room_token") + "/started/");
     window.location.href = "/map";
   };
 
