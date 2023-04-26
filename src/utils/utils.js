@@ -68,10 +68,10 @@ export const generate_map = (MAP_SIZE, players) => {
             type = "sun";
             fill = "sun";
           } else if (distance(x, y) < 5) {
-          } else if (randomNumber > 95) {
+          } else if (randomNumber > 97) {
             type = "asteroid";
             fill = "asteroid";
-          } else if (randomNumber > 85) {
+          } else if (randomNumber > 92) {
             type = "planet";
             const planetRandom = Math.floor(Math.random() * 100) + 1;
             if (planetRandom > 90) {
@@ -335,7 +335,7 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa) => {
   var pathPossible = [];
   var distanceMax = 0;
   if (ship.type == "base") {
-    distanceMax = 2;
+    distanceMax = 5;
   } else if (ship.type == "ship") {
     distanceMax = 5;
   }
@@ -382,7 +382,7 @@ const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleH
 };
 
 const updateVisible = (ship, map) => {
-  const distanceMax = ship.type === "base" ? 10 : 5;
+  const distanceMax = ship.type === "base" ? 5 : 5;
   const newMap = map.map((hex) => {
     const actualDistance = HexUtils.distance(hex.coord, ship.coord);
     if (actualDistance <= distanceMax) {
