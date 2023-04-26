@@ -245,7 +245,7 @@ function GameLobby() {
                       className="text-lg leading-6 font-medium text-white"
                       id="modal-headline"
                     >
-                      Entrez votre nom pour rejoindre la partie
+                    Rejoingnez la partie
                     </h3>
                     <div className="mt-2">
                       <form onSubmit={submitFormJoin}>
