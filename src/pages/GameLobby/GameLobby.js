@@ -245,7 +245,7 @@ function GameLobby() {
                       className="text-lg leading-6 font-medium text-white"
                       id="modal-headline"
                     >
-                    Rejoingnez la partie
+                    Join Game
                     </h3>
                     <div className="mt-2">
                       <form onSubmit={submitFormJoin}>
@@ -256,7 +256,7 @@ function GameLobby() {
                             value={namePlayer}
                             onChange={(e) => setNamePlayer(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                            placeholder="Entrez votre nom"
+                            placeholder="Enter name"
                           />
                         </div>
                         <div className="flex justify-center">
@@ -264,7 +264,7 @@ function GameLobby() {
                             type="submit"
                             className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
                           >
-                            Rejoindre la partie
+                            Join
                           </button>
                         </div>
                       </form>

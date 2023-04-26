@@ -1,33 +1,29 @@
 .app {
   display: flex;
   flex-direction: column;
-  background-image: url("/src/assets/img/starry.jpg");
 }
 
 .controls {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
+  position: fixed;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%) rotate(-90deg);
   background-color: rgba(255, 255, 255, 0.5);
-  padding: 10px;
-  border-radius: 5px;
   display: flex;
-  flex-direction: row;
   align-items: center;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .controls input {
-  margin-left: 10px;
+  width: 150px;
 }
 
-.controlls-container {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
+.controls-container {
   width: 10%;
   height: 10%;
+}
 
-  z-index: 1;
+.controls svg {
+  transform: rotate(90deg);
 }
