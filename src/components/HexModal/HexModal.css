@@ -41,6 +41,14 @@
   --pallet4: #00edff;
 }
 
+.sun {
+  --palletHR: 0deg;
+  --pallet1: #131323;
+  --pallet2: #47ecef;
+  --pallet3: #cdedf1;
+  --pallet4: #00edff;
+}
+
 .agri {
   --palletHR: 0deg;
   --pallet1: #131323;

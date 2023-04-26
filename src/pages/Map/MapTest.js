@@ -14,6 +14,7 @@ import ShipModal from "../../components/ShipModal/ShipModal";
 
 import CyberButton from "../../components/cyberButton/CyberButton";
 import NavBar from "../../components/NavBar/NavBar";
+import BackGroundVideoMap from "../../assets/video/background-map.mp4";
 
 import "./Map.css";
 
@@ -193,6 +194,9 @@ const Map = () => {
   return (
     <>
       <div className="app">
+        <div className="video-wrapper">
+          <video autoPlay loop muted src={BackGroundVideoMap}></video>
+        </div>
         <NavBar players={players} ressources={[]}></NavBar>
         <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
         <HexGrid

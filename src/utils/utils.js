@@ -152,7 +152,7 @@ export const drawMap = (
       var hexagon = null;
       var fill = "";
       var style = "";
-      var stroke = "#fff";
+      var stroke = "#fff3";
       var data_player = {};
 
       for (let index in hexa.data_players) {
@@ -163,7 +163,8 @@ export const drawMap = (
 
       if (data_player.status == "hidden") {
         fill = " ";
-        style = " ";
+        style = "hide";
+        stroke = "#fff2";
       }
 
       if (pathPossibleHexa.includes(index)) {
@@ -289,7 +290,7 @@ export const SetHexData = (hexa) => {
 
   if (hexa.fill == "void") {
     name = "Space";
-    desc = "Well it's just plain void, what were you expecting ? ";
+    desc = "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
     img =
       "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
     voidSpace = true;
@@ -297,7 +298,7 @@ export const SetHexData = (hexa) => {
   if (hexa.fill == "mine") {
     name = "Mining planet";
     desc =
-      "Mineral planets are rich in valuable minerals and ores, making them prime locations for mining and resource extraction. However, they may also be home to dangerous environmental conditions and hostile alien species.";
+      "Celestial depths behold a cosmic dance, where stardust miners carve new worlds in deft romance; through astral veins they delve, unraveling mysteries grand, unearthing elements that shape the universe's hand.";
     img = "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
     style = "mine";
     voidSpace = false;
@@ -305,7 +306,7 @@ export const SetHexData = (hexa) => {
   if (hexa.fill == "agri") {
     name = "Agricultural Planet";
     desc =
-      "Agricultural planets are characterized by their fertile soil and abundant plant life, making them ideal for farming and food production. These planets are often highly populated and feature bustling cities and agricultural communities.";
+      "On these worlds of boundless green, the harvest of a million suns takes root and grows, promising sustenance and bounty to all who call them home.";
     img = "https://4kwallpapers.com/images/walls/thumbs_3t/8758.jpg";
     style = "agri";
     voidSpace = false;
@@ -313,7 +314,7 @@ export const SetHexData = (hexa) => {
   if (hexa.fill == "atmo") {
     name = "Atmospheric Planet";
     desc =
-      "Atmospheric planets in the game are characterized by their thick atmospheres and often feature unique weather patterns, making them challenging to explore but also rich in resources.";
+      "In the vast expanse, an atmospheric jewel gleams, where nebulous whispers paint skies with vibrant dreams; as winds entwine in harmonious dance, they birth new tales, a celestial tapestry that endlessly regales.";
     img =
       "https://w0.peakpx.com/wallpaper/538/645/HD-wallpaper-planet-124d-alien-black-cosmos-darkness-light-neon-space-ufo-violet-thumbnail.jpg";
     style = "atmo";
@@ -322,7 +323,7 @@ export const SetHexData = (hexa) => {
   if (hexa.fill == "indu") {
     name = "Industrial Planet";
     desc =
-      "Industrial planets are highly developed, with advanced infrastructure and a focus on manufacturing and production. Players can expect to find a wide range of industrial resources and technology on these planets.";
+      "Silent echoes of industry linger, where once steel giants reigned; an abandoned planet's ghostly whispers, a testament to dreams unchained. Yet within its slumber lies the seed of resurgence, awaiting the touch of creators to awaken its dormant emergence.";
     img = "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
     style = "indu";
     voidSpace = false;
@@ -333,6 +334,14 @@ export const SetHexData = (hexa) => {
       "A vast expanse of rocky debris, the asteroid field is a captivating cosmic maze. Suspended in the vacuum of space, these celestial fragments drift and collide, creating a mesmerizing ballet of chaos and beauty.";
     img = "https://t3.ftcdn.net/jpg/02/93/06/66/360_F_293066613_gJaIeEOyHm8Alm7JzF0SICDrvmKxSsrz.jpg";
     style = "indu";
+    voidSpace = false;
+  }
+  if (hexa.fill == "sun") {
+    name = "Polaris B (white dwarf)";
+    desc =
+      "Polaris Ab is a dim and small star, orbiting its brighter companion in a dance of light and gravity. Its presence adds to the mystique and allure of the Polaris system.";
+    img = "https://qph.cf2.quoracdn.net/main-qimg-03498708fef0dc7fc62b01745fe31840-lq";
+    style = "sun";
     voidSpace = false;
   }
 
