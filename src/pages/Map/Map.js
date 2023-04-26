@@ -8,6 +8,7 @@ import {
   centerViewBoxAroundCoord,
 } from "./CustomHexUtils";
 
+
 import axios from "axios";
 import "./Map.css";
 import Hexagon from "./mapAssets/Hexagons";
@@ -23,22 +24,14 @@ import Ship2 from "../../assets/img/ships/ship2/ship/ship.png";
 import Ship3 from "../../assets/img/ships/ship3/ship/ship.png";
 import Ship4 from "../../assets/img/ships/ship4/ship/ship.png";
 
-import food from "../../assets/img/ressources/foods/food.png";
-import water from "../../assets/img/ressources/foods/water.png";
-
-import diamonds from "../../assets/img/ressources/mine/diamonds.png";
-import iron from "../../assets/img/ressources/mine/iron.png";
-import uranium from "../../assets/img/ressources/mine/uranium.png";
 import CyberButton from "../../components/cyberButton/CyberButton";
+import NavBar from "../../components/NavBar/NavBar";
 
-const ressourceImages = {
-  diamonds: diamonds,
-  uranium: uranium,
-  energy: uranium,
-  "freeze-dried": food,
-  steel: iron,
-  water: water,
-  hydrogene: uranium,
+const ships = {
+  Ship1,
+  Ship2,
+  Ship3,
+  Ship4,
 };
 
 const ships = {
@@ -151,7 +144,6 @@ function Map() {
                 newHexagonClassNames[index] = updateHexagonClassNames[index];
               }
             }
-
             if (playerData) {
               var updatedPlayerData = updatePlayerMapStatus(
                 ship,
@@ -166,15 +158,29 @@ function Map() {
                 "visible"
               );
               setPlayerData(updatedPlayerData);
-              updatePlayerData(
+              await updatePlayerData(
                 localStorage.getItem("GameRoomID"),
                 updatedPlayerData.number,
                 updatedPlayerData.player_map
               );
             }
             setHexagonClassNames(newHexagonClassNames);
-            await delay(600);
           }
+
+          ship.moved = roomData.turn;
+
+          var oldShip = {
+            type: "void",
+            fill: "void",
+            coord: selectedShip.coord,
+            asteroids: selectedShip.asteroids,
+          };
+
+          var updatedMap = updateHexagon(map, oldShip, oldShip);
+          await saveMap(updatedMap);
+          updatedMap = updateHexagon(updatedMap, ship, ship);
+          await saveMap(updatedMap);
+          setMap(updatedMap);
           setMoving(false);
           setSelectedShip(null);
         }
@@ -224,13 +230,16 @@ function Map() {
       var img = "";
       var style = "";
       var voidSpace = false;
+      var name = "";
       if (hexa.fill == "void") {
+        name = "Space";
         desc = "Well it's just plain void, what were you expecting ? ";
         img =
           "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
         voidSpace = true;
       }
       if (hexa.fill == "mine") {
+        name = "Mining planet";
         desc =
           "Mineral planets are rich in valuable minerals and ores, making them prime locations for mining and resource extraction. However, they may also be home to dangerous environmental conditions and hostile alien species.";
         img =
@@ -239,6 +248,7 @@ function Map() {
         voidSpace = false;
       }
       if (hexa.fill == "agri") {
+        name = "Agricultural Planet";
         desc =
           "Agricultural planets are characterized by their fertile soil and abundant plant life, making them ideal for farming and food production. These planets are often highly populated and feature bustling cities and agricultural communities.";
         img = "https://4kwallpapers.com/images/walls/thumbs_3t/8758.jpg";
@@ -246,6 +256,7 @@ function Map() {
         voidSpace = false;
       }
       if (hexa.fill == "atmo") {
+        name = "Atmospheric Planet";
         desc =
           "Atmospheric planets in the game are characterized by their thick atmospheres and often feature unique weather patterns, making them challenging to explore but also rich in resources.";
         img =
@@ -254,6 +265,7 @@ function Map() {
         voidSpace = false;
       }
       if (hexa.fill == "indu") {
+        name = "Industrial Planet";
         desc =
           "Industrial planets are highly developed, with advanced infrastructure and a focus on manufacturing and production. Players can expect to find a wide range of industrial resources and technology on these planets.";
         img =
@@ -262,16 +274,42 @@ function Map() {
         voidSpace = false;
       }
       const hex = {
-        name: hexa.fill,
+        name: name,
         image: img,
         description: desc,
         style: style,
         voidSpace: voidSpace,
         coord: hexa.coord,
+        fill: hexa.fill
       };
       setSelectedHex(hex);
       setIsHexModalOpen(true);
     }
+  };
+
+  const updateHexagon = (mapData, hexa, newProperties) => {
+    const newMap = mapData.map((json) => JSON.parse(json));
+
+    const indexToUpdate = newMap.findIndex(
+      (obj) => obj.coord.q == hexa.coord.q && obj.coord.r == hexa.coord.r && obj.coord.s == hexa.coord.s
+    );
+
+    if (indexToUpdate === -1) {
+      return mapData;
+    }
+
+    const objToUpdate = newMap[indexToUpdate];
+
+    for (const prop in newProperties) {
+      objToUpdate[prop] = newProperties[prop];
+    }
+
+    const updatedJson = JSON.stringify(objToUpdate);
+
+    const updatedList = [...mapData];
+    updatedList[indexToUpdate] = updatedJson;
+
+    return updatedList;
   };
 
   const handleShipClick = (hexa) => {
@@ -538,20 +576,37 @@ function Map() {
               }
             ></Hexagon>
           );
-        } else if (hexa.type == "base" || hexa.type == "miner") {
-          hexagon = (
-            <Hexagon
-              style={style}
-              stroke={stroke}
-              fill={hexa.type + "/" + hexa.fill}
-              hexa={hexa.coord}
-              handleClick={fill ? () => {} : () => handleShipClick(hexa)}
-              key={key}
-              index={key}
-              onMouseEnter={null}
-              onMouseLeave={null}
-            ></Hexagon>
-          );
+        } else if (hexa.type == "base") {
+          var hexaFill = hexa.fill.split("/")[0];
+          if (hexaFill == playerData.number && parseInt(hexa.moved) < parseInt(roomData.turn)) {
+            hexagon = (
+              <Hexagon
+                style={style}
+                stroke={stroke}
+                fill={fill ? "" : hexa.type + "/" + hexa.fill}
+                hexa={hexa.coord}
+                handleClick={() => handleShipClick(hexa)}
+                key={key}
+                index={key}
+                onMouseEnter={null}
+                onMouseLeave={null}
+              ></Hexagon>
+            );
+          } else {
+            hexagon = (
+              <Hexagon
+                style={style}
+                stroke={stroke}
+                fill={fill ? "" : hexa.type + "/" + hexa.fill}
+                hexa={hexa.coord}
+                handleClick={() => {}}
+                key={key}
+                index={key}
+                onMouseEnter={null}
+                onMouseLeave={null}
+              ></Hexagon>
+            );
+          }
         } else {
           var style = "planet";
           hexagon = (
@@ -574,6 +629,20 @@ function Map() {
     setHexagons(newHexagons);
   };
 
+  const saveMap = async (newMap) => {
+    try {
+      const response = await axios.put("http://127.0.0.1:8000/map", {
+        game_room_id: localStorage.getItem("GameRoomID"),
+        player_number: playerData.number,
+        updated_map: newMap,
+      });
+
+      console.log("Map data updated successfully", response);
+    } catch (error) {
+      console.error("Error updating player data", error);
+    }
+  };
+
   useEffect(() => {
     drawMap();
   }, [hexagonClassNames, selectedShip]);
@@ -582,7 +651,7 @@ function Map() {
     if (map.length > 0) {
       drawMap();
     }
-  }, [map, viewBox]);
+  }, [map, viewBox, roomData]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -650,14 +719,11 @@ function Map() {
             });
             setFirst(false);
           }
-          console.log("map data retrieved");
           setMap(response.data.map);
         } else if (response.type == "player") {
-          console.log("player data retrieved");
           setPlayerData(response.data);
           setRessources(response.data.resources);
         } else if (response.type == "room") {
-          console.log("room data retrieved");
           setRoomData(response.data);
           setPlayers(response.data.players);
         }
@@ -687,56 +753,34 @@ function Map() {
     }
   }, []);
 
+  const handleNextTurn = async () => {
+    const newRoomData = roomData.players.map((item) => {
+      if (item.number === playerData.number) {
+        return { ...item, ready: true };
+      } else {
+        return item;
+      }
+    });
+    try {
+      // updatedPlayerData is a list of string (JSON formatted string)
+      const response = await axios.put("http://127.0.0.1:8000/game_room/players", {
+        game_room_id: localStorage.getItem("GameRoomID"),
+        player_number: playerData.number,
+        updated_players_data: newRoomData,
+      });
+
+      console.log("Player set to ready", response);
+    } catch (error) {
+      console.error("Error updating player data", error);
+    }
+  };
+
   var minZoom = 0.25 / (mapSize / 10);
 
   return (
     <div className="app">
-      <div className="navbar">
-        <div className="player-list-container">
-          <div className="players">
-            <div className="player-container">
-              <img
-                className="img-ship-players"
-                src={Ship1}
-                alt="ship-player1"
-              />
-            </div>
-            <p>{playerData.name}</p>
-          </div>
-          {players.map((player, index) => (
-            <div key={index} className="players">
-              {player.name ? (
-                <>
-                  <div className="player-container">
-                    <img
-                      className="img-ship-players"
-                      src={ships[`Ship${player.number}`]}
-                      alt={`ship-player${player.number}`}
-                    />
-                  </div>
-                  <p>{player.name}</p>
-                </>
-              ) : (
-                <div className="player-container"></div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="ressources-list-container">
-          <div className="ressources-list">
-            {Object.entries(ressources).map(([key, value]) => (
-              <div className="resources" key={key}>
-                <img
-                  className="ressource-img"
-                  src={ressourceImages[key]}
-                  alt={key}
-                />
-                <p>{value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+
+      <NavBar players={players} ressources={ressources}></NavBar>
 
       <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
       <HexGrid
@@ -759,13 +803,7 @@ function Map() {
       </HexGrid>
 
       <div className="controlls-container">
-        <CyberButton
-          message={"Next Turn"}
-          onClick={() => {
-            console.log("clicked");
-          }}
-          turn="Turn 21"
-        ></CyberButton>
+        <CyberButton message={"Ready"} onClick={() => handleNextTurn()} turn={`Turn ${roomData.turn} `}></CyberButton>
       </div>
       {isShipModalOpen && selectedShip ? (
         <ShipModal
