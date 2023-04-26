@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
-import {
-  findPath,
-  hexToPixel,
-  isVisible,
-  getRotationDegree,
-  centerViewBoxAroundCoord,
-} from "./CustomHexUtils";
-
+import { findPath, hexToPixel, isVisible, getRotationDegree, centerViewBoxAroundCoord } from "./CustomHexUtils";
 
 import axios from "axios";
 import "./Map.css";
@@ -26,13 +19,6 @@ import Ship4 from "../../assets/img/ships/ship4/ship/ship.png";
 
 import CyberButton from "../../components/cyberButton/CyberButton";
 import NavBar from "../../components/NavBar/NavBar";
-
-const ships = {
-  Ship1,
-  Ship2,
-  Ship3,
-  Ship4,
-};
 
 const ships = {
   Ship1,
@@ -91,9 +77,7 @@ function Map() {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
-        viewBox.split(" ")[3]
-      }`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
       setViewBox(newViewBox);
     }
   };
@@ -111,10 +95,8 @@ function Map() {
   const handleHexClick = async (hexa) => {
     if (moving) {
       if (
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
-          "movable" ||
-        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] ==
-          "path"
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "movable" ||
+        hexagonClassNames[`${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`] == "path"
       ) {
         let path = findPath(selectedShip.coord, hexa.coord, map);
 
@@ -137,26 +119,13 @@ function Map() {
             let newHexagonClassNames = {};
             let updateHexagonClassNames = { ...hexagonClassNames };
             for (let index in updateHexagonClassNames) {
-              if (
-                updateHexagonClassNames[index] != "movable" &&
-                updateHexagonClassNames[index] != "path"
-              ) {
+              if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
                 newHexagonClassNames[index] = updateHexagonClassNames[index];
               }
             }
             if (playerData) {
-              var updatedPlayerData = updatePlayerMapStatus(
-                ship,
-                playerData,
-                5,
-                "discover"
-              );
-              updatedPlayerData = updatePlayerMapStatus(
-                ship,
-                updatedPlayerData,
-                5,
-                "visible"
-              );
+              var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
+              updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
               setPlayerData(updatedPlayerData);
               await updatePlayerData(
                 localStorage.getItem("GameRoomID"),
@@ -191,12 +160,7 @@ function Map() {
       if (
         playerData.player_map.some((item) => {
           let hex = JSON.parse(item);
-          if (
-            hex.q === hexa.q &&
-            hex.r === hexa.r &&
-            hex.s === hexa.s &&
-            hex.status === "visible"
-          ) {
+          if (hex.q === hexa.q && hex.r === hexa.r && hex.s === hexa.s && hex.status === "visible") {
             return true;
           }
         })
@@ -242,8 +206,7 @@ function Map() {
         name = "Mining planet";
         desc =
           "Mineral planets are rich in valuable minerals and ores, making them prime locations for mining and resource extraction. However, they may also be home to dangerous environmental conditions and hostile alien species.";
-        img =
-          "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
+        img = "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
         style = "mine";
         voidSpace = false;
       }
@@ -268,8 +231,7 @@ function Map() {
         name = "Industrial Planet";
         desc =
           "Industrial planets are highly developed, with advanced infrastructure and a focus on manufacturing and production. Players can expect to find a wide range of industrial resources and technology on these planets.";
-        img =
-          "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
+        img = "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
         style = "indu";
         voidSpace = false;
       }
@@ -280,7 +242,7 @@ function Map() {
         style: style,
         voidSpace: voidSpace,
         coord: hexa.coord,
-        fill: hexa.fill
+        fill: hexa.fill,
       };
       setSelectedHex(hex);
       setIsHexModalOpen(true);
@@ -353,10 +315,7 @@ function Map() {
     var newHexagonClassNames = {};
     let updateHexagonClassNames = { ...hexagonClassNames }; // make a copy of the current classNames object
     for (var index in updateHexagonClassNames) {
-      if (
-        updateHexagonClassNames[index] != "movable" &&
-        updateHexagonClassNames[index] != "path"
-      ) {
+      if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
         newHexagonClassNames[index] = updateHexagonClassNames[index];
       }
     }
@@ -405,48 +364,16 @@ function Map() {
     // };
     // var newMap = updateHexagon(map, hexa, newHexa);
     // setMap(newMap);
-    console.log("build")
+    console.log("build");
   };
 
   const updateViewBox = () => {
-    const centerX =
-      parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY =
-      parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
     const newWidth = 100 / scale;
     const newHeight = 100 / scale;
-    const newViewBox = `${centerX - newWidth / 2} ${
-      centerY - newHeight / 2
-    } ${newWidth} ${newHeight}`;
+    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
-  };
-
-  const updateHexagon = (mapData, hexa, newProperties) => {
-    const newMap = mapData.map((json) => JSON.parse(json));
-
-    const indexToUpdate = newMap.findIndex(
-      (obj) =>
-        obj.coord.q == hexa.coord.q &&
-        obj.coord.r == hexa.coord.r &&
-        obj.coord.s == hexa.coord.s
-    );
-
-    if (indexToUpdate === -1) {
-      return mapData;
-    }
-
-    const objToUpdate = newMap[indexToUpdate];
-
-    for (const prop in newProperties) {
-      objToUpdate[prop] = newProperties[prop];
-    }
-
-    const updatedJson = JSON.stringify(objToUpdate);
-
-    const updatedList = [...mapData];
-    updatedList[indexToUpdate] = updatedJson;
-
-    return updatedList;
   };
 
   const swapHexagons = (hex1, hex2) => {
@@ -500,11 +427,7 @@ function Map() {
     return { ...playerData, player_map: updatedPlayerMap };
   };
 
-  const updatePlayerData = async (
-    gameRoomId,
-    playerNumber,
-    updatedPlayerDataMap
-  ) => {
+  const updatePlayerData = async (gameRoomId, playerNumber, updatedPlayerDataMap) => {
     try {
       // updatedPlayerData is a list of string (JSON formatted string)
       const response = await axios.put("http://127.0.0.1:8000/player/map", {
@@ -527,7 +450,7 @@ function Map() {
     };
     var newMap = updateHexagon(map, hexa, newHexa);
     setMap(newMap);
-    setIsHexModalOpen(false)
+    setIsHexModalOpen(false);
   };
 
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -547,9 +470,7 @@ function Map() {
             fill = " ";
             style = " ";
             stroke = "#fff7";
-          } else if (
-            JSON.parse(playerData.player_map[index]).status == "discover"
-          ) {
+          } else if (JSON.parse(playerData.player_map[index]).status == "discover") {
             style = "discover";
           } else {
             style = hexa.type;
@@ -568,22 +489,18 @@ function Map() {
               handleClick={fill ? () => {} : () => handleHexClick(hexa)}
               key={key}
               index={key}
-              onMouseEnter={
-                hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null
-              }
-              onMouseLeave={
-                hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null
-              }
+              onMouseEnter={hexagonInPath[key] ? () => handleHexagonMouseEnter(hexa) : null}
+              onMouseLeave={hexagonInPath[key] ? () => handleHexagonMouseLeave(hexa) : null}
             ></Hexagon>
           );
-        } else if (hexa.type == "base") {
-          var hexaFill = hexa.fill.split("/")[0];
-          if (hexaFill == playerData.number && parseInt(hexa.moved) < parseInt(roomData.turn)) {
+        } else if (hexa.type == "base" || hexa.type == "ship" || hexa.type == "miner") {
+          var hexaFill = ("" + hexa.fill).split("/")[0];
+          if (hexaFill == playerData.number && parseInt(hexa.moved) < parseInt(roomData.turn) && hexa.type != "miner") {
             hexagon = (
               <Hexagon
                 style={style}
                 stroke={stroke}
-                fill={fill ? "" : hexa.type + "/" + hexa.fill}
+                fill={hexa.type + "/" + hexa.fill}
                 hexa={hexa.coord}
                 handleClick={() => handleShipClick(hexa)}
                 key={key}
@@ -597,7 +514,7 @@ function Map() {
               <Hexagon
                 style={style}
                 stroke={stroke}
-                fill={fill ? "" : hexa.type + "/" + hexa.fill}
+                fill={hexa.type + "/" + hexa.fill}
                 hexa={hexa.coord}
                 handleClick={() => {}}
                 key={key}
@@ -660,24 +577,24 @@ function Map() {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) - speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) + speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -704,16 +621,8 @@ function Map() {
             response.data.map.forEach((item, index) => {
               const hexa = JSON.parse(item);
 
-              if (
-                hexa.type == "base" &&
-                hexa.fill == localStorage.getItem("numberPlayer")
-              ) {
-                const newViewBox = centerViewBoxAroundCoord(
-                  hexa.coord.q,
-                  hexa.coord.r,
-                  hexagonSize.x,
-                  viewBox
-                );
+              if (hexa.type == "base" && hexa.fill == localStorage.getItem("numberPlayer")) {
+                const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
                 setViewBox(newViewBox);
               }
             });
@@ -779,7 +688,6 @@ function Map() {
 
   return (
     <div className="app">
-
       <NavBar players={players} ressources={ressources}></NavBar>
 
       <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
@@ -791,12 +699,7 @@ function Map() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <Layout
-          size={hexagonSize}
-          flat={false}
-          spacing={1}
-          origin={{ x: -6, y: -6 }}
-        >
+        <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
           {hexagons}
         </Layout>
         <Patterns />
