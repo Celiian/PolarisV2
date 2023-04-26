@@ -125,6 +125,11 @@ function GameLobby() {
     if (TokenAccessGame) {
       (async () => {
         const response = await getGameRoomByToken(TokenAccessGame);
+
+        var numberPlayerid = Object.keys(response.players).length;
+
+        localStorage.setItem("GameRoomID", response.id_doc_game_room);
+        localStorage.setItem("numberPlayer", numberPlayer + 1);
         setGameRoomID(response.id_doc_game_room);
         setPlayerOwner(response.room_game_owner);
       })();

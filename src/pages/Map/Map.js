@@ -12,12 +12,8 @@ import ShipModal from "../../components/ShipModal/ShipModal";
 //import MiniMap from "./MiniMap";
 //import styled from "styled-components";
 
-
-
 import CyberButton from "../../components/cyberButton/CyberButton";
 import NavBar from "../../components/NavBar/NavBar";
-
-
 
 function Map() {
   const [hexagonClassNames, setHexagonClassNames] = useState({});
@@ -96,6 +92,14 @@ function Map() {
           path.shift();
           let ship = selectedShip;
           setHexagonInPath([]);
+          let newHexagonClassNames = {};
+          let updateHexagonClassNames = { ...hexagonClassNames };
+          for (let index in updateHexagonClassNames) {
+            if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
+              newHexagonClassNames[index] = updateHexagonClassNames[index];
+            }
+          }
+          setHexagonClassNames(newHexagonClassNames);
           for (let indexPath in path) {
             let nextCase = path[indexPath];
             let rotation = getRotationDegree(ship.coord, nextCase);
@@ -105,43 +109,32 @@ function Map() {
             } else {
               ship.fill += "/" + rotation;
             }
-            let newHexas = swapHexagons(ship, nextCase);
-            setSelectedShip(newHexas[0]);
-            ship = newHexas[0];
-            let newHexagonClassNames = {};
-            let updateHexagonClassNames = { ...hexagonClassNames };
-            for (let index in updateHexagonClassNames) {
-              if (updateHexagonClassNames[index] != "movable" && updateHexagonClassNames[index] != "path") {
-                newHexagonClassNames[index] = updateHexagonClassNames[index];
-              }
-            }
-            if (playerData) {
-              var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
-              updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
-              setPlayerData(updatedPlayerData);
-              await updatePlayerData(
-                localStorage.getItem("GameRoomID"),
-                updatedPlayerData.number,
-                updatedPlayerData.player_map
-              );
-            }
-            setHexagonClassNames(newHexagonClassNames);
+            let response = swapHexagons(ship, nextCase);
+            setSelectedShip(response[0]);
+            ship = response[0];
+            var oldShip = {
+              type: "void",
+              fill: "void",
+              coord: selectedShip.coord,
+              asteroids: selectedShip.asteroids,
+            };
+
+            var updatedMap = updateHexagon(response[2], oldShip, oldShip);
+            updatedMap = updateHexagon(updatedMap, ship, ship);
+            saveMap(updatedMap);
           }
 
           ship.moved = roomData.turn;
 
-          var oldShip = {
-            type: "void",
-            fill: "void",
-            coord: selectedShip.coord,
-            asteroids: selectedShip.asteroids,
-          };
-
-          var updatedMap = updateHexagon(map, oldShip, oldShip);
-          await saveMap(updatedMap);
-          updatedMap = updateHexagon(updatedMap, ship, ship);
-          await saveMap(updatedMap);
-          setMap(updatedMap);
+          if (playerData) {
+            var updatedPlayerData = updatePlayerMapStatus(ship, playerData, 5, "discover");
+            updatedPlayerData = updatePlayerMapStatus(ship, updatedPlayerData, 5, "visible");
+            updatePlayerData(
+              localStorage.getItem("GameRoomID"),
+              updatedPlayerData.number,
+              updatedPlayerData.player_map
+            );
+          }
           setMoving(false);
           setSelectedShip(null);
         }
@@ -244,8 +237,9 @@ function Map() {
   const updateHexagon = (mapData, hexa, newProperties) => {
     const newMap = mapData.map((json) => JSON.parse(json));
 
+    console.log(hexa);
     const indexToUpdate = newMap.findIndex(
-      (obj) => obj.coord.q == hexa.coord.q && obj.coord.r == hexa.coord.r && obj.coord.s == hexa.coord.s
+      (obj) => obj && obj.coord.q == hexa.coord.q && obj.coord.r == hexa.coord.r && obj.coord.s == hexa.coord.s
     );
 
     if (indexToUpdate === -1) {
@@ -396,10 +390,9 @@ function Map() {
 
       newMap[index1] = JSON.stringify(hex1Data);
       newMap[index2] = JSON.stringify(hex2Data);
-      setMap(newMap);
 
       // Return the two new hexagons after swapping their coordinates
-      return [hex1Data, hex2Data];
+      return [hex1Data, hex2Data, newMap];
     }
   };
 
@@ -441,7 +434,7 @@ function Map() {
       fill: playerData.number,
     };
     var newMap = updateHexagon(map, hexa, newHexa);
-    setMap(newMap);
+    saveMap(newMap);
     setIsHexModalOpen(false);
   };
 
@@ -506,7 +499,7 @@ function Map() {
               <Hexagon
                 style={style}
                 stroke={stroke}
-                fill={hexa.type + "/" + hexa.fill}
+                fill={fill ? "" : hexa.type + "/" + hexa.fill}
                 hexa={hexa.coord}
                 handleClick={() => {}}
                 key={key}
@@ -551,16 +544,6 @@ function Map() {
       console.error("Error updating player data", error);
     }
   };
-
-  useEffect(() => {
-    drawMap();
-  }, [hexagonClassNames, selectedShip]);
-
-  useEffect(() => {
-    if (map.length > 0) {
-      drawMap();
-    }
-  }, [map, viewBox, roomData]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -675,6 +658,12 @@ function Map() {
       console.error("Error updating player data", error);
     }
   };
+
+  useEffect(() => {
+    if (map.length > 0) {
+      drawMap();
+    }
+  }, [viewBox, hexagonClassNames, map, playerData, roomData]);
 
   var minZoom = 0.25 / (mapSize / 10);
 
