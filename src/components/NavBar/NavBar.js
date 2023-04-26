@@ -52,8 +52,12 @@ export default function NavBar({ players, ressources }) {
         <div className="ressources-list">
           {Object.entries(ressources).map(([key, value]) => (
             <div className="resources" key={key}>
-              <img className="ressource-img" src={ressourceImages[key]} alt={key} />
-              <p>{value}</p>
+              <img
+                className="ressource-img"
+                src={ressourceImages[key]}
+                alt={key}
+              />
+              <p className="ressources-value">{value}</p>
             </div>
           ))}
         </div>

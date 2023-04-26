@@ -97,9 +97,10 @@ const GameLobby = () => {
           <div className="logo-container">
             <img className="game-logo-img" src={GameLogo} alt="logo-game" />
           </div>
-          <div className="flex flex-row justify-around">
+          <div className="flex flex-col items-center">
             <div className="players-list-container">
               <div className="flex flex-col w-9/12 h-full">
+
                 {roomData ? (
                   roomData.players.map((player, index) => (
                     <div key={index} className="pt-5">
@@ -122,18 +123,14 @@ const GameLobby = () => {
                 )}
               </div>
             </div>
-            <div className="options-container">
-              <p>Voici tous les options</p>
-              <ul>
-                <li>Taille de la Carte</li>
-                <li>Nombre de joueurs</li>
-                <li>Durée de partie</li>
-                <li>Voleur</li>
-              </ul>
-              <div className="main-buttons-actions">
-                <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-                {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={startGame} />}
-              </div>
+            <div className="main-buttons-actions">
+              <InviteButton
+                message={"Invite"}
+                onClickFunction={copyInviteLink}
+              />
+              {accessStartBtn === true && (
+                <StartButton message={"Launch"} onClickFunction={startGame} />
+              )}
             </div>
           </div>
         </div>
