@@ -56,7 +56,6 @@ const Map = () => {
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   const [viewBox, setViewBox] = useState(initialViewBox);
 
-
   const handleZoom = (event) => {
     const newZoom = event.target.value;
     if (newZoom !== 0) {
@@ -97,9 +96,7 @@ const Map = () => {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
-        viewBox.split(" ")[3]
-      }`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
       setViewBox(newViewBox);
     }
   };
@@ -131,16 +128,8 @@ const Map = () => {
       setMap(data.map);
       if (first) {
         data.map.forEach((hexa, index) => {
-          if (
-            hexa.type == "base" &&
-            hexa.fill == localStorage.getItem("player_id")
-          ) {
-            const newViewBox = centerViewBoxAroundCoord(
-              hexa.coord.q,
-              hexa.coord.r,
-              hexagonSize.x,
-              viewBox
-            );
+          if (hexa.type == "base" && hexa.fill == localStorage.getItem("player_id")) {
+            const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
             setViewBox(newViewBox);
           }
         });
@@ -190,24 +179,24 @@ const Map = () => {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) - speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
-            viewBox.split(" ")[1]
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${
-            parseFloat(viewBox.split(" ")[1]) + speed
-          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
+            viewBox.split(" ")[2]
+          } ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -261,12 +250,7 @@ const Map = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
-          <Layout
-            size={hexagonSize}
-            flat={false}
-            spacing={1}
-            origin={{ x: -6, y: -6 }}
-          >
+          <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
             {hexagons}
           </Layout>
           <Patterns />
@@ -274,9 +258,7 @@ const Map = () => {
         <div className="controls-container">
           <CyberButton
             message={"Ready"}
-            onClick={() =>
-              handleNextTurn(players, setDataInDatabase, token, turn)
-            }
+            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn)}
             turn={`Turn ${turn} `}
             color={"black"}
           ></CyberButton>
@@ -301,7 +283,13 @@ const Map = () => {
           hexa={selectedHex}
           showModal={true}
           handleModalClose={() => setIsHexModalOpen(false)}
-          handleAddMiner={() => AddMiner(selectedHex, player, token, setDataInDatabase, map, setIsHexModalOpen)}
+          button1={selectedHex.button1}
+          dataButton1={selectedHex.dataButton1}
+          function1={
+            selectedHex.dataButton1.func == "addMiner"
+              ? () => AddMiner(selectedHex, player, token, setDataInDatabase, map, setIsHexModalOpen)
+              : () => {}
+          }
         />
       )}
     </>

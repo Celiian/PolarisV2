@@ -50,15 +50,18 @@ function HexModal({
             <p id="modal-desc">{hexa.description}</p>
 
             {button1 && (
-              <button onClick={() => function1} className="btn-miner">
-                {dataButton1.name}
-              </button>
+              <CyberButton
+                message={dataButton1.message}
+                toolTip={dataButton1.toolTip}
+                style={dataButton1.style}
+                onClick={() => function1()}
+                className="btn-miner"
+              ></CyberButton>
             )}
             {button2 && (
-              <button onClick={() => function2} className="btn-miner">
+              <button onClick={() => function2()} className="btn-miner">
                 {dataButton2.name}
               </button>
-
             )}
           </div>
           <button className="button" type="button" title="close modal" onClick={handleModalClose}>

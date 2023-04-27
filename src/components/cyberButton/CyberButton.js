@@ -1,9 +1,9 @@
 import "./CyberButton.css";
 
-export default function CyberButton({ message, onClick, turn, color }) {
+export default function CyberButton({ message, onClick, toolTip, style }) {
   return (
     <>
-      <button className={"cyberpunk2077 " + color} onClick={onClick} style={{ "--button-label": `"${turn}"` }}>
+      <button className={"cyberpunk2077 " + style} onClick={onClick} style={{ "--button-label": `"${toolTip}"` }}>
         {message}
       </button>
     </>
