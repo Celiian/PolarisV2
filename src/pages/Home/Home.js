@@ -51,8 +51,8 @@ const Home = () => {
             ressources: {
               water: 10,
               foodCan: 10,
-              shipEngine: 10,
-              shipPart: 10,
+              shipEngine: 14,
+              shipPart: 100,
               coins: 10,
               uranium: 10,
               ore: 10,
