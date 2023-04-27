@@ -1,0 +1,14 @@
+.drawer-content {
+    width: 300px;
+}
+
+button.btn-drawer {
+    position: fixed;
+    top: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: bold;
+}
