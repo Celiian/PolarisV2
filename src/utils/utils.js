@@ -71,13 +71,13 @@ export const generate_map = (MAP_SIZE, players) => {
               fill = "indu";
               const prodRandom = Math.floor(Math.random() * 100) + 1;
               if (prodRandom > 50) {
-                prod = "ship_part";
+                prod = "shipPart";
               } else {
-                prod = "ship_engine";
+                prod = "shipEngine";
               }
             } else if (planetRandom > 60) {
               fill = "agri";
-              prod = "food";
+              prod = "foodCan";
             } else if (planetRandom > 40) {
               fill = "atmo";
               prod = "water";
@@ -506,10 +506,11 @@ const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa,
   setPathHexa(pathIndexes);
 };
 
-export const handleNextTurn = async (players, setDataInDatabase, token, turn) => {
+export const handleNextTurn = async (players, setDataInDatabase, token, turn, map, actualPlayer) => {
+  console.log("clicked");
   var allReady = true;
   players.forEach((player) => {
-    if (player.ready == false && player.id != localStorage.getItem("player_id")) {
+    if (player.ready == false && player.id != actualPlayer.id) {
       allReady = false;
     }
   });
@@ -517,7 +518,7 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn) =>
   var newPlayers = [];
   if (!allReady) {
     newPlayers = players.map((player) => {
-      if (player.id === localStorage.getItem("player_id")) {
+      if (player.id === actualPlayer.id) {
         return {
           ...player,
           ready: true,
@@ -526,6 +527,21 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn) =>
       return player;
     });
   } else {
+    var ressource_players = {};
+    players.forEach((player, index) => {
+      var newRessources = player.ressources;
+      map.forEach((hexa) => {
+        if (hexa.type == "miner" && hexa.fill == player.id) {
+          hexa.ressources.forEach((rss) => {
+            newRessources[rss] = newRessources[rss] + 10 * hexa.level;
+          });
+        }
+      });
+      ressource_players[index] = newRessources;
+    });
+
+    console.log(ressource_players);
+
     newPlayers = players.map((player) => {
       return {
         ...player,
@@ -547,9 +563,9 @@ export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setI
     fill: player.id,
     planets: dataSupp.planets_type,
     ressources: dataSupp.ressource_prod,
+    level: 1,
   };
   var newMap = updateHexagon(map, hexa, newHexa);
-  console.log(newHexa);
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
 };
 

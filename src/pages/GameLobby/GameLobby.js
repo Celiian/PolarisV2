@@ -17,6 +17,7 @@ const GameLobby = () => {
   const [showModal, setShowModal] = useState(false);
   const [accessStartBtn, setAccessStartBtn] = useState(true);
   const [namePlayer, setNamePlayer] = useState("");
+  const [token, setToken] = useState("");
   const path = "/game_room/";
 
   useEffect(() => {
@@ -36,7 +37,6 @@ const GameLobby = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     var token = params.get("room");
-    console.log(token);
     if (token && token.endsWith("1")) {
       setShowModal(true);
       setAccessStartBtn(false);
@@ -45,6 +45,7 @@ const GameLobby = () => {
       setAccessStartBtn(true);
     }
     token = token.slice(0, -1);
+    setToken(token);
     localStorage.setItem("room_token", token);
 
     const databaseRef = ref(db, path + token);
@@ -82,9 +83,10 @@ const GameLobby = () => {
         water: 10,
         foodCan: 10,
         shipEngine: 10,
+        shipPart: 10,
         coins: 10,
         uranium: 10,
-        iron: 10,
+        ore: 10,
         crystal: 10,
       },
     });
@@ -93,9 +95,7 @@ const GameLobby = () => {
   };
 
   const copyInviteLink = () => {
-    let linkInvite = `${
-      window.location.origin
-    }/lobby?room=${localStorage.getItem("room_token")}1`;
+    let linkInvite = `${window.location.origin}/lobby?room=${token}1`;
     navigator.clipboard.writeText(linkInvite).then(
       () => {
         console.log("Lien copié dans le presse-papiers :", linkInvite);
@@ -108,14 +108,8 @@ const GameLobby = () => {
 
   const startGame = async () => {
     const map = generate_map(40, roomData.players);
-    await setDataInDatabase(
-      map,
-      path + localStorage.getItem("room_token") + "/map/"
-    );
-    await setDataInDatabase(
-      true,
-      path + localStorage.getItem("room_token") + "/started/"
-    );
+    await setDataInDatabase(map, path + token + "/map/");
+    await setDataInDatabase(true, path + token + "/started/");
     window.location.href = "/map";
   };
 
@@ -138,17 +132,9 @@ const GameLobby = () => {
                       {player.name ? (
                         <p className="players_logos_lobby">
                           {player.id == 1 ? (
-                            <img
-                              className="owner_player_logo"
-                              src={CrownAstronautLogo}
-                              alt="Logo Owner Astronaut"
-                            />
+                            <img className="owner_player_logo" src={CrownAstronautLogo} alt="Logo Owner Astronaut" />
                           ) : (
-                            <img
-                              className="players_logo"
-                              src={AstronautLogo}
-                              alt="Logo Astronaut"
-                            />
+                            <img className="players_logo" src={AstronautLogo} alt="Logo Astronaut" />
                           )}
                           {player.name}
                         </p>
@@ -163,13 +149,8 @@ const GameLobby = () => {
               </div>
             </div>
             <div className="main-buttons-actions">
-              <InviteButton
-                message={"Invite"}
-                onClickFunction={copyInviteLink}
-              />
-              {accessStartBtn === true && (
-                <StartButton message={"Launch"} onClickFunction={startGame} />
-              )}
+              <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
+              {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={startGame} />}
             </div>
           </div>
         </div>
@@ -189,10 +170,7 @@ const GameLobby = () => {
               >
                 <div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <h3
-                      className="text-lg leading-6 font-medium text-white"
-                      id="modal-headline"
-                    >
+                    <h3 className="text-lg leading-6 font-medium text-white" id="modal-headline">
                       Join GameRoom
                     </h3>
                     <div className="mt-2">

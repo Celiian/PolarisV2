@@ -30,13 +30,10 @@ const Home = () => {
       console.log("Le lien a déjà été généré :", lienGenere);
       return;
     }
-    const caracteres =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let generatedToken = "";
     for (let i = 0; i < 15; i++) {
-      generatedToken += caracteres.charAt(
-        Math.floor(Math.random() * caracteres.length)
-      );
+      generatedToken += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
     }
     return generatedToken;
   };
@@ -51,13 +48,14 @@ const Home = () => {
             id: 1,
             ready: false,
             ressources: {
-              Water: 10,
-              FoodCan: 10,
-              ShipEngine: 10,
-              Coins: 10,
-              Uranium: 10,
-              Iron: 10,
-              Crystal: 10,
+              water: 10,
+              foodCan: 10,
+              shipEngine: 10,
+              shipPart: 10,
+              coins: 10,
+              uranium: 10,
+              ore: 10,
+              crystal: 10,
             },
           },
         ],
@@ -116,33 +114,23 @@ const Home = () => {
 
             <div className="container-rules">
               <div className="bg-gray-800 rounded-md shadow-md p-4">
-                <h2 className="text-lg font-bold mb-2 text-white">
-                  Game Rules
-                </h2>
+                <h2 className="text-lg font-bold mb-2 text-white">Game Rules</h2>
                 <ul className="list-disc list-inside text-white p-3">
                   <li>Maximum 4 players to play a game</li>
+                  <li>Players collect resources to build ships, space stations ships, space stations ...</li>
+                  <li>Players can build equipped spaceshipsto explore, conquer.</li>
                   <li>
-                    Players collect resources to build ships, space stations
-                    ships, space stations ...
-                  </li>
-                  <li>
-                    Players can build equipped spaceshipsto explore, conquer.
-                  </li>
-                  <li>
-                    Players can build mining stations to collect resources,
-                    produce energy and
+                    Players can build mining stations to collect resources, produce energy and
                     <br />
                     resources, produce energy and protect their territory.
                   </li>
                   <li>
-                    Players invest in advanced technologies to improve their
-                    spaceships
+                    Players invest in advanced technologies to improve their spaceships
                     <br />
                     improve their spaceships, bases and miners.
                   </li>
                   <li>
-                    Players send ships to explore new territories, discover
-                    resources and find
+                    Players send ships to explore new territories, discover resources and find
                     <br />
                     discover resources and find rare ores.
                   </li>
@@ -152,17 +140,14 @@ const Home = () => {
                     rare minerals.
                   </li>
                   <li>
-                    Victory Condition: The player who first reaches the total of
-                    10 victory points wins.
+                    Victory Condition: The player who first reaches the total of 10 victory points wins.
                     <br />
                     total of 10 victory points wins the game
                   </li>
                   <li>
-                    Players can gain victory points by building space elements
-                    (bases, ships, miners), <br></br>
+                    Players can gain victory points by building space elements (bases, ships, miners), <br></br>
                     discovering resources and resources and minerals, <br></br>
-                    and by trading resources, technology and minerals with other
-                    players.
+                    and by trading resources, technology and minerals with other players.
                   </li>
                 </ul>
               </div>

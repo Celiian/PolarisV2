@@ -223,23 +223,14 @@ const Map = () => {
 
   var minZoom = 0.25 / (mapSize / 10);
 
-  var ressources = {
-    Water: 10,
-    FoodCan: 10,
-    ShipEngine: 10,
-    Coins: 10,
-    Uranium: 10,
-    Iron: 10,
-    Crystal: 10,
-  };
-
   return (
     <>
       <div className="app">
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideoMap}></video>
         </div>
-        <NavBar players={players} ressources={ressources}></NavBar>
+
+        {player && <NavBar players={players} ressources={player.ressources}></NavBar>}
 
         <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
         <HexGrid
@@ -258,7 +249,7 @@ const Map = () => {
         <div className="controls-container">
           <CyberButton
             message={"Ready"}
-            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn)}
+            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn, map, player)}
             toolTip={`Turn ${turn} `}
             style={"black"}
           ></CyberButton>
