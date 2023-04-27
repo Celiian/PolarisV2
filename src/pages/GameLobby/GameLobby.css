@@ -17,7 +17,7 @@ video {
     border-radius: 10px;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
     background-color: rgb(31 41 55);
-    height: 400px;
+    height: 430px;
 }
 
 .owner_player_logo {
@@ -25,7 +25,7 @@ video {
     width: 50px;
 }
 
-p.owner-player-p{
+p.owner-player-p {
     display: flex;
     justify-content: flex-start;
     padding: 20px;

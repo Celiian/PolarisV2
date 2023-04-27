@@ -15,6 +15,9 @@ import Base2 from "../../assets/img/ships/ship2/base/base.png";
 import Base3 from "../../assets/img/ships/ship3/base/base.png";
 import Base4 from "../../assets/img/ships/ship4/base/base.png";
 
+//
+import CyberButtonGlitched from "../CyberButtonGlitched/CyberButtonGlitched";
+
 const ressourceImages = {
   water: water,
   foodCan: food_can,
@@ -41,7 +44,11 @@ export default function NavBar({ players, ressources }) {
             {player.name ? (
               <>
                 <div className="player-container">
-                  <img className="img-ship-players" src={ships[`Base${player.id}`]} alt={`ship-player${player.id}`} />
+                  <img
+                    className="img-ship-players"
+                    src={ships[`Base${player.id}`]}
+                    alt={`ship-player${player.id}`}
+                  />
                 </div>
                 <p>{player.name}</p>
               </>
@@ -56,7 +63,11 @@ export default function NavBar({ players, ressources }) {
           {ressources &&
             Object.entries(ressources).map(([key, value]) => (
               <div className="resources" key={key}>
-                <img className="ressource-img" src={ressourceImages[key]} alt={key} />
+                <img
+                  className="ressource-img"
+                  src={ressourceImages[key]}
+                  alt={key}
+                />
                 <p className="ressources-value">
                   {key} : {value}
                 </p>
@@ -64,6 +75,7 @@ export default function NavBar({ players, ressources }) {
             ))}
         </div>
       </div>
+      <CyberButtonGlitched message={"Trade"} />
     </div>
   );
 }

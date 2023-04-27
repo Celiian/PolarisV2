@@ -13,9 +13,6 @@ export default function CyberButtonGlitched({ message, onClick, color }) {
         <span aria-hidden class="cybr-btn__glitch">
           {message}_
         </span>
-        <span aria-hidden class="cybr-btn__tag">
-          R25
-        </span>
       </button>
     </>
   );
