@@ -91,6 +91,7 @@ export default function NavBar({
       <TradeModal
         showModal={tradeModal}
         handleClose={() => setTradeModal(false)}
+        ressources={ressources}
       />
     </div>
   );
