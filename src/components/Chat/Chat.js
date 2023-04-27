@@ -20,6 +20,19 @@ import SendIcon from "@mui/icons-material/Send";
 
 import "./Chat.css";
 
+// Assets bases
+import Base1 from "../../assets/img/ships/ship1/base/base.png";
+import Base2 from "../../assets/img/ships/ship2/base/base.png";
+import Base3 from "../../assets/img/ships/ship3/base/base.png";
+import Base4 from "../../assets/img/ships/ship4/base/base.png";
+
+const ships = {
+  Base1,
+  Base2,
+  Base3,
+  Base4,
+};
+
 const ChatDrawer = ({
   open,
   onClose,
@@ -65,7 +78,6 @@ const ChatDrawer = ({
     if (token) {
       const databaseRef = ref(db, "/game_room/" + token);
       onValue(databaseRef, (snapshot) => {
-        console.log(snapshot.val().chat);
         if (snapshot.val().chat) {
           setMessages(snapshot.val().chat);
         }
@@ -81,16 +93,31 @@ const ChatDrawer = ({
     <ThemeProvider theme={theme}>
       <Drawer anchor="left" open={open} onClose={onClose}>
         <div>
-          <Typography variant="h6" style={{ padding: "1rem" }}>
-            Chat
-          </Typography>
+          <h1>GameChat</h1>
           <List>
             {messages.map((msg, index) => (
-              <ListItem key={index}>
-                <ListItemAvatar>
-                  <Avatar>{msg.sender[0].toUpperCase()}</Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={msg.sender} secondary={msg.message} />
+              <ListItem
+                key={index}
+                className={
+                  msg.player_id === localStorage.getItem("player_id")
+                    ? "align-right"
+                    : ""
+                }
+              >
+                <img
+                  className="img-ship-players"
+                  src={ships[`Base${msg.player_id}`]}
+                  alt={`ship-player${msg.player_id}`}
+                />
+                <ListItemText
+                  primary={msg.sender}
+                  secondary={msg.message}
+                  className={
+                    msg.player_id === localStorage.getItem("player_id")
+                      ? "align-right-text"
+                      : ""
+                  }
+                />
               </ListItem>
             ))}
           </List>

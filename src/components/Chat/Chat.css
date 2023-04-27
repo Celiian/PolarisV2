@@ -12,3 +12,21 @@ button.btn-drawer {
     border-radius: 10px;
     font-weight: bold;
 }
+
+.align-right {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
+.align-right .MuiListItemText-root {
+    margin-right: 16px;
+}
+
+.align-right .MuiListItemAvatar-root {
+    margin-left: 16px;
+}
+
+.align-right-text {
+    text-align: right;
+}
