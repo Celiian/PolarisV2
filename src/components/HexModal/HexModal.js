@@ -59,9 +59,13 @@ function HexModal({
               ></CyberButton>
             )}
             {button2 && (
-              <button onClick={() => function2()} className="btn-miner">
-                {dataButton2.name}
-              </button>
+              <CyberButton
+                message={dataButton2.message}
+                toolTip={dataButton2.toolTip}
+                style={dataButton2.style}
+                onClick={() => function2()}
+                className="btn-miner"
+              ></CyberButton>
             )}
           </div>
           <button className="button" type="button" title="close modal" onClick={handleModalClose}>

@@ -152,8 +152,6 @@ export const drawMap = (
   id,
   setSelectedHex,
   setIsHexModalOpen,
-  setSelectedShip,
-  setIsShipModalOpen,
   pathPossibleHexa,
   selectedShip,
   setPathHexa,
@@ -162,10 +160,14 @@ export const drawMap = (
   setDataInDatabase,
   token,
   turn,
-  player
+  player,
+  shipBuild,
+  setShipBuild,
+  setSelectedShip,
+  setMapInDb
 ) => {
   var Hexagons = [];
-  map.forEach((hexa, index) => {
+  Object.entries(map).forEach(([index, hexa]) => {
     if (isVisible(hexa.coord, hexagonSize, viewBox)) {
       var hexagon = null;
       var fill = "";
@@ -205,6 +207,10 @@ export const drawMap = (
         style = "path";
       }
 
+      if (shipBuild.includes(index)) {
+        style = "movable";
+      }
+
       const key = `${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`;
       if (hexa.fill === "void") {
         hexagon = (
@@ -222,13 +228,16 @@ export const drawMap = (
                       selectedShip,
                       map,
                       pathHexa,
-                      setDataInDatabase,
+                      setMapInDb,
                       setPathPossibleHexa,
                       setPathHexa,
                       token,
-                      turn
+                      turn,
+                      setShipBuild
                     )
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player)
+                : shipBuild.includes(index)
+                ? () => BuildShip(hexa, player, token, setDataInDatabase, map, setIsHexModalOpen)
+                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
             }
             key={index}
             index={index}
@@ -259,9 +268,7 @@ export const drawMap = (
             handleClick={
               pathPossibleHexa.includes(index)
                 ? () => {}
-                : hexa.moved < turn
-                ? () => handleShipClick(hexa, setSelectedShip, setIsShipModalOpen)
-                : () => {}
+                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
             }
             key={index}
             index={index}
@@ -278,7 +285,7 @@ export const drawMap = (
             handleClick={
               fill || pathPossibleHexa.includes(index)
                 ? () => {}
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player)
+                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, turn)
             }
             key={index}
             index={index}
@@ -291,13 +298,13 @@ export const drawMap = (
   return Hexagons;
 };
 
-const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen, player) => {
-  var hex = SetHexData(hexa, player, map);
+const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn) => {
+  var hex = SetHexData(hexa, player, map, setSelectedShip, turn);
   setSelectedHex(hex);
   setIsHexModalOpen(true);
 };
 
-export const SetHexData = (hexa, player, map) => {
+export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
   var desc = "";
   var img = "";
   var style = "";
@@ -307,9 +314,38 @@ export const SetHexData = (hexa, player, map) => {
   var button1 = false;
   var dataButton1 = { message: "", toolTip: "", func: "", style: "", dataSupp: null };
   var button2 = false;
-  var dataButton2 = {};
+  var dataButton2 = { message: "", toolTip: "", func: "", style: "", dataSupp: null };
 
-  if (hexa.fill == "void") {
+  if (hexa.type == "base") {
+    setSelectedShip(hexa);
+    name = "Mother Ship";
+    desc =
+      "Despite its size, the Mother Ship boasts a sleek and streamlined design, allowing it to navigate even the most challenging environments and protect its inhabitants. Thanks to its advanced manufacturing facilities, the motherShip can also produce smaller spacecraft such as exploration ships, requiring 20 ship parts and 5 ship engines to construct. ";
+    img = "https://wallpapercrafter.com/desktop1/540220-action-battlestar-fighting-futuristic-galactica.jpg";
+    style = "indu";
+
+    if (hexa.moved < turn) {
+      button1 = true;
+    }
+    button2 = true;
+    dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
+    dataButton2 = { message: "Build Ship", toolTip: "ӨӨƼᕓՆ", func: "addShip", style: "black small", dataSupp: null };
+  } else if (hexa.type == "ship") {
+    setSelectedShip(hexa);
+    name = "Exploration Ship";
+    desc =
+      "Equipped with cutting-edge propulsion systems and state-of-the-art scientific instruments, the space exploration ship represents humanity's unwavering commitment to unlocking the secrets of the universe. As it voyages through the cosmos, it offers a glimpse into the boundless possibilities of space exploration and the limitless potential of human ingenuity.";
+    img =
+      "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e61c74a7-0e3e-40be-8a70-e05a01fef9f7/dct211a-d481ce86-8ddf-40d7-868f-70e8a3bb1640.jpg/v1/fill/w_1210,h_660,q_75,strp/star_wars_terran_scout_ship_by_scifidan96_dct211a-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjYwIiwicGF0aCI6IlwvZlwvZTYxYzc0YTctMGUzZS00MGJlLThhNzAtZTA1YTAxZmVmOWY3XC9kY3QyMTFhLWQ0ODFjZTg2LThkZGYtNDBkNy04NjhmLTcwZThhM2JiMTY0MC5qcGciLCJ3aWR0aCI6Ijw9MTIxMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.cm-EAnU0hLKNFZhZ99vV53vEuYdUEq7jn2u8XVbqZtc";
+    style = "large";
+
+    if (hexa.moved < turn) {
+      button1 = true;
+    }
+    button2 = true;
+    dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
+    dataButton2 = { message: "Upgrade Ship", toolTip: "ӨӨƼᕓՆ", func: "", style: "black small", dataSupp: null };
+  } else if (hexa.fill == "void") {
     name = "Space";
     desc = "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
     img =
@@ -318,7 +354,7 @@ export const SetHexData = (hexa, player, map) => {
       if (hexa.data_players[index].id == player.id) {
         if (hexa.data_players[index].status == "visible") {
           let neighbors = HexUtils.neighbors(hexa.coord);
-          map.forEach((hex) => {
+          Object.entries(map).forEach(([index, hex]) => {
             if (hex.type == "planet") {
               neighbors.forEach((neighbor) => {
                 if (neighbor.q == hex.coord.q && neighbor.r == hex.coord.r && neighbor.s == hex.coord.s) {
@@ -341,51 +377,48 @@ export const SetHexData = (hexa, player, map) => {
 
     if (miner) {
       button1 = false;
-    } else {
+    } else if (button1 == true) {
       dataButton1.message = "Build Miner";
       dataButton1.toolTip = "ƼᕓӨӨՆ";
       dataButton1.func = "addMiner";
       dataButton1.style = "black small";
       dataButton1.dataSupp = dataMiner;
+      desc =
+        "With a miner ship at your disposal, the rich resources of nearby planets are yours for the taking. Add this essential vessel to your fleet to extract valuable materials and propel your civilization towards prosperity and power. To build a miner ship you will need 10 Ship Part and 2 Ship Engine";
     }
-  }
-  if (hexa.fill == "mine") {
+    style = "large";
+  } else if (hexa.fill == "mine") {
     name = "Mining planet";
     desc =
       "Celestial depths behold a cosmic dance, where stardust miners carve new worlds in deft romance; through astral veins they delve, unraveling mysteries grand, unearthing elements that shape the universe's hand.";
     img = "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
     style = "mine";
-  }
-  if (hexa.fill == "agri") {
+  } else if (hexa.fill == "agri") {
     name = "Agricultural Planet";
     desc =
       "On these worlds of boundless green, the harvest of a million suns takes root and grows, promising sustenance and bounty to all who call them home.";
     img = "https://4kwallpapers.com/images/walls/thumbs_3t/8758.jpg";
     style = "agri";
-  }
-  if (hexa.fill == "atmo") {
+  } else if (hexa.fill == "atmo") {
     name = "Atmospheric Planet";
     desc =
       "In the vast expanse, an atmospheric jewel gleams, where nebulous whispers paint skies with vibrant dreams; as winds entwine in harmonious dance, they birth new tales, a celestial tapestry that endlessly regales.";
     img =
       "https://w0.peakpx.com/wallpaper/538/645/HD-wallpaper-planet-124d-alien-black-cosmos-darkness-light-neon-space-ufo-violet-thumbnail.jpg";
     style = "atmo";
-  }
-  if (hexa.fill == "indu") {
+  } else if (hexa.fill == "indu") {
     name = "Industrial Planet";
     desc =
       "Silent echoes of industry linger, where once steel giants reigned; an abandoned planet's ghostly whispers, a testament to dreams unchained. Yet within its slumber lies the seed of resurgence, awaiting the touch of creators to awaken its dormant emergence.";
     img = "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
     style = "indu";
-  }
-  if (hexa.fill == "asteroid") {
+  } else if (hexa.fill == "asteroid") {
     name = "Asteroid field";
     desc =
       "A vast expanse of rocky debris, the asteroid field is a captivating cosmic maze. Suspended in the vacuum of space, these celestial fragments drift and collide, creating a mesmerizing ballet of chaos and beauty.";
     img = "https://t3.ftcdn.net/jpg/02/93/06/66/360_F_293066613_gJaIeEOyHm8Alm7JzF0SICDrvmKxSsrz.jpg";
     style = "indu";
-  }
-  if (hexa.fill == "sun") {
+  } else if (hexa.fill == "sun") {
     name = "Polaris B (white dwarf)";
     desc =
       "Polaris Ab is a dim and small star, orbiting its brighter companion in a dance of light and gravity. Its presence adds to the mystique and allure of the Polaris system.";
@@ -399,7 +432,7 @@ export const SetHexData = (hexa, player, map) => {
     description: desc,
     style: style,
     coord: hexa.coord,
-    fill: hexa.fill,
+    fill: style || hexa.fill,
     button1: button1,
     dataButton1: dataButton1,
     button2: button2,
@@ -407,12 +440,7 @@ export const SetHexData = (hexa, player, map) => {
   };
 };
 
-const handleShipClick = (hexa, setSelectedShip, setIsShipModalOpen) => {
-  setSelectedShip(hexa);
-  setIsShipModalOpen(true);
-};
-
-export const prepareMoveShip = (ship, map, setPathPossibleHexa) => {
+export const prepareMoveShip = (ship, map, setPathPossibleHexa, setIsHexModalOpen) => {
   var pathPossible = [];
   var distanceMax = 0;
   if (ship.type == "base") {
@@ -420,26 +448,31 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa) => {
   } else if (ship.type == "ship") {
     distanceMax = 5;
   }
-  map.forEach((hexa, index) => {
+  Object.entries(map).forEach(([index, hexa]) => {
     var actualDistance = HexUtils.distance(hexa.coord, ship.coord);
+    if (actualDistance <= distanceMax) {
+    }
     if (actualDistance <= distanceMax) {
       pathPossible.push(index);
     }
   });
   setPathPossibleHexa(pathPossible);
+  setIsHexModalOpen(false);
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleHexa, setPathHexa, token, turn) => {
-  const shipIndex = map.findIndex(
-    (hex) => hex.coord.q === ship.coord.q && hex.coord.r === ship.coord.r && hex.coord.s === ship.coord.s
-  );
-  const newMap = [...map];
+const moveShip = async (ship, map, pathHexa, setMapInDb, setPathPossibleHexa, setPathHexa, token, turn) => {
+  var shipKey = `${ship.coord.q}_${ship.coord.r}_${ship.coord.s}`;
+
+  const newMap = map;
   setPathHexa([]);
   setPathPossibleHexa([]);
+  console.log(pathHexa);
+  const hexaListToUpdate = [];
   for (let i = 0; i < pathHexa.length; i++) {
     const hexIndex = pathHexa[i];
+
     const hex = newMap[hexIndex];
 
     newMap[hexIndex] = {
@@ -449,23 +482,25 @@ const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleH
       coord: ship.coord,
     };
     var rotate = getRotationDegree(ship.coord, hex.coord);
-    newMap[shipIndex] = {
+    newMap[shipKey] = {
       ...hex,
-      fill: ship.fill.charAt(0) + "/" + rotate,
+      fill: String(ship.fill).charAt(0) + "/" + rotate,
       type: ship.type,
       coord: hex.coord,
       moved: turn,
     };
 
+    hexaListToUpdate.push(newMap[hexIndex], newMap[shipKey]);
     ship.coord = hex.coord;
-    const lastMap = updateVisible(ship, newMap);
-    await setDataInDatabase(lastMap, "/game_room/" + token + "/map/");
+    await setMapInDb(hexaListToUpdate, `/game_room/${token}/map/`);
+    await delay(100);
   }
 };
 
 const updateVisible = (ship, map) => {
   const distanceMax = ship.type === "base" ? 10 : 5;
-  const newMap = map.map((hex) => {
+  const newMap = {};
+  Object.entries(map).forEach(([key, hex]) => {
     const actualDistance = HexUtils.distance(hex.coord, ship.coord);
     if (actualDistance <= distanceMax) {
       const newDataPlayers = hex.data_players.map((player) => {
@@ -475,7 +510,7 @@ const updateVisible = (ship, map) => {
           return player;
         }
       });
-      return { ...hex, data_players: newDataPlayers };
+      newMap[key] = { ...hex, data_players: newDataPlayers };
     } else {
       const newDataPlayers = hex.data_players.map((player) => {
         if (player.status == "visible" && String(player.ship) == String(ship.type)) {
@@ -484,7 +519,7 @@ const updateVisible = (ship, map) => {
           return player;
         }
       });
-      return { ...hex, data_players: newDataPlayers };
+      newMap[key] = { ...hex, data_players: newDataPlayers };
     }
   });
   return newMap;
@@ -492,7 +527,7 @@ const updateVisible = (ship, map) => {
 
 const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa, setPathPossibleHexa) => {
   const mapCoordToIndex = {};
-  map.forEach((hex, index) => {
+  Object.entries(map).forEach(([index, hex]) => {
     mapCoordToIndex[`${hex.coord.q},${hex.coord.r},${hex.coord.s}`] = index;
   });
 
@@ -507,7 +542,6 @@ const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa,
 };
 
 export const handleNextTurn = async (players, setDataInDatabase, token, turn, map, actualPlayer) => {
-  console.log("clicked");
   var allReady = true;
   players.forEach((player) => {
     if (player.ready == false && player.id != actualPlayer.id) {
@@ -530,7 +564,7 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn, ma
     var ressource_players = {};
     players.forEach((player, index) => {
       var newRessources = player.ressources;
-      map.forEach((hexa) => {
+      Object.entries(map).forEach(([index, hexa]) => {
         if (hexa.type == "miner" && hexa.fill == player.id) {
           hexa.ressources.forEach((rss) => {
             newRessources[rss] = newRessources[rss] + 10 * hexa.level;
@@ -539,8 +573,6 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn, ma
       });
       ressource_players[index] = newRessources;
     });
-
-    console.log(ressource_players);
 
     newPlayers = players.map((player) => {
       return {
@@ -569,16 +601,45 @@ export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setI
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
 };
 
+export const AddShip = async (hexa, map, setIsHexModalOpen, setShipBuild) => {
+  setIsHexModalOpen(false);
+
+  var shipBuild = [];
+  var neighbors = HexUtils.neighbors(hexa.coord);
+  Object.entries(map).forEach(([index, hexa]) => {
+    neighbors.forEach((neighbor) => {
+      if (
+        neighbor.q == hexa.coord.q &&
+        neighbor.r == hexa.coord.r &&
+        neighbor.s == hexa.coord.s &&
+        hexa.type == "void"
+      ) {
+        shipBuild.push(index);
+      }
+    });
+  });
+  setShipBuild(shipBuild);
+};
+
+export const BuildShip = async (hexa, player, token, setDataInDatabase, map, setShipBuild) => {
+  setShipBuild([]);
+
+  const newHexa = {
+    coord: hexa.coord,
+    type: "ship",
+    fill: player.id,
+    moved: -1,
+    level: 1,
+  };
+
+  var newMap = updateHexagon(map, hexa, newHexa);
+  await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
+};
+
 const updateHexagon = (mapData, hexa, newProperties) => {
-  const newMap = mapData.map((hex) => hex);
+  const newMap = mapData;
 
-  const indexToUpdate = newMap.findIndex(
-    (obj) => obj && obj.coord.q == hexa.coord.q && obj.coord.r == hexa.coord.r && obj.coord.s == hexa.coord.s
-  );
-
-  if (indexToUpdate === -1) {
-    return mapData;
-  }
+  const indexToUpdate = `${hexa.coord.q}_${hexa.coord.r}_${hexa.coord.s}`;
 
   const objToUpdate = newMap[indexToUpdate];
 
@@ -586,8 +647,7 @@ const updateHexagon = (mapData, hexa, newProperties) => {
     objToUpdate[prop] = newProperties[prop];
   }
 
-  const updatedList = [...mapData];
-  updatedList[indexToUpdate] = objToUpdate;
+  mapData[indexToUpdate] = objToUpdate;
 
-  return updatedList;
+  return mapData;
 };

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
-import { ref, onValue, off, set } from "firebase/database";
+import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
-import { drawMap, prepareMoveShip, handleNextTurn, AddMiner } from "../../utils/utils";
+import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip } from "../../utils/utils";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
@@ -38,6 +38,7 @@ const Map = () => {
 
   const [pathPossibleHexa, setPathPossibleHexa] = useState([]);
   const [pathHexa, setPathHexa] = useState([]);
+  const [shipBuild, setShipBuild] = useState([]);
 
   const [mouseDown, setMouseDown] = useState(false);
   const [lastMouseX, setLastMouseX] = useState(null);
@@ -119,6 +120,21 @@ const Map = () => {
     document.addEventListener("click", playAudio);
   }, []);
 
+  const setMapInDb = async (data, path) => {
+    const databaseRef = ref(db, path);
+    try {
+      const updates = {};
+      data.forEach((doc) => {
+        const docPath = `${doc.coord.q}_${doc.coord.r}_${doc.coord.s}`;
+        updates[docPath] = doc;
+      });
+      await update(databaseRef, updates);
+      console.log("Data saved successfully.");
+    } catch (error) {
+      console.error("Error saving data: ", error);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("room_token");
     const databaseRef = ref(db, "/game_room/" + token);
@@ -127,7 +143,7 @@ const Map = () => {
       var data = snapshot.val();
       setMap(data.map);
       if (first) {
-        data.map.forEach((hexa, index) => {
+        Object.entries(data.map).forEach((hexa, index) => {
           if (hexa.type == "base" && hexa.fill == localStorage.getItem("player_id")) {
             const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
             setViewBox(newViewBox);
@@ -154,11 +170,9 @@ const Map = () => {
       map,
       hexagonSize,
       viewBox,
-      localStorage.getItem("player_id"),
+      player.id,
       setSelectedHex,
       setIsHexModalOpen,
-      setSelectedShip,
-      setIsShipModalOpen,
       pathPossibleHexa,
       selectedShip,
       setPathHexa,
@@ -167,10 +181,14 @@ const Map = () => {
       setDataInDatabase,
       token,
       turn,
-      player
+      player,
+      shipBuild,
+      setShipBuild,
+      setSelectedShip,
+      setMapInDb
     );
     setHexagons(hexas);
-  }, [map, viewBox, pathPossibleHexa, pathHexa]);
+  }, [map, viewBox, pathPossibleHexa, pathHexa, shipBuild]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -255,20 +273,6 @@ const Map = () => {
           ></CyberButton>
         </div>
       </div>
-      {isShipModalOpen && selectedShip ? (
-        <ShipModal
-          ship={selectedShip}
-          handleMove={() => {
-            prepareMoveShip(selectedShip, map, setPathPossibleHexa);
-          }}
-          handleClose={() => {
-            setIsShipModalOpen(false);
-          }}
-          handleBuild={() => {}}
-        />
-      ) : (
-        <></>
-      )}
       {isHexModalOpen && (
         <HexModal
           hexa={selectedHex}
@@ -276,6 +280,8 @@ const Map = () => {
           handleModalClose={() => setIsHexModalOpen(false)}
           button1={selectedHex.button1}
           dataButton1={selectedHex.dataButton1}
+          button2={selectedHex.button2}
+          dataButton2={selectedHex.dataButton2}
           function1={
             selectedHex.dataButton1.func == "addMiner"
               ? () =>
@@ -288,6 +294,13 @@ const Map = () => {
                     setIsHexModalOpen,
                     selectedHex.dataButton1.dataSupp
                   )
+              : selectedHex.dataButton1.func == "moveShip"
+              ? () => prepareMoveShip(selectedShip, map, setPathPossibleHexa, setIsHexModalOpen)
+              : () => {}
+          }
+          function2={
+            selectedHex.dataButton2.func == "addShip"
+              ? () => AddShip(selectedHex, map, setIsHexModalOpen, setShipBuild)
               : () => {}
           }
         />

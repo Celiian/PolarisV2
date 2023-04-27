@@ -65,6 +65,14 @@
   --pallet4: #00edff;
 }
 
+.large {
+  --palletHR: 0deg;
+  --pallet1: #030306;
+  --pallet2: #181b17;
+  --pallet3: #272727;
+  --pallet4: #00edff;
+}
+
 h1 {
   color: var(--pallet4);
   --ts: 0 0 2vw var(--pallet1);
@@ -87,7 +95,18 @@ h1 {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(90vw, 750px, 120vh);
+  width: min(90, 750, 120vh);
+  display: grid;
+  grid-template-columns: 6% min(40vh, 35%) 1fr;
+  padding-bottom: 4vw;
+}
+
+#window-pane .large {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(120vw, 120vh);
   display: grid;
   grid-template-columns: 6% min(40vh, 35%) 1fr;
   padding-bottom: 4vw;

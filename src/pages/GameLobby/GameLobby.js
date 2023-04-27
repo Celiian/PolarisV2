@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ref, onValue, off, set } from "firebase/database";
+import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
 import "./GameLobby.css";
 import InviteButton from "../../components/InviteButton/InviteButton";
@@ -67,6 +67,21 @@ const GameLobby = () => {
     await set(databaseRef, data);
   };
 
+  const setMapInDb = async (data, path) => {
+    const databaseRef = ref(db, path);
+    try {
+      const updates = {};
+      data.forEach((doc) => {
+        const docPath = `${doc.coord.q}_${doc.coord.r}_${doc.coord.s}`;
+        updates[docPath] = doc;
+      });
+      await update(databaseRef, updates);
+      console.log("Data saved successfully.");
+    } catch (error) {
+      console.error("Error saving data: ", error);
+    }
+  };
+
   const submitFormJoin = async (event) => {
     event.preventDefault();
     setShowModal(false);
@@ -108,7 +123,7 @@ const GameLobby = () => {
 
   const startGame = async () => {
     const map = generate_map(40, roomData.players);
-    await setDataInDatabase(map, path + token + "/map/");
+    await setMapInDb(map, path + token + "/map/");
     await setDataInDatabase(true, path + token + "/started/");
     window.location.href = "/map";
   };

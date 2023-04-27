@@ -4,6 +4,7 @@ import "./NavBar.css";
 import water from "../../assets/img/ressources/foods/water.png";
 import food_can from "../../assets/img/ressources/foods/food_can.png";
 import ship_engine from "../../assets/img/ressources/ship_engine.png";
+import ship_part from "../../assets/img/ressources/ship_part.png";
 import uranium from "../../assets/img/ressources/mine/uranium.png";
 import coins from "../../assets/img/ressources/coins.png";
 import ore from "../../assets/img/ressources/mine/iron.png";
@@ -19,6 +20,7 @@ const ressourceImages = {
   water: water,
   foodCan: food_can,
   shipEngine: ship_engine,
+  shipPart: ship_part,
   uranium: uranium,
   coins: coins,
   ore: ore,
@@ -58,7 +60,7 @@ export default function NavBar({ players, ressources }) {
               <div className="resources" key={key}>
                 <img className="ressource-img" src={ressourceImages[key]} alt={key} />
                 <p className="ressources-value">
-                  {key} : {value}
+                  {key == "shipPart" ? "Ship Part" : key == "shipEngine" ? "Ship Engine" : key} : {value}
                 </p>
               </div>
             ))}
