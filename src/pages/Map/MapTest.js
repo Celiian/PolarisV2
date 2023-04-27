@@ -24,7 +24,7 @@ const Map = () => {
   const [players, setPlayers] = useState([]);
   const [turn, setTurn] = useState(0);
   const [speed, setSpeed] = useState(100);
-  const [scale, setScale] = useState(0.3);
+  const [scale, setScale] = useState(0.6);
   const [mapSize, setMapSize] = useState(0);
   const [hexagons, setHexagons] = useState([]);
   const [token, setToken] = useState("");
@@ -54,13 +54,27 @@ const Map = () => {
 
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   const [viewBox, setViewBox] = useState(initialViewBox);
-  
+
+  const handleZoom = (event) => {
+    const newZoom = event.target.value;
+    if (newZoom !== 0) {
+      setScale(newZoom);
+      updateViewBox();
+    }
+  };
 
   const updateViewBox = () => {
     const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
     const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
-    const newWidth = 100 / scale;
-    const newHeight = 100 / scale;
+    var newWidth = 100 / scale;
+    var newHeight = 100 / scale;
+
+    if (newHeight == Infinity) {
+      newHeight = 100;
+    }
+    if (newWidth == Infinity) {
+      newWidth = 100;
+    }
     const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
     setViewBox(newViewBox);
   };
@@ -87,12 +101,6 @@ const Map = () => {
 
   const handleMouseUp = () => {
     setMouseDown(false);
-  };
-
-  const handleZoom = (event) => {
-    const newZoom = event.target.value;
-    setScale(newZoom);
-    updateViewBox();
   };
 
   useEffect(() => {
