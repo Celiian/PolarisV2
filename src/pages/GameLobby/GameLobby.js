@@ -79,13 +79,13 @@ const GameLobby = () => {
       name: namePlayer,
       ready: false,
       ressources: {
-        Water: 10,
-        FoodCan: 10,
-        ShipEngine: 10,
-        Coins: 10,
-        Uranium: 10,
-        Iron: 10,
-        Crystal: 10,
+        water: 10,
+        foodCan: 10,
+        shipEngine: 10,
+        coins: 10,
+        uranium: 10,
+        iron: 10,
+        crystal: 10,
       },
     });
 

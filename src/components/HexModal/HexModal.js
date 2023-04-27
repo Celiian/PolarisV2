@@ -1,7 +1,17 @@
 import React from "react";
 import "./HexModal.css";
 
-function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
+function HexModal({
+  showModal,
+  handleModalClose,
+  hexa,
+  button1 = false,
+  dataButton1 = {},
+  function1 = () => {},
+  button2 = false,
+  dataButton2 = {},
+  function2 = () => {},
+}) {
   return (
     <div className={hexa.fill}>
       <button
@@ -37,8 +47,15 @@ function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
           <h2 id="modal-title">{hexa.name}</h2>
           <div className="test">
             <p id="modal-desc">{hexa.description}</p>
-            {hexa.voidSpace === true && (
-              <button onClick={handleAddMiner} className="btn-miner">AddMiner</button>
+            {button1 && (
+              <button onClick={() => function1} className="btn-miner">
+                {dataButton1.name}
+              </button>
+            )}
+            {button2 && (
+              <button onClick={() => function2} className="btn-miner">
+                {dataButton2.name}
+              </button>
             )}
           </div>
           <button
