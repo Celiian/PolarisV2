@@ -89,10 +89,12 @@ const ChatDrawer = ({
     }
   }, []);
 
+  console.log(messages);
+
   return (
     <ThemeProvider theme={theme}>
       <Drawer anchor="left" open={open} onClose={onClose}>
-        <div>
+        <div className="chat-container">
           <h1>GameChat</h1>
           <List>
             {messages.map((msg, index) => (
@@ -122,14 +124,7 @@ const ChatDrawer = ({
             ))}
           </List>
         </div>
-        <div
-          style={{
-            padding: "1rem",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className="sendchat-container">
           <TextField
             label="Type your message"
             variant="outlined"
