@@ -94,6 +94,7 @@ const GameLobby = () => {
       id: player_id,
       name: namePlayer,
       ready: false,
+      ship: 0,
       ressources: {
         water: 10,
         foodCan: 10,
@@ -122,10 +123,15 @@ const GameLobby = () => {
   };
 
   const startGame = async () => {
-    const map = generate_map(40, roomData.players);
-    await setMapInDb(map, path + token + "/map/");
     await setDataInDatabase(true, path + token + "/started/");
     window.location.href = "/map";
+  };
+
+  const setMap = async () => {
+    const map = generate_map(40, roomData.players);
+    await setMapInDb(map, path + token + "/map/");
+
+    startGame();
   };
 
   return (
@@ -165,7 +171,7 @@ const GameLobby = () => {
             </div>
             <div className="main-buttons-actions">
               <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-              {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={startGame} />}
+              {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={setMap} />}
             </div>
           </div>
         </div>

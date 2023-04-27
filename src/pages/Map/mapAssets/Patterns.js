@@ -75,8 +75,8 @@ const Patterns = () => (
     <Pattern id="ship/1/90" link={Ship190} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/1/135" link={Ship1135} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/1/-45" link={Ship1_45} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/1/-90" link={Ship1_90} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/1/-135" link={Ship1_135} size={{ x: 10, y: 12 }} />
+    <Pattern id="ship/1/-90" link={Ship1_90} size={{ x: 10, y: 12 }} />
+    <Pattern id="ship/1/-135" link={Ship1_135} size={{ x: 10, y: 12 }} />
 
     <Pattern id="miner/1" link={Miner1} size={{ x: 10, y: 12 }} />
     <Pattern id="miner/1/45" link={Miner145} size={{ x: 10, y: 12 }} />

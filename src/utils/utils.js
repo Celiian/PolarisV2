@@ -103,26 +103,30 @@ export const generate_map = (MAP_SIZE, players) => {
                   id: players_spot[indexSpot].id,
                   status: "visible",
                   ship: "base",
+                  shipId: 0,
                 });
               } else {
                 data_players.push({
                   id: players_spot[indexSpot].id,
                   status: "hidden",
                   ship: "",
+                  shipId: -1,
                 });
               }
             }
           }
         }
-        if (type == "base" || type == "ship") {
+        if (type == "base") {
           var data = JSON.parse(`{
           "type": "${type}",
           "fill": "${fill}",
           "coord": ${JSON.stringify(P2(x, y, -x - y))},
           "data_players" : ${JSON.stringify(data_players)},
-          "moved" : ${moved}
+          "moved" : ${moved},
+          "level" : 1,
+          "id" : -2
         }`);
-        } else if (type == "planet") {
+        } else if (type == "planet" || type == "sun") {
           var data = JSON.parse(`{
           "type": "${type}",
           "fill": "${fill}",
@@ -135,7 +139,8 @@ export const generate_map = (MAP_SIZE, players) => {
           "type": "${type}",
           "fill": "${fill}",
           "coord": ${JSON.stringify(P2(x, y, -x - y))},
-          "data_players" : ${JSON.stringify(data_players)}
+          "data_players" : ${JSON.stringify(data_players)},
+          "id" : -1
         }`);
         }
         map.push(data);
@@ -149,7 +154,6 @@ export const drawMap = (
   map,
   hexagonSize,
   viewBox,
-  id,
   setSelectedHex,
   setIsHexModalOpen,
   pathPossibleHexa,
@@ -172,14 +176,8 @@ export const drawMap = (
       var hexagon = null;
       var fill = "";
       var style = "";
-      var stroke = "#fff7";
-      var data_player = {};
-
-      for (let index in hexa.data_players) {
-        if (hexa.data_players[index].id == id) {
-          data_player = hexa.data_players[index];
-        }
-      }
+      var stroke = "#fff9";
+      var data_player = (data_player = hexa.data_players[player.id - 1]);
 
       if (data_player.status == "hidden") {
         fill = " ";
@@ -195,9 +193,9 @@ export const drawMap = (
         ) {
           stroke = "#fff";
         }
-      } else if (data_player.status == "discover") {
-        style = "discover";
-        stroke = "#fff4";
+      } else if (data_player.status == "discovered") {
+        style = "discovered";
+        stroke = "#fff2";
       }
 
       if (pathPossibleHexa.includes(index)) {
@@ -208,7 +206,7 @@ export const drawMap = (
       }
 
       if (shipBuild.includes(index)) {
-        style = "movable";
+        style = "buildable";
       }
 
       const key = `${hexa.coord.q},${hexa.coord.r},${hexa.coord.s}`;
@@ -233,10 +231,11 @@ export const drawMap = (
                       setPathHexa,
                       token,
                       turn,
-                      setShipBuild
+                      setShipBuild,
+                      player
                     )
                 : shipBuild.includes(index)
-                ? () => BuildShip(hexa, player, token, setDataInDatabase, map, setIsHexModalOpen)
+                ? () => BuildShip(hexa, player, token, setDataInDatabase, map, setShipBuild, shipBuild)
                 : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
             }
             key={index}
@@ -250,7 +249,7 @@ export const drawMap = (
           ></Hexagon>
         );
       } else if (hexa.type == "base" || hexa.type == "ship" || hexa.type == "miner") {
-        if (String(hexa.fill).charAt(0) == id) {
+        if (String(hexa.fill).charAt(0) == player.id) {
           fill = "";
           style = "";
         } else {
@@ -462,67 +461,83 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa, setIsHexModalOpe
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const moveShip = async (ship, map, pathHexa, setMapInDb, setPathPossibleHexa, setPathHexa, token, turn) => {
+const moveShip = async (ship, map, pathHexa, setMapInDb, setPathPossibleHexa, setPathHexa, token, turn, player) => {
   var shipKey = `${ship.coord.q}_${ship.coord.r}_${ship.coord.s}`;
 
-  const newMap = map;
   setPathHexa([]);
   setPathPossibleHexa([]);
-  console.log(pathHexa);
-  const hexaListToUpdate = [];
+  var newMap = { ...map };
+
   for (let i = 0; i < pathHexa.length; i++) {
-    const hexIndex = pathHexa[i];
+    let hexaListToUpdate = [];
+    let hexIndex = pathHexa[i];
+    var newMapLoop = { ...newMap };
+    let hex = map[hexIndex];
 
-    const hex = newMap[hexIndex];
-
-    newMap[hexIndex] = {
-      ...ship,
-      fill: hex.fill,
-      type: hex.type,
+    newMapLoop[shipKey] = {
       coord: ship.coord,
+      fill: "void",
+      type: "void",
+      data_players: hex.data_players,
     };
+
     var rotate = getRotationDegree(ship.coord, hex.coord);
-    newMap[shipKey] = {
+    newMapLoop[hexIndex] = {
       ...hex,
       fill: String(ship.fill).charAt(0) + "/" + rotate,
       type: ship.type,
-      coord: hex.coord,
       moved: turn,
+      level: ship.level,
+      id: ship.id,
     };
 
-    hexaListToUpdate.push(newMap[hexIndex], newMap[shipKey]);
+    hexaListToUpdate.push(newMapLoop[hexIndex], newMapLoop[shipKey]);
     ship.coord = hex.coord;
+
+    const modified = updateVisible(ship, newMapLoop, player);
+    modified.forEach((key) => {
+      hexaListToUpdate.push(newMapLoop[key]);
+    });
+
     await setMapInDb(hexaListToUpdate, `/game_room/${token}/map/`);
-    await delay(100);
+    await delay(50);
   }
 };
 
 const updateVisible = (ship, map) => {
+  const player_id = parseInt(localStorage.getItem("player_id")) - 1;
   const distanceMax = ship.type === "base" ? 10 : 5;
-  const newMap = {};
+  var modified = [];
   Object.entries(map).forEach(([key, hex]) => {
     const actualDistance = HexUtils.distance(hex.coord, ship.coord);
+    var player_data = hex.data_players[player_id];
+
     if (actualDistance <= distanceMax) {
-      const newDataPlayers = hex.data_players.map((player) => {
-        if (parseInt(player.id) === parseInt(localStorage.getItem("player_id"))) {
-          return { ...player, status: "visible", ship: ship.type };
-        } else {
-          return player;
+      if (player_data.ship != "miner") {
+        if (player_data.status != "visible") {
+          modified.push(key);
+          player_data.ship = "ship";
+          player_data.shipId = ship.id;
+          player_data.status = "visible";
+        } else if (player_data.shipId == -1) {
+          modified.push(key);
+          player_data.ship = "ship";
+          player_data.shipId = ship.id;
+          player_data.status = "visible";
         }
-      });
-      newMap[key] = { ...hex, data_players: newDataPlayers };
+      }
     } else {
-      const newDataPlayers = hex.data_players.map((player) => {
-        if (player.status == "visible" && String(player.ship) == String(ship.type)) {
-          return { ...player, status: "discover" };
-        } else {
-          return player;
+      if (player_data.ship != "miner" && player_data.status == "visible") {
+        if (player_data.ship == ship.type && player_data.shipId == ship.id) {
+          modified.push(key);
+          player_data.status = "discovered";
+          player_data.ship = "";
+          player_data.shipId = -1;
         }
-      });
-      newMap[key] = { ...hex, data_players: newDataPlayers };
+      }
     }
   });
-  return newMap;
+  return modified;
 };
 
 const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa, setPathPossibleHexa) => {
@@ -621,8 +636,9 @@ export const AddShip = async (hexa, map, setIsHexModalOpen, setShipBuild) => {
   setShipBuild(shipBuild);
 };
 
-export const BuildShip = async (hexa, player, token, setDataInDatabase, map, setShipBuild) => {
+export const BuildShip = async (hexa, player, token, setDataInDatabase, map, setShipBuild, shipBuild) => {
   setShipBuild([]);
+  shipBuild = [];
 
   const newHexa = {
     coord: hexa.coord,
@@ -630,10 +646,17 @@ export const BuildShip = async (hexa, player, token, setDataInDatabase, map, set
     fill: player.id,
     moved: -1,
     level: 1,
+    id: player.ship,
   };
 
+  player.ship += 1;
   var newMap = updateHexagon(map, hexa, newHexa);
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
+  await setPlayerData(setDataInDatabase, player, token);
+};
+
+const setPlayerData = async (setDataInDatabase, player, token) => {
+  await setDataInDatabase(player, "/game_room/" + token + "/players/" + (player.id - 1));
 };
 
 const updateHexagon = (mapData, hexa, newProperties) => {

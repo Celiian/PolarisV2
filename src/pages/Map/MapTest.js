@@ -170,7 +170,6 @@ const Map = () => {
       map,
       hexagonSize,
       viewBox,
-      player.id,
       setSelectedHex,
       setIsHexModalOpen,
       pathPossibleHexa,
@@ -188,7 +187,7 @@ const Map = () => {
       setMapInDb
     );
     setHexagons(hexas);
-  }, [map, viewBox, pathPossibleHexa, pathHexa, shipBuild]);
+  }, [map, player, viewBox, pathPossibleHexa, pathHexa, shipBuild]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {

@@ -3,12 +3,12 @@
   fill-opacity: 0.1;
 }
 
-.discover {
-  fill: rgb(55, 55, 55);
+.discovered {
+  fill: rgb(59, 56, 56);
   fill-opacity: 0.1;
 }
 
-.discover:hover {
+.discovered:hover {
   fill: white;
   fill-opacity: 0.4;
 }
@@ -39,6 +39,15 @@
 .movable {
   fill: rgb(209, 210, 212);
   fill-opacity: 0.3;
+}
+
+.buildable {
+  fill: rgb(209, 210, 212);
+  fill-opacity: 0.3;
+}
+
+.buildable:hover {
+  fill-opacity: 0.1;
 }
 
 .path {
