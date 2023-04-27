@@ -89,8 +89,6 @@ const ChatDrawer = ({
     }
   }, []);
 
-  console.log(messages);
-
   return (
     <ThemeProvider theme={theme}>
       <Drawer anchor="left" open={open} onClose={onClose}>

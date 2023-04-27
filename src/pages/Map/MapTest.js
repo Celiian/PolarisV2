@@ -49,6 +49,7 @@ const Map = () => {
   const [mouseDown, setMouseDown] = useState(false);
   const [lastMouseX, setLastMouseX] = useState(null);
   const [lastMouseY, setLastMouseY] = useState(null);
+  const [tradeModal, setTradeModal] = useState(false);
   const [first, setFist] = useState(true);
   const hexagonSize = { x: 12, y: 12 };
 
@@ -261,7 +262,12 @@ const Map = () => {
         </div>
 
         {player && (
-          <NavBar players={players} ressources={player.ressources}></NavBar>
+          <NavBar
+            players={players}
+            ressources={player.ressources}
+            setTradeModal={setTradeModal}
+            tradeModal={tradeModal}
+          ></NavBar>
         )}
         <button className="btn-drawer" onClick={handleDrawerOpen}>
           Chat

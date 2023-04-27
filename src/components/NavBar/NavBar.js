@@ -17,6 +17,7 @@ import Base4 from "../../assets/img/ships/ship4/base/base.png";
 
 //
 import CyberButtonGlitched from "../CyberButtonGlitched/CyberButtonGlitched";
+import TradeModal from "../TradeModal/TradeModal";
 
 const ressourceImages = {
   water: water,
@@ -35,7 +36,12 @@ const ships = {
   Base4,
 };
 
-export default function NavBar({ players, ressources }) {
+export default function NavBar({
+  players,
+  ressources,
+  setTradeModal,
+  tradeModal,
+}) {
   return (
     <div className="navbar">
       <div className="player-list-container">
@@ -75,7 +81,17 @@ export default function NavBar({ players, ressources }) {
             ))}
         </div>
       </div>
-      <CyberButtonGlitched message={"Trade"} />
+      <CyberButtonGlitched
+        onClick={() => {
+          setTradeModal(true);
+        }}
+        message={"Trade"}
+      />
+
+      <TradeModal
+        showModal={tradeModal}
+        handleClose={() => setTradeModal(false)}
+      />
     </div>
   );
 }
