@@ -66,3 +66,8 @@ img.game-logo-img {
 .container-rules{
   padding-left: 250px;
 }
+
+.container-btn-create {
+  display: flex;
+  justify-content: center;
+}
