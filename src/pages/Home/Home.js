@@ -48,7 +48,7 @@ const Home = () => {
   localStorage.clear();
 
   return (
-    <div>
+    <>
       <div className="h-screen">
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideo}></video>
@@ -63,40 +63,55 @@ const Home = () => {
                 <h2 className="text-center" style={{ color: "white" }}>
                   Create GameRoom
                 </h2>
-                <div className="mb-4">
-                  <input
-                    type="text"
-                    id="name"
-                    value={nameOwnerPlayer}
-                    onChange={(e) => setNameOwnerPlayer(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    placeholder="Enter name"
-                  />
-                </div>
-                <button onClick={() => submitFormCreate()} className="custom-button">
-                  Create
-                </button>
+                <form
+                  className="flex flex-col items-center h-full justify-center"
+                  onSubmit={submitFormCreate}
+                >
+                  <div className="mb-4">
+                    <input
+                      type="text"
+                      id="name"
+                      value={nameOwnerPlayer}
+                      onChange={(e) => setNameOwnerPlayer(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      placeholder="Enter name"
+                    />
+                  </div>
+                  <button type="submit" className="custom-button">
+                    Create
+                  </button>
+                </form>
               </div>
             </div>
+
             <div className="container-rules">
               <div className="bg-gray-800 rounded-md shadow-md p-4">
-                <h2 className="text-lg font-bold mb-2 text-white">Règles du jeu</h2>
+                <h2 className="text-lg font-bold mb-2 text-white">
+                  Règles du jeu
+                </h2>
                 <ul className="list-disc list-inside text-white p-3">
                   <li>Maximum 4 players to play a game</li>
-                  <li>Players collect resources to build ships, space stations ships, space stations ...</li>
-                  <li>Players can build equipped spaceshipsto explore, conquer.</li>
                   <li>
-                    Players can build mining stations to collect resources, produce energy and
+                    Players collect resources to build ships, space stations ships, space stations ...
+                  </li>
+                  <li>
+                    Players can build equipped spaceshipsto explore, conquer.
+                  </li>
+                  <li>
+                    Players can build mining stations to collect resources,
+                    produce energy and
                     <br />
                     resources, produce energy and protect their territory.
                   </li>
                   <li>
-                    Players invest in advanced technologies to improve their spaceships
+                    Players invest in advanced technologies to improve their
+                    spaceships
                     <br />
                     improve their spaceships, bases and miners.
                   </li>
                   <li>
-                    Players send ships to explore new territories, discover resources and find
+                    Players send ships to explore new territories, discover
+                    resources and find
                     <br />
                     discover resources and find rare ores.
                   </li>
@@ -106,14 +121,17 @@ const Home = () => {
                     rare minerals.
                   </li>
                   <li>
-                    Victory Condition: The player who first reaches the total of 10 victory points wins.
+                    Victory Condition: The player who first reaches the total of
+                    10 victory points wins.
                     <br />
                     total of 10 victory points wins the game
                   </li>
                   <li>
-                    Players can gain victory points by building space elements (bases, ships, miners), <br></br>
+                    Players can gain victory points by building space elements
+                    (bases, ships, miners), <br></br>
                     discovering resources and resources and minerals, <br></br>
-                    and by trading resources, technology and minerals with other players.
+                    and by trading resources, technology
+                    and minerals with other players.
                   </li>
                 </ul>
               </div>
@@ -121,8 +139,8 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-};
+}
 
 export default Home;

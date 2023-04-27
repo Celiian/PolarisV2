@@ -69,7 +69,9 @@ const GameLobby = () => {
   };
 
   const copyInviteLink = () => {
-    let linkInvite = `${window.location.origin}/lobby?room=${localStorage.getItem("room_token")}1`;
+    let linkInvite = `${
+      window.location.origin
+    }/lobby?room=${localStorage.getItem("room_token")}1`;
     navigator.clipboard.writeText(linkInvite).then(
       () => {
         console.log("Lien copié dans le presse-papiers :", linkInvite);
@@ -82,8 +84,14 @@ const GameLobby = () => {
 
   const startGame = async () => {
     const map = generate_map(40, roomData.players);
-    await setDataInDatabase(map, path + localStorage.getItem("room_token") + "/map/");
-    await setDataInDatabase(true, path + localStorage.getItem("room_token") + "/started/");
+    await setDataInDatabase(
+      map,
+      path + localStorage.getItem("room_token") + "/map/"
+    );
+    await setDataInDatabase(
+      true,
+      path + localStorage.getItem("room_token") + "/started/"
+    );
     window.location.href = "/map";
   };
 
@@ -134,52 +142,57 @@ const GameLobby = () => {
             </div>
           </div>
         </div>
-      </div>
-      {showModal === true && (
-        <div className="fixed z-10 inset-0 overflow-y-auto">
-          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity">
-              <div className="absolute inset-0 bg-gray-800 opacity-75"></div>
-            </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
-            &#8203;
-            <div
-              className="inline-block align-bottom bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="modal-headline"
-            >
-              <div>
-                <div className="mt-3 text-center sm:mt-5">
-                  <h3 className="text-lg leading-6 font-medium text-white" id="modal-headline">
-                    Entrez votre nom pour rejoindre la partie
-                  </h3>
-                  <div className="mt-2">
-                    <div className="mb-4">
-                      <input
-                        type="text"
-                        id="name"
-                        value={namePlayer}
-                        onChange={(e) => setNamePlayer(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                        placeholder="Entrez votre nom"
-                      />
-                    </div>
-                    <div className="flex justify-center">
-                      <button
-                        onClick={submitFormJoin}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-                      >
-                        Rejoindre la partie
-                      </button>
+        {showModal === true && (
+          <div className="fixed z-10 inset-0 overflow-y-auto">
+            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+              <div className="fixed inset-0 transition-opacity">
+                <div className="absolute inset-0 bg-gray-800 opacity-75"></div>
+              </div>
+              <span className="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+              &#8203;
+              <div
+                className="inline-block align-bottom bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-headline"
+              >
+                <div>
+                  <div className="mt-3 text-center sm:mt-5">
+                    <h3
+                      className="text-lg leading-6 font-medium text-white"
+                      id="modal-headline"
+                    >
+                      Join GameRoom
+                    </h3>
+                    <div className="mt-2">
+                      <form onSubmit={submitFormJoin}>
+                        <div className="mb-4">
+                          <input
+                            type="text"
+                            id="name"
+                            value={namePlayer}
+                            onChange={(e) => setNamePlayer(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-700 rounded-md bg-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                            placeholder="Enter name"
+                          />
+                        </div>
+                        <div className="flex justify-center">
+                          <button
+                            type="submit"
+                            className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
+                          >
+                            Join
+                          </button>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };
