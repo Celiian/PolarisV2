@@ -259,8 +259,8 @@ const Map = () => {
           <CyberButton
             message={"Ready"}
             onClick={() => handleNextTurn(players, setDataInDatabase, token, turn)}
-            turn={`Turn ${turn} `}
-            color={"black"}
+            toolTip={`Turn ${turn} `}
+            style={"black"}
           ></CyberButton>
         </div>
       </div>
