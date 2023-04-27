@@ -5,9 +5,24 @@ import db from "../../firebaseConfig";
 
 import BackGroundVideo from "../../assets/video/background-home.webm";
 import GameLogo from "../../assets/img/icons/logo.png";
+import backgroundSound from "../../assets/sound/ost.mp3";
 
 const Home = () => {
   const [nameOwnerPlayer, setNameOwnerPlayer] = useState("");
+
+  useEffect(() => {
+    const audio = new Audio(backgroundSound);
+
+    const playAudio = () => {
+      if (audio.duration > 0 && !audio.paused) {
+        return;
+      }
+      audio.loop = true;
+      audio.play();
+    };
+
+    document.addEventListener("click", playAudio);
+  }, []);
 
   const generateLink = () => {
     const lienGenere = localStorage.getItem("lienGenere");

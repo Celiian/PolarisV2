@@ -10,6 +10,7 @@ import CrownAstronautLogo from "../../assets/img/icons/crown_astronaut.png";
 import AstronautLogo from "../../assets/img/icons/astronaut.png";
 import BackGroundVideo from "../../assets/video/background-home.webm";
 import GameLogo from "../../assets/img/icons/logo.png";
+import backgroundSound from "../../assets/sound/ost.mp3";
 
 const GameLobby = () => {
   const [roomData, setRoomData] = useState(null);
@@ -17,6 +18,20 @@ const GameLobby = () => {
   const [accessStartBtn, setAccessStartBtn] = useState(true);
   const [namePlayer, setNamePlayer] = useState("");
   const path = "/game_room/";
+
+  useEffect(() => {
+    const audio = new Audio(backgroundSound);
+
+    const playAudio = () => {
+      if (audio.duration > 0 && !audio.paused) {
+        return;
+      }
+      audio.loop = true;
+      audio.play();
+    };
+
+    document.addEventListener("click", playAudio);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

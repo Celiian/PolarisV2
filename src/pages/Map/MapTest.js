@@ -15,6 +15,7 @@ import ShipModal from "../../components/ShipModal/ShipModal";
 import CyberButton from "../../components/cyberButton/CyberButton";
 import NavBar from "../../components/NavBar/NavBar";
 import BackGroundVideoMap from "../../assets/video/background-map.mp4";
+import backgroundSound from "../../assets/sound/ost-map.mp3";
 
 import "./Map.css";
 
@@ -53,6 +54,7 @@ const Map = () => {
 
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   const [viewBox, setViewBox] = useState(initialViewBox);
+  
 
   const updateViewBox = () => {
     const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
@@ -92,6 +94,20 @@ const Map = () => {
     setScale(newZoom);
     updateViewBox();
   };
+
+  useEffect(() => {
+    const audio = new Audio(backgroundSound);
+
+    const playAudio = () => {
+      if (audio.duration > 0 && !audio.paused) {
+        return;
+      }
+      audio.loop = true;
+      audio.play();
+    };
+
+    document.addEventListener("click", playAudio);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("room_token");
