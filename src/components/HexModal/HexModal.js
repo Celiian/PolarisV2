@@ -2,7 +2,17 @@ import React from "react";
 import "./HexModal.css";
 import CyberButton from "../cyberButton/CyberButton";
 
-function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
+function HexModal({
+  showModal,
+  handleModalClose,
+  hexa,
+  button1 = false,
+  dataButton1 = {},
+  function1 = () => {},
+  button2 = false,
+  dataButton2 = {},
+  function2 = () => {},
+}) {
   return (
     <div className={hexa.fill}>
       <button
@@ -38,13 +48,17 @@ function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
           <h2 id="modal-title">{hexa.name}</h2>
           <div className="test">
             <p id="modal-desc">{hexa.description}</p>
-            {hexa.voidSpace === true && (
-              <CyberButton
-                message={"Build Miner"}
-                onClick={() => handleAddMiner}
-                turn={`kl̝̊ẽkl̝̊ɞñ̟̊ `}
-                color={"black small"}
-              ></CyberButton>
+
+            {button1 && (
+              <button onClick={() => function1} className="btn-miner">
+                {dataButton1.name}
+              </button>
+            )}
+            {button2 && (
+              <button onClick={() => function2} className="btn-miner">
+                {dataButton2.name}
+              </button>
+
             )}
           </div>
           <button className="button" type="button" title="close modal" onClick={handleModalClose}>

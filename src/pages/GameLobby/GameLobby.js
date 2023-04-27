@@ -78,6 +78,15 @@ const GameLobby = () => {
       id: player_id,
       name: namePlayer,
       ready: false,
+      ressources: {
+        water: 10,
+        foodCan: 10,
+        shipEngine: 10,
+        coins: 10,
+        uranium: 10,
+        iron: 10,
+        crystal: 10,
+      },
     });
 
     await setDataInDatabase(newData, path + localStorage.getItem("room_token"));
@@ -123,16 +132,23 @@ const GameLobby = () => {
           <div className="flex flex-col items-center">
             <div className="players-list-container">
               <div className="flex flex-col w-9/12 h-full">
-
                 {roomData ? (
                   roomData.players.map((player, index) => (
                     <div key={index} className="pt-5">
                       {player.name ? (
                         <p className="players_logos_lobby">
                           {player.id == 1 ? (
-                            <img className="owner_player_logo" src={CrownAstronautLogo} alt="Logo Owner Astronaut" />
+                            <img
+                              className="owner_player_logo"
+                              src={CrownAstronautLogo}
+                              alt="Logo Owner Astronaut"
+                            />
                           ) : (
-                            <img className="players_logo" src={AstronautLogo} alt="Logo Astronaut" />
+                            <img
+                              className="players_logo"
+                              src={AstronautLogo}
+                              alt="Logo Astronaut"
+                            />
                           )}
                           {player.name}
                         </p>
