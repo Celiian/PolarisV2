@@ -49,6 +49,7 @@ export const generate_map = (MAP_SIZE, players) => {
         let type = "void";
         let fill = "void";
         let moved = -1;
+        let prod = "";
         for (let index in players_spot) {
           if (players_spot[index].x == x && players_spot[index].y == y) {
             fill = players[index].id;
@@ -60,20 +61,36 @@ export const generate_map = (MAP_SIZE, players) => {
             type = "sun";
             fill = "sun";
           } else if (distance(x, y) < 5) {
-          } else if (randomNumber > 97) {
+          } else if (randomNumber > 98) {
             type = "asteroid";
             fill = "asteroid";
-          } else if (randomNumber > 92) {
+          } else if (randomNumber > 94) {
             type = "planet";
             const planetRandom = Math.floor(Math.random() * 100) + 1;
-            if (planetRandom > 90) {
+            if (planetRandom > 80) {
               fill = "indu";
-            } else if (planetRandom > 50) {
+              const prodRandom = Math.floor(Math.random() * 100) + 1;
+              if (prodRandom > 50) {
+                prod = "ship_part";
+              } else {
+                prod = "ship_engine";
+              }
+            } else if (planetRandom > 60) {
               fill = "agri";
-            } else if (planetRandom > 30) {
+              prod = "food";
+            } else if (planetRandom > 40) {
               fill = "atmo";
+              prod = "water";
             } else {
               fill = "mine";
+              const prodRandom = Math.floor(Math.random() * 100) + 1;
+              if (prodRandom > 90) {
+                prod = "uranium";
+              } else if (prodRandom > 60) {
+                prod = "crystal";
+              } else {
+                prod = "ore";
+              }
             }
           }
         }
@@ -105,12 +122,20 @@ export const generate_map = (MAP_SIZE, players) => {
           "data_players" : ${JSON.stringify(data_players)},
           "moved" : ${moved}
         }`);
+        } else if (type == "planet") {
+          var data = JSON.parse(`{
+          "type": "${type}",
+          "fill": "${fill}",
+          "coord": ${JSON.stringify(P2(x, y, -x - y))},
+          "data_players" : ${JSON.stringify(data_players)},
+          "prod" : ${prod}
+        }`);
         } else {
           var data = JSON.parse(`{
           "type": "${type}",
           "fill": "${fill}",
           "coord": ${JSON.stringify(P2(x, y, -x - y))},
-          "data_players" : ${JSON.stringify(data_players)}
+          "data_players" : ${JSON.stringify(data_players)},
         }`);
         }
         map.push(data);
@@ -279,6 +304,7 @@ export const SetHexData = (hexa, player, map) => {
   var voidSpace = false;
   var name = "";
   var miner = false;
+  var dataMiner = { planets_type: [], ressource_prod: [] };
   if (hexa.fill == "void") {
     name = "Space";
     desc = "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
@@ -292,6 +318,8 @@ export const SetHexData = (hexa, player, map) => {
             if (hex.type == "planet") {
               neighbors.forEach((neighbor) => {
                 if (neighbor.q == hex.coord.q && neighbor.r == hex.coord.r && neighbor.s == hex.coord.s) {
+                  dataMiner.planets_type.push(hex.type);
+                  dataMiner.ressource_prod.push(hex.prod);
                   voidSpace = true;
                 }
               });

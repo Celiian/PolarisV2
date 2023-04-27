@@ -41,7 +41,7 @@ function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
             {hexa.voidSpace === true && (
               <CyberButton
                 message={"Build Miner"}
-                onClick={() => handleAddMiner()}
+                onClick={() => handleAddMiner}
                 turn={`kl̝̊ẽkl̝̊ɞñ̟̊ `}
                 color={"black small"}
               ></CyberButton>
