@@ -305,7 +305,7 @@ export const SetHexData = (hexa, player, map) => {
   var miner = false;
   var dataMiner = { planets_type: [], ressource_prod: [] };
   var button1 = false;
-  var dataButton1 = { message: "", toolTip: "", func: "", style: "" };
+  var dataButton1 = { message: "", toolTip: "", func: "", style: "", dataSupp: null };
   var button2 = false;
   var dataButton2 = {};
 
@@ -346,6 +346,7 @@ export const SetHexData = (hexa, player, map) => {
       dataButton1.toolTip = "ƼᕓӨӨՆ";
       dataButton1.func = "addMiner";
       dataButton1.style = "black small";
+      dataButton1.dataSupp = dataMiner;
     }
   }
   if (hexa.fill == "mine") {
@@ -537,15 +538,18 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn) =>
   await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/");
 };
 
-export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setIsHexModalOpen) => {
+export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setIsHexModalOpen, dataSupp) => {
   setIsHexModalOpen(false);
 
   const newHexa = {
     coord: hexa.coord,
     type: "miner",
     fill: player.id,
+    planets: dataSupp.planets_type,
+    ressources: dataSupp.ressource_prod,
   };
   var newMap = updateHexagon(map, hexa, newHexa);
+  console.log(newHexa);
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
 };
 

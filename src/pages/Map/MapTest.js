@@ -287,7 +287,16 @@ const Map = () => {
           dataButton1={selectedHex.dataButton1}
           function1={
             selectedHex.dataButton1.func == "addMiner"
-              ? () => AddMiner(selectedHex, player, token, setDataInDatabase, map, setIsHexModalOpen)
+              ? () =>
+                  AddMiner(
+                    selectedHex,
+                    player,
+                    token,
+                    setDataInDatabase,
+                    map,
+                    setIsHexModalOpen,
+                    selectedHex.dataButton1.dataSupp
+                  )
               : () => {}
           }
         />
