@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ref, onValue, off } from "firebase/database";
+import db from "../../firebaseConfig";
+import { SendMessage } from "../../utils/utils";
+
 import {
   Drawer,
   List,
@@ -14,7 +18,15 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
-const ChatDrawer = ({ open, onClose, playerData }) => {
+import "./Chat.css";
+
+const ChatDrawer = ({
+  open,
+  onClose,
+  playerData,
+  setDataInDatabase,
+  token,
+}) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -22,12 +34,14 @@ const ChatDrawer = ({ open, onClose, playerData }) => {
     setInputValue(event.target.value);
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (inputValue.trim() !== "") {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { message: inputValue, sender: `${playerData.name}` },
-      ]);
+      messages.push({
+        message: inputValue,
+        sender: `${playerData.name}`,
+        player_id: `${playerData.id}`,
+      });
+      await SendMessage(setDataInDatabase, messages, token);
       setInputValue("");
     }
   };
@@ -46,6 +60,22 @@ const ChatDrawer = ({ open, onClose, playerData }) => {
       },
     },
   });
+
+  useEffect(() => {
+    if (token) {
+      const databaseRef = ref(db, "/game_room/" + token);
+      onValue(databaseRef, (snapshot) => {
+        console.log(snapshot.val().chat);
+        if (snapshot.val().chat) {
+          setMessages(snapshot.val().chat);
+        }
+      });
+
+      return () => {
+        off(databaseRef);
+      };
+    }
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

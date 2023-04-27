@@ -266,11 +266,15 @@ const Map = () => {
         <button className="btn-drawer" onClick={handleDrawerOpen}>
           Chat
         </button>
-        <ChatDrawer
-          open={drawerOpen}
-          onClose={handleDrawerClose}
-          playerData={player}
-        />
+        {token && (
+          <ChatDrawer
+            open={drawerOpen}
+            onClose={handleDrawerClose}
+            playerData={player}
+            token={token}
+            setDataInDatabase={setDataInDatabase}
+          />
+        )}
 
         <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
         <HexGrid

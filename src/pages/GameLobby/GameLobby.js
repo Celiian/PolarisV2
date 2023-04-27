@@ -51,6 +51,7 @@ const GameLobby = () => {
     const databaseRef = ref(db, path + token);
     onValue(databaseRef, (snapshot) => {
       setRoomData(snapshot.val());
+      console.log(snapshot.val());
       if (snapshot.val().started) {
         window.location.href = "/map";
       }
@@ -132,9 +133,17 @@ const GameLobby = () => {
                       {player.name ? (
                         <p className="players_logos_lobby">
                           {player.id == 1 ? (
-                            <img className="owner_player_logo" src={CrownAstronautLogo} alt="Logo Owner Astronaut" />
+                            <img
+                              className="owner_player_logo"
+                              src={CrownAstronautLogo}
+                              alt="Logo Owner Astronaut"
+                            />
                           ) : (
-                            <img className="players_logo" src={AstronautLogo} alt="Logo Astronaut" />
+                            <img
+                              className="players_logo"
+                              src={AstronautLogo}
+                              alt="Logo Astronaut"
+                            />
                           )}
                           {player.name}
                         </p>
@@ -149,8 +158,13 @@ const GameLobby = () => {
               </div>
             </div>
             <div className="main-buttons-actions">
-              <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-              {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={startGame} />}
+              <InviteButton
+                message={"Invite"}
+                onClickFunction={copyInviteLink}
+              />
+              {accessStartBtn === true && (
+                <StartButton message={"Launch"} onClickFunction={startGame} />
+              )}
             </div>
           </div>
         </div>
@@ -170,7 +184,10 @@ const GameLobby = () => {
               >
                 <div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <h3 className="text-lg leading-6 font-medium text-white" id="modal-headline">
+                    <h3
+                      className="text-lg leading-6 font-medium text-white"
+                      id="modal-headline"
+                    >
                       Join GameRoom
                     </h3>
                     <div className="mt-2">
