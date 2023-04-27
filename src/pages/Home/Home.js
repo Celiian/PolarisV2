@@ -45,7 +45,22 @@ const Home = () => {
     var token = generateLink();
     await setDataInDatabase(
       {
-        players: [{ name: nameOwnerPlayer, id: 1, ready: false }],
+        players: [
+          {
+            name: nameOwnerPlayer,
+            id: 1,
+            ready: false,
+            ressources: {
+              water: 10,
+              food_can: 10,
+              ship_engine: 10,
+              uranium: 10,
+              coins: 10,
+              iron: 10,
+              crystal: 10,
+            },
+          },
+        ],
         started: false,
         token_game_room: token,
         turn: 0,

@@ -1,6 +1,11 @@
 import Hexagon from "../pages/Map/mapAssets/Hexagons";
 import { HexUtils } from "react-hexgrid";
-import { findPath, memoize, isVisible, getRotationDegree } from "../pages/Map/CustomHexUtils";
+import {
+  findPath,
+  memoize,
+  isVisible,
+  getRotationDegree,
+} from "../pages/Map/CustomHexUtils";
 
 function P2(q, r, s) {
   return { q: q, r: r, s: s };
@@ -33,16 +38,24 @@ export const generate_map = (MAP_SIZE, players) => {
   var players_spot = [];
 
   for (let index in players) {
-    let randSpotX = Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
-    let randSpotY = Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
+    let randSpotX =
+      Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
+    let randSpotY =
+      Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
     var distanceToSun = distance(randSpotX, randSpotY);
-    let invalidSpot = randSpotX * randSpotY > 0 && Math.abs(randSpotX) + Math.abs(randSpotY) > MAP_SIZE;
+    let invalidSpot =
+      randSpotX * randSpotY > 0 &&
+      Math.abs(randSpotX) + Math.abs(randSpotY) > MAP_SIZE;
 
     while (distanceToSun < 5 || invalidSpot) {
-      randSpotX = Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
-      randSpotY = Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
+      randSpotX =
+        Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
+      randSpotY =
+        Math.floor(Math.random() * ((MAP_SIZE - 1) * 2)) - MAP_SIZE - 2;
       distanceToSun = distance(randSpotX, randSpotY);
-      invalidSpot = randSpotX * randSpotY > 0 && Math.abs(randSpotX) + Math.abs(randSpotY) > MAP_SIZE;
+      invalidSpot =
+        randSpotX * randSpotY > 0 &&
+        Math.abs(randSpotX) + Math.abs(randSpotY) > MAP_SIZE;
     }
 
     players_spot.push({ x: randSpotX, y: randSpotY, id: players[index].id });
@@ -89,7 +102,14 @@ export const generate_map = (MAP_SIZE, players) => {
         for (let index in players) {
           for (let indexSpot in players_spot) {
             if (players[index].id == players_spot[indexSpot].id) {
-              if (distance(players_spot[indexSpot].x, players_spot[indexSpot].y, x, y) < 10) {
+              if (
+                distance(
+                  players_spot[indexSpot].x,
+                  players_spot[indexSpot].y,
+                  x,
+                  y
+                ) < 10
+              ) {
                 data_players.push({
                   id: players_spot[indexSpot].id,
                   status: "visible",
@@ -207,19 +227,31 @@ export const drawMap = (
                       token,
                       turn
                     )
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
+                : () =>
+                    handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
             }
             key={index}
             index={index}
             onMouseEnter={
               pathPossibleHexa.includes(index)
                 ? () =>
-                    handleHexagonMouseEnter(selectedShip, hexa, map, setPathHexa, pathPossibleHexa, setPathPossibleHexa)
+                    handleHexagonMouseEnter(
+                      selectedShip,
+                      hexa,
+                      map,
+                      setPathHexa,
+                      pathPossibleHexa,
+                      setPathPossibleHexa
+                    )
                 : () => {}
             }
           ></Hexagon>
         );
-      } else if (hexa.type == "base" || hexa.type == "ship" || hexa.type == "miner") {
+      } else if (
+        hexa.type == "base" ||
+        hexa.type == "ship" ||
+        hexa.type == "miner"
+      ) {
         if (hexa.fill.charAt(0) == id) {
           fill = "";
           style = "";
@@ -234,7 +266,8 @@ export const drawMap = (
               pathPossibleHexa.includes(index)
                 ? () => {}
                 : hexa.moved < turn
-                ? () => handleShipClick(hexa, setSelectedShip, setIsShipModalOpen)
+                ? () =>
+                    handleShipClick(hexa, setSelectedShip, setIsShipModalOpen)
                 : () => {}
             }
             key={index}
@@ -252,7 +285,8 @@ export const drawMap = (
             handleClick={
               fill || pathPossibleHexa.includes(index)
                 ? () => {}
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
+                : () =>
+                    handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
             }
             key={index}
             index={index}
@@ -300,7 +334,8 @@ export const SetHexData = (hexa) => {
 
   if (hexa.fill == "void") {
     name = "Space";
-    desc = "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
+    desc =
+      "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
     img =
       "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
     voidSpace = true;
@@ -309,7 +344,8 @@ export const SetHexData = (hexa) => {
     name = "Mining planet";
     desc =
       "Celestial depths behold a cosmic dance, where stardust miners carve new worlds in deft romance; through astral veins they delve, unraveling mysteries grand, unearthing elements that shape the universe's hand.";
-    img = "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
+    img =
+      "https://t4.ftcdn.net/jpg/01/82/66/81/360_F_182668101_Lx58VcbiiS03jhaYSDdhuz0zH3CD9pSL.jpg";
     style = "mine";
     voidSpace = false;
   }
@@ -334,7 +370,8 @@ export const SetHexData = (hexa) => {
     name = "Industrial Planet";
     desc =
       "Silent echoes of industry linger, where once steel giants reigned; an abandoned planet's ghostly whispers, a testament to dreams unchained. Yet within its slumber lies the seed of resurgence, awaiting the touch of creators to awaken its dormant emergence.";
-    img = "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
+    img =
+      "https://i.pinimg.com/736x/5c/6a/96/5c6a965591f7969cbf5de9684ba0840d.jpg";
     style = "indu";
     voidSpace = false;
   }
@@ -342,7 +379,8 @@ export const SetHexData = (hexa) => {
     name = "Asteroid field";
     desc =
       "A vast expanse of rocky debris, the asteroid field is a captivating cosmic maze. Suspended in the vacuum of space, these celestial fragments drift and collide, creating a mesmerizing ballet of chaos and beauty.";
-    img = "https://t3.ftcdn.net/jpg/02/93/06/66/360_F_293066613_gJaIeEOyHm8Alm7JzF0SICDrvmKxSsrz.jpg";
+    img =
+      "https://t3.ftcdn.net/jpg/02/93/06/66/360_F_293066613_gJaIeEOyHm8Alm7JzF0SICDrvmKxSsrz.jpg";
     style = "indu";
     voidSpace = false;
   }
@@ -350,7 +388,8 @@ export const SetHexData = (hexa) => {
     name = "Polaris B (white dwarf)";
     desc =
       "Polaris Ab is a dim and small star, orbiting its brighter companion in a dance of light and gravity. Its presence adds to the mystique and allure of the Polaris system.";
-    img = "https://qph.cf2.quoracdn.net/main-qimg-03498708fef0dc7fc62b01745fe31840-lq";
+    img =
+      "https://qph.cf2.quoracdn.net/main-qimg-03498708fef0dc7fc62b01745fe31840-lq";
     style = "sun";
     voidSpace = false;
   }
@@ -390,9 +429,21 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa) => {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const moveShip = async (ship, map, pathHexa, setDataInDatabase, setPathPossibleHexa, setPathHexa, token, turn) => {
+const moveShip = async (
+  ship,
+  map,
+  pathHexa,
+  setDataInDatabase,
+  setPathPossibleHexa,
+  setPathHexa,
+  token,
+  turn
+) => {
   const shipIndex = map.findIndex(
-    (hex) => hex.coord.q === ship.coord.q && hex.coord.r === ship.coord.r && hex.coord.s === ship.coord.s
+    (hex) =>
+      hex.coord.q === ship.coord.q &&
+      hex.coord.r === ship.coord.r &&
+      hex.coord.s === ship.coord.s
   );
   const newMap = [...map];
   setPathHexa([]);
@@ -428,7 +479,9 @@ const updateVisible = (ship, map) => {
     const actualDistance = HexUtils.distance(hex.coord, ship.coord);
     if (actualDistance <= distanceMax) {
       const newDataPlayers = hex.data_players.map((player) => {
-        if (parseInt(player.id) === parseInt(localStorage.getItem("player_id"))) {
+        if (
+          parseInt(player.id) === parseInt(localStorage.getItem("player_id"))
+        ) {
           return { ...player, status: "visible", ship: ship.type };
         } else {
           return player;
@@ -437,7 +490,10 @@ const updateVisible = (ship, map) => {
       return { ...hex, data_players: newDataPlayers };
     } else {
       const newDataPlayers = hex.data_players.map((player) => {
-        if (player.status == "visible" && String(player.ship) == String(ship.type)) {
+        if (
+          player.status == "visible" &&
+          String(player.ship) == String(ship.type)
+        ) {
           return { ...player, status: "discover" };
         } else {
           return player;
@@ -449,7 +505,14 @@ const updateVisible = (ship, map) => {
   return newMap;
 };
 
-const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa, setPathPossibleHexa) => {
+const handleHexagonMouseEnter = (
+  ship,
+  hexa,
+  map,
+  setPathHexa,
+  pathPossibleHexa,
+  setPathPossibleHexa
+) => {
   const mapCoordToIndex = {};
   map.forEach((hex, index) => {
     mapCoordToIndex[`${hex.coord.q},${hex.coord.r},${hex.coord.s}`] = index;
@@ -458,17 +521,29 @@ const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa,
   const findPathMemoized = memoize(findPath);
 
   const path = findPathMemoized(ship.coord, hexa.coord, map) || [];
-  const pathIndexes = path.slice(1).map((hexaPath) => mapCoordToIndex[`${hexaPath.q},${hexaPath.r},${hexaPath.s}`]);
+  const pathIndexes = path
+    .slice(1)
+    .map(
+      (hexaPath) => mapCoordToIndex[`${hexaPath.q},${hexaPath.r},${hexaPath.s}`]
+    );
   var newPathPossibleHexa = pathPossibleHexa;
 
   setPathPossibleHexa(newPathPossibleHexa);
   setPathHexa(pathIndexes);
 };
 
-export const handleNextTurn = async (players, setDataInDatabase, token, turn) => {
+export const handleNextTurn = async (
+  players,
+  setDataInDatabase,
+  token,
+  turn
+) => {
   var allReady = true;
   players.forEach((player) => {
-    if (player.ready == false && player.id != localStorage.getItem("player_id")) {
+    if (
+      player.ready == false &&
+      player.id != localStorage.getItem("player_id")
+    ) {
       allReady = false;
     }
   });
