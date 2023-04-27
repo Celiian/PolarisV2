@@ -6,14 +6,6 @@ function P2(q, r, s) {
   return { q: q, r: r, s: s };
 }
 
-const EDGES = 6;
-const RADIUS = 65;
-const TAU = 2 * Math.PI;
-const EDGE_LEN = Math.sin(Math.PI / EDGES) * RADIUS * 2;
-const GRID_Y_SPACE = Math.cos(Math.PI / EDGES) * RADIUS * 2;
-const GRID_X_SPACE = RADIUS * 2 - EDGE_LEN * 0.5;
-const GRID_Y_OFFSET = GRID_Y_SPACE * 0.5;
-
 const distance = (xa, ya, xb = 0, yb = 0) => {
   let dx = xa - xb;
   let dy = ya - yb;
@@ -144,7 +136,8 @@ export const drawMap = (
   setPathPossibleHexa,
   setDataInDatabase,
   token,
-  turn
+  turn,
+  player
 ) => {
   var Hexagons = [];
   map.forEach((hexa, index) => {
@@ -152,7 +145,7 @@ export const drawMap = (
       var hexagon = null;
       var fill = "";
       var style = "";
-      var stroke = "#fff3";
+      var stroke = "#fff7";
       var data_player = {};
 
       for (let index in hexa.data_players) {
@@ -175,6 +168,9 @@ export const drawMap = (
         ) {
           stroke = "#fff";
         }
+      } else if (data_player.status == "discover") {
+        style = "discover";
+        stroke = "#fff4";
       }
 
       if (pathPossibleHexa.includes(index)) {
@@ -207,7 +203,7 @@ export const drawMap = (
                       token,
                       turn
                     )
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
+                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player)
             }
             key={index}
             index={index}
@@ -220,15 +216,20 @@ export const drawMap = (
           ></Hexagon>
         );
       } else if (hexa.type == "base" || hexa.type == "ship" || hexa.type == "miner") {
-        if (hexa.fill.charAt(0) == id) {
+        if (String(hexa.fill).charAt(0) == id) {
           fill = "";
           style = "";
+        } else {
+          if (style == "discover") {
+            fill = " ";
+            style = "discover";
+          }
         }
         hexagon = (
           <Hexagon
             style={style ? style : "planet"}
             stroke={stroke}
-            fill={fill ? fill : hexa.type + "/" + hexa.fill}
+            fill={fill ? "" : hexa.type + "/" + hexa.fill}
             hexa={hexa.coord}
             handleClick={
               pathPossibleHexa.includes(index)
@@ -252,7 +253,7 @@ export const drawMap = (
             handleClick={
               fill || pathPossibleHexa.includes(index)
                 ? () => {}
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen)
+                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player)
             }
             key={index}
             index={index}
@@ -265,45 +266,50 @@ export const drawMap = (
   return Hexagons;
 };
 
-const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen) => {
-  var neighbors = HexUtils.neighbors(hexa.coord);
-  if (
-    map.some((hex) => {
-      for (let index in neighbors) {
-        if (
-          hex.q === neighbors[index].q &&
-          hex.r === neighbors[index].r &&
-          hex.s === neighbors[index].s &&
-          hex.type === "planet"
-        ) {
-          return true;
-        }
-      }
-    })
-  ) {
-    console.log("platent");
-  } else {
-    console.log("fuck");
-  }
-
-  var hex = SetHexData(hexa);
+const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen, player) => {
+  var hex = SetHexData(hexa, player, map);
   setSelectedHex(hex);
   setIsHexModalOpen(true);
 };
 
-export const SetHexData = (hexa) => {
+export const SetHexData = (hexa, player, map) => {
   var desc = "";
   var img = "";
   var style = "";
   var voidSpace = false;
   var name = "";
-
+  var miner = false;
   if (hexa.fill == "void") {
     name = "Space";
     desc = "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
     img =
       "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&w=1000&q=80";
-    voidSpace = true;
+    for (let index in hexa.data_players) {
+      if (hexa.data_players[index].id == player.id) {
+        if (hexa.data_players[index].status == "visible") {
+          let neighbors = HexUtils.neighbors(hexa.coord);
+          map.forEach((hex) => {
+            if (hex.type == "planet") {
+              neighbors.forEach((neighbor) => {
+                if (neighbor.q == hex.coord.q && neighbor.r == hex.coord.r && neighbor.s == hex.coord.s) {
+                  voidSpace = true;
+                }
+              });
+            } else if (hex.type == "miner") {
+              neighbors.forEach((neighbor) => {
+                if (neighbor.q == hex.coord.q && neighbor.r == hex.coord.r && neighbor.s == hex.coord.s) {
+                  miner = true;
+                }
+              });
+            }
+          });
+        }
+      }
+    }
+
+    if (miner) {
+      voidSpace = false;
+    }
   }
   if (hexa.fill == "mine") {
     name = "Mining planet";
@@ -491,8 +497,43 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn) =>
         ready: false,
       };
     });
-    await setDataInDatabase(turn + 1, "/game_room/" + token + "/turn/"); // update the database with the new players array
+    await setDataInDatabase(turn + 1, "/game_room/" + token + "/turn/");
   }
 
-  await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/"); // update the database with the new players array
+  await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/");
+};
+
+export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setIsHexModalOpen) => {
+  setIsHexModalOpen(false);
+
+  const newHexa = {
+    coord: hexa.coord,
+    type: "miner",
+    fill: player.id,
+  };
+  var newMap = updateHexagon(map, hexa, newHexa);
+  await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
+};
+
+const updateHexagon = (mapData, hexa, newProperties) => {
+  const newMap = mapData.map((hex) => hex);
+
+  const indexToUpdate = newMap.findIndex(
+    (obj) => obj && obj.coord.q == hexa.coord.q && obj.coord.r == hexa.coord.r && obj.coord.s == hexa.coord.s
+  );
+
+  if (indexToUpdate === -1) {
+    return mapData;
+  }
+
+  const objToUpdate = newMap[indexToUpdate];
+
+  for (const prop in newProperties) {
+    objToUpdate[prop] = newProperties[prop];
+  }
+
+  const updatedList = [...mapData];
+  updatedList[indexToUpdate] = objToUpdate;
+
+  return updatedList;
 };

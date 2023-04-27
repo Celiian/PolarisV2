@@ -4,6 +4,12 @@
 }
 
 .discover {
+  fill: rgb(55, 55, 55);
+  fill-opacity: 0.1;
+}
+
+.discover:hover {
+  fill: white;
   fill-opacity: 0.4;
 }
 

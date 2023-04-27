@@ -4,7 +4,7 @@ import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
 import { ref, onValue, off, set } from "firebase/database";
 import db from "../../firebaseConfig";
-import { drawMap, prepareMoveShip, handleNextTurn } from "../../utils/utils";
+import { drawMap, prepareMoveShip, handleNextTurn, AddMiner } from "../../utils/utils";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
@@ -22,6 +22,7 @@ import "./Map.css";
 const Map = () => {
   const [map, setMap] = useState([]);
   const [players, setPlayers] = useState([]);
+  const [player, setPlayer] = useState([]);
   const [turn, setTurn] = useState(0);
   const [speed, setSpeed] = useState(100);
   const [scale, setScale] = useState(0.6);
@@ -134,6 +135,11 @@ const Map = () => {
         setFist(false);
       }
       setPlayers(data.players);
+      data.players.forEach((player) => {
+        if (player.id == localStorage.getItem("player_id")) {
+          setPlayer(player);
+        }
+      });
       setTurn(data.turn);
     });
 
@@ -159,7 +165,8 @@ const Map = () => {
       setPathPossibleHexa,
       setDataInDatabase,
       token,
-      turn
+      turn,
+      player
     );
     setHexagons(hexas);
   }, [map, viewBox, pathPossibleHexa, pathHexa]);
@@ -265,7 +272,7 @@ const Map = () => {
           hexa={selectedHex}
           showModal={true}
           handleModalClose={() => setIsHexModalOpen(false)}
-          handleAddMiner={() => {}}
+          handleAddMiner={() => AddMiner(selectedHex, player, token, setDataInDatabase, map, setIsHexModalOpen)}
         />
       )}
     </>

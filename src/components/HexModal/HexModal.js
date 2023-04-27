@@ -1,5 +1,6 @@
 import React from "react";
 import "./HexModal.css";
+import CyberButton from "../cyberButton/CyberButton";
 
 function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
   return (
@@ -38,15 +39,15 @@ function HexModal({ showModal, handleModalClose, hexa, handleAddMiner }) {
           <div className="test">
             <p id="modal-desc">{hexa.description}</p>
             {hexa.voidSpace === true && (
-              <button onClick={handleAddMiner} className="btn-miner">AddMiner</button>
+              <CyberButton
+                message={"Build Miner"}
+                onClick={() => handleAddMiner()}
+                turn={`kl̝̊ẽkl̝̊ɞñ̟̊ `}
+                color={"black small"}
+              ></CyberButton>
             )}
           </div>
-          <button
-            className="button"
-            type="button"
-            title="close modal"
-            onClick={handleModalClose}
-          >
+          <button className="button" type="button" title="close modal" onClick={handleModalClose}>
             X
           </button>
           <div className="under-text-detail" aria-hidden="true"></div>
