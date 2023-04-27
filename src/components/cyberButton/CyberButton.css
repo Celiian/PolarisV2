@@ -33,6 +33,29 @@ a.cyberpunk2077 {
   outline: none;
 }
 
+button.cyberpunk2077.small,
+a.cyberpunk2077.small {
+  --background-color: #ff003c;
+  display: block;
+  border: none;
+  border-radius: 0%;
+  font-size: 0.8rem; /* smaller font size */
+  line-height: 100%;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: "Advent Pro", arial;
+  padding: 8% 10%; /* smaller padding */
+  margin: 10px;
+  position: relative;
+  color: #fff;
+  border-right: 3px solid #ffffff;
+  clip-path: polygon(-15px 0%, calc(100% + 15px) 0%, calc(100% + 15px) 100%, 20px 100%, -15px calc(100% - 35px));
+  cursor: pointer;
+  background-color: var(--background-color);
+  outline: none;
+}
+
 button.cyberpunk2077:hover,
 a.cyberpunk2077:hover,
 button.cyberpunk2077:focus,
