@@ -66,15 +66,17 @@ img.img-ship-players {
 .resources {
   display: flex;
   align-items: center;
+  flex-direction: column;
 }
 
 img.ressource-img {
-  width: 40px;
+  width: 25px;
 }
 
 .ressources-value{
   color: white;
   font-weight: bold;
+  font-size: 12px;
 }
 
 .navbar:after {

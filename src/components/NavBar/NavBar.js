@@ -1,25 +1,28 @@
 import "./NavBar.css";
 
-import food from "../../assets/img/ressources/foods/food.png";
+// Ressources
 import water from "../../assets/img/ressources/foods/water.png";
-
-import diamonds from "../../assets/img/ressources/mine/diamonds.png";
-import iron from "../../assets/img/ressources/mine/iron.png";
+import food_can from "../../assets/img/ressources/foods/food_can.png";
+import ship_engine from "../../assets/img/ressources/ship_engine.png";
 import uranium from "../../assets/img/ressources/mine/uranium.png";
+import coins from "../../assets/img/ressources/coins.png";
+import iron from "../../assets/img/ressources/mine/iron.png";
+import crystal from "../../assets/img/ressources/mine/crystal.png";
 
+// Assets bases
 import Base1 from "../../assets/img/ships/ship1/base/base.png";
 import Base2 from "../../assets/img/ships/ship2/base/base.png";
 import Base3 from "../../assets/img/ships/ship3/base/base.png";
 import Base4 from "../../assets/img/ships/ship4/base/base.png";
 
 const ressourceImages = {
-  diamonds: diamonds,
-  uranium: uranium,
-  energy: uranium,
-  "freeze-dried": food,
-  steel: iron,
-  water: water,
-  hydrogene: uranium,
+  Water: water,
+  FoodCan: food_can,
+  ShipEngine: ship_engine,
+  Uranium: uranium,
+  Coins: coins,
+  Iron: iron,
+  Crystal: crystal,
 };
 
 const ships = {
@@ -38,7 +41,11 @@ export default function NavBar({ players, ressources }) {
             {player.name ? (
               <>
                 <div className="player-container">
-                  <img className="img-ship-players" src={ships[`Base${player.id}`]} alt={`ship-player${player.id}`} />
+                  <img
+                    className="img-ship-players"
+                    src={ships[`Base${player.id}`]}
+                    alt={`ship-player${player.id}`}
+                  />
                 </div>
                 <p>{player.name}</p>
               </>
@@ -57,7 +64,9 @@ export default function NavBar({ players, ressources }) {
                 src={ressourceImages[key]}
                 alt={key}
               />
-              <p className="ressources-value">{value}</p>
+              <p className="ressources-value">
+                {key} : {value}
+              </p>
             </div>
           ))}
         </div>
