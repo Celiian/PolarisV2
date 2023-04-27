@@ -32,10 +32,12 @@ The application should now be running at http://localhost:3000.
 * Material UI
 * react-hexgrid
 
-### **Back-end**
+### **Back-end (not used now)**
 
 * FastAPI
 * firebase_admin
+* uvicorn
+* python-dotenv
 
 # **Database Firebase**
 * Firestore Database
