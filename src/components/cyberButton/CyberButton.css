@@ -26,7 +26,7 @@ a.cyberpunk2077 {
   margin: 10px;
   position: relative;
   color: #fff;
-  border-right: 3px solid #8ae66e;
+  border-right: 3px solid #ffffff;
   clip-path: polygon(-15px 0%, calc(100% + 15px) 0%, calc(100% + 15px) 100%, 20px 100%, -15px calc(100% - 35px));
   cursor: pointer;
   background-color: var(--background-color);
@@ -56,6 +56,11 @@ a.cyberpunk2077.purple {
 button.cyberpunk2077.blue,
 a.cyberpunk2077.blue {
   --background-color: #136377;
+}
+
+button.cyberpunk2077.black,
+a.cyberpunk2077.blue {
+  --background-color: #141414;
 }
 
 button.cyberpunk2077:after,
@@ -94,8 +99,8 @@ a.cyberpunk2077:before {
   height: 12px;
   top: 0px;
   left: calc(0px - 1px - var(--outside));
-  border-left: 2px solid #8ae66e;
-  border-right: 2px solid #8ae66e;
+  border-left: 2px solid #fff;
+  border-right: 2px solid #000;
 }
 
 button.cyberpunk2077:hover:before,

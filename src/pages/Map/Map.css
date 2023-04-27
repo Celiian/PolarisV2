@@ -20,6 +20,9 @@
 }
 
 .controls-container {
+  position: fixed;
+  bottom: 5%;
+  right: 5%;
   width: 10%;
   height: 10%;
 }

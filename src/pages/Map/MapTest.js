@@ -198,6 +198,7 @@ const Map = () => {
           <video autoPlay loop muted src={BackGroundVideoMap}></video>
         </div>
         <NavBar players={players} ressources={[]}></NavBar>
+
         <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
         <HexGrid
           width={"100vw"}
@@ -212,11 +213,12 @@ const Map = () => {
           </Layout>
           <Patterns />
         </HexGrid>
-        <div className="controlls-container">
+        <div className="controls-container">
           <CyberButton
             message={"Ready"}
             onClick={() => handleNextTurn(players, setDataInDatabase, token, turn)}
             turn={`Turn ${turn} `}
+            color={"black"}
           ></CyberButton>
         </div>
       </div>

@@ -165,6 +165,16 @@ export const drawMap = (
         fill = " ";
         style = "hide";
         stroke = "#fff2";
+        if (
+          hexa.coord.q == 40 ||
+          hexa.coord.r == 40 ||
+          hexa.coord.q == -40 ||
+          hexa.coord.r == -40 ||
+          hexa.coord.s == -40 ||
+          hexa.coord.s == 40
+        ) {
+          stroke = "#fff";
+        }
       }
 
       if (pathPossibleHexa.includes(index)) {

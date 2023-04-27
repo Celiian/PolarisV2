@@ -12,6 +12,11 @@
   fill-opacity: 0.1;
 }
 
+.hide:hover {
+  fill: white;
+  fill-opacity: 0.1;
+}
+
 .void:hover {
   fill: aliceblue;
   fill-opacity: 0.5;
