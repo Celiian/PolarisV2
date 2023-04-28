@@ -137,6 +137,26 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
+    const databaseRef = ref(db, "/game_room/" + token + "/turn/");
+    onValue(databaseRef, (snapshot) => {
+      toast("Turn" + snapshot.val() + " started, check your ressources", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    });
+
+    return () => {
+      off(databaseRef);
+    };
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem("room_token");
     const databaseRef = ref(db, "/game_room/" + token);
     setToken(token);

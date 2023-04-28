@@ -723,16 +723,6 @@ export const handleNextTurn = async (players, token, turn, map, actualPlayer) =>
       };
     });
     await setDataInDatabase(turn + 1, "/game_room/" + token + "/turn/");
-    toast("Turn" + turn + 1 + " started, check your ressources", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
   }
   await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/");
 };
