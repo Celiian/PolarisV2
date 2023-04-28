@@ -53,6 +53,12 @@ import Miner2_45 from "../../../assets/img/ships/ship2/miner/miner-45.png";
 import Miner2_90 from "../../../assets/img/ships/ship2/miner/miner-90.png";
 import Miner2_135 from "../../../assets/img/ships/ship2/miner/miner-135.png";
 
+import Miner2 from "../../../assets/img/ships/ship2/miner/miner.png";
+
+import Miner3 from "../../../assets/img/ships/ship3/miner/miner.png";
+
+import Miner4 from "../../../assets/img/ships/ship4/miner/miner.png";
+
 const Patterns = () => (
   <>
     <Pattern id="sun" link={Sun} size={{ x: 11, y: 12 }} />
@@ -111,6 +117,10 @@ const Patterns = () => (
     <Pattern id="miner/2/-45" link={Miner2_45} size={{ x: 10, y: 12 }} />
     <Pattern id="miner/2/-90" link={Miner2_90} size={{ x: 10, y: 12 }} />
     <Pattern id="miner/2/-135" link={Miner2_135} size={{ x: 10, y: 12 }} />
+
+    <Pattern id="miner/2" link={Miner2} size={{ x: 10, y: 12 }} />
+    <Pattern id="miner/3" link={Miner3} size={{ x: 10, y: 12 }} />
+    <Pattern id="miner/4" link={Miner4} size={{ x: 10, y: 12 }} />
   </>
 );
 
