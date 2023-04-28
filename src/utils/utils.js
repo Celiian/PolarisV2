@@ -675,6 +675,16 @@ const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa,
 
 export const handleNextTurn = async (players, token, turn, map, actualPlayer) => {
   var allReady = true;
+  toast("You are ready for next turn", {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
   players.forEach((player) => {
     if (player.ready == false && player.id != actualPlayer.id) {
       allReady = false;
@@ -713,8 +723,17 @@ export const handleNextTurn = async (players, token, turn, map, actualPlayer) =>
       };
     });
     await setDataInDatabase(turn + 1, "/game_room/" + token + "/turn/");
+    toast("Turn" + turn + 1 + " started, check your ressources", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
   }
-
   await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/");
 };
 
