@@ -83,6 +83,16 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
         player.ressources[tradeSelected] += quantityTrade;
 
         setPlayerData(player, token);
+        toast("You bought " + quantityTrade + " " + tradeSelected + " for " + quantity + " coins", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       } else {
         toast("You don't have enought coins", {
           position: "top-right",
@@ -96,13 +106,23 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
         });
       }
     } else if (ressourceSelected && cost > 0) {
-      if (player.ressources[ressourceSelected] <= quantity) {
+      if (player.ressources[ressourceSelected] >= quantity) {
         player.ressources[ressourceSelected] -= quantity;
         player.ressources.coins += cost;
 
         setPlayerData(player, token);
+        toast("You sold " + quantity + " " + tradeSelected + " for " + cost + " coins", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       } else {
-        toast("You don't have enought" + ressourceSelected, {
+        toast("You don't have enought " + ressourceSelected, {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
