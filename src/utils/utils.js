@@ -1,6 +1,33 @@
 import Hexagon from "../pages/Map/mapAssets/Hexagons";
 import { HexUtils } from "react-hexgrid";
+import { ref, set, update } from "firebase/database";
 import { findPath, memoize, isVisible, getRotationDegree } from "../pages/Map/CustomHexUtils";
+import db from "../firebaseConfig";
+
+const setDataInDatabase = async (data, path) => {
+  const databaseRef = ref(db, path);
+  try {
+    await set(databaseRef, data);
+    console.log("Data saved successfully.");
+  } catch (error) {
+    console.error("Error saving data: ", error);
+  }
+};
+
+const setMapInDb = async (data, path) => {
+  const databaseRef = ref(db, path);
+  try {
+    const updates = {};
+    data.forEach((doc) => {
+      const docPath = `${doc.coord.q}_${doc.coord.r}_${doc.coord.s}`;
+      updates[docPath] = doc;
+    });
+    await update(databaseRef, updates);
+    console.log("Data saved successfully.");
+  } catch (error) {
+    console.error("Error saving data: ", error);
+  }
+};
 
 function P2(q, r, s) {
   return { q: q, r: r, s: s };
@@ -161,14 +188,12 @@ export const drawMap = (
   setPathHexa,
   pathHexa,
   setPathPossibleHexa,
-  setDataInDatabase,
   token,
   turn,
   player,
   shipBuild,
   setShipBuild,
-  setSelectedShip,
-  setMapInDb
+  setSelectedShip
 ) => {
   var Hexagons = [];
   Object.entries(map).forEach(([index, hexa]) => {
@@ -226,7 +251,7 @@ export const drawMap = (
                       selectedShip,
                       map,
                       pathHexa,
-                      setMapInDb,
+
                       setPathPossibleHexa,
                       setPathHexa,
                       token,
@@ -235,7 +260,7 @@ export const drawMap = (
                       player
                     )
                 : shipBuild.includes(index)
-                ? () => BuildShip(hexa, player, token, setDataInDatabase, map, setShipBuild, shipBuild)
+                ? () => BuildShip(hexa, player, token, map, setShipBuild, shipBuild)
                 : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
             }
             key={index}
@@ -329,7 +354,7 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
       "Despite its size, the Mother Ship boasts a sleek and streamlined design, allowing it to navigate even the most challenging environments and protect its inhabitants. Thanks to its advanced manufacturing facilities, the motherShip can also produce smaller spacecraft such as exploration ships, requiring 20 ship parts and 5 ship engines to construct. ";
     img = "https://wallpapercrafter.com/desktop1/540220-action-battlestar-fighting-futuristic-galactica.jpg";
     style = "indu";
-    if (hexa.fill == player.id) {
+    if (String(hexa.fill).charAt(0) == player.id) {
       if (hexa.moved < turn) {
         button1 = true;
       }
@@ -356,7 +381,7 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
       " ship parts.";
     img = "https://pbs.twimg.com/media/Dabg7QvXcAABFRu.jpg:large";
     style = "indu";
-    if (hexa.fill == player.id) {
+    if (String(hexa.fill).charAt(0) == player.id) {
       button1 = true;
       var btnMsg = "Upgrade Ship";
       var func = "upgradeShip";
@@ -529,7 +554,7 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa, setIsHexModalOpe
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const moveShip = async (ship, map, pathHexa, setMapInDb, setPathPossibleHexa, setPathHexa, token, turn, player) => {
+const moveShip = async (ship, map, pathHexa, setPathPossibleHexa, setPathHexa, token, turn, player) => {
   var shipKey = `${ship.coord.q}_${ship.coord.r}_${ship.coord.s}`;
 
   setPathHexa([]);
@@ -628,7 +653,7 @@ const handleHexagonMouseEnter = (ship, hexa, map, setPathHexa, pathPossibleHexa,
   setPathHexa(pathIndexes);
 };
 
-export const handleNextTurn = async (players, setDataInDatabase, token, turn, map, actualPlayer) => {
+export const handleNextTurn = async (players, token, turn, map, actualPlayer) => {
   var allReady = true;
   players.forEach((player) => {
     if (player.ready == false && player.id != actualPlayer.id) {
@@ -677,11 +702,10 @@ export const AddMiner = async (
   hexa,
   player,
   token,
-  setMapInDb,
+
   map,
   setIsHexModalOpen,
-  dataSupp,
-  setDataInDatabase
+  dataSupp
 ) => {
   console.log(hexa);
   setIsHexModalOpen(false);
@@ -689,7 +713,7 @@ export const AddMiner = async (
   player.ressources.shipEngine -= 2;
   player.ressources.shipPart -= 10;
   player.points += 1;
-  //await setPlayerData(setDataInDatabase, player, token);
+  await setPlayerData(player, token);
 
   var hexaKey = `${hexa.coord.q}_${hexa.coord.r}_${hexa.coord.s}`;
 
@@ -733,11 +757,11 @@ export const AddShip = async (hexa, map, setIsHexModalOpen, setShipBuild) => {
   setShipBuild(shipBuild);
 };
 
-export const BuildShip = async (hexa, player, token, setDataInDatabase, map, setShipBuild, shipBuild) => {
+export const BuildShip = async (hexa, player, token, map, setShipBuild, shipBuild) => {
   player.ressources.shipEngine -= 5;
   player.ressources.shipPart -= 20;
   player.points += 1;
-  await setPlayerData(setDataInDatabase, player, token);
+  await setPlayerData(player, token);
 
   setShipBuild([]);
   shipBuild = [];
@@ -754,10 +778,10 @@ export const BuildShip = async (hexa, player, token, setDataInDatabase, map, set
   player.ship += 1;
   var newMap = updateHexagon(map, hexa, newHexa);
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
-  await setPlayerData(setDataInDatabase, player, token);
+  await setPlayerData(player, token);
 };
 
-const setPlayerData = async (setDataInDatabase, player, token) => {
+export const setPlayerData = async (player, token) => {
   await setDataInDatabase(player, "/game_room/" + token + "/players/" + (player.id - 1));
 };
 
@@ -777,11 +801,11 @@ const updateHexagon = (mapData, hexa, newProperties) => {
   return mapData;
 };
 
-export const SendMessage = async (setDataInDatabase, message, tokenPlayer) => {
+export const SendMessage = async (message, tokenPlayer) => {
   await setDataInDatabase(message, "/game_room/" + tokenPlayer + "/chat/");
 };
 
-export const upgradeShip = async (ship, player, map, setMapInDb, token, setDataInDatabase) => {
+export const upgradeShip = async (ship, player, map, token) => {
   var newData = [];
 
   const shipKey = `${ship.coord.q}_${ship.coord.r}_${ship.coord.s}`;
@@ -803,5 +827,5 @@ export const upgradeShip = async (ship, player, map, setMapInDb, token, setDataI
   });
 
   await setMapInDb(newData, "/game_room/" + token + "/map/");
-  await setPlayerData(setDataInDatabase, player, token);
+  await setPlayerData(player, token);
 };

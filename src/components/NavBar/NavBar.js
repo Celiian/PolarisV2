@@ -38,13 +38,7 @@ const ships = {
   Base4,
 };
 
-export default function NavBar({
-  players,
-  ressources,
-  setTradeModal,
-  tradeModal,
-  turn,
-}) {
+export default function NavBar({ players, ressources, setTradeModal, tradeModal, turn, player, token }) {
   return (
     <div className="navbar">
       <div className="player-list-container">
@@ -53,11 +47,7 @@ export default function NavBar({
             {player.name ? (
               <>
                 <div className="player-container">
-                  <img
-                    className="img-ship-players"
-                    src={ships[`Base${player.id}`]}
-                    alt={`ship-player${player.id}`}
-                  />
+                  <img className="img-ship-players" src={ships[`Base${player.id}`]} alt={`ship-player${player.id}`} />
                 </div>
                 <p>{player.name}</p>
               </>
@@ -73,18 +63,9 @@ export default function NavBar({
           {ressources &&
             Object.entries(ressources).map(([key, value]) => (
               <div className="resources" key={key}>
-                <img
-                  className="ressource-img"
-                  src={ressourceImages[key]}
-                  alt={key}
-                />
+                <img className="ressource-img" src={ressourceImages[key]} alt={key} />
                 <p className="ressources-value">
-                  {key == "shipPart"
-                    ? "Ship Part"
-                    : key == "shipEngine"
-                    ? "Ship Engine"
-                    : key}{" "}
-                  : {value}
+                  {key == "shipPart" ? "Ship Part" : key == "shipEngine" ? "Ship Engine" : key} : {value}
                 </p>
               </div>
             ))}
@@ -97,11 +78,7 @@ export default function NavBar({
         message={"Trade"}
       />
 
-      <TradeModal
-        showModal={tradeModal}
-        handleClose={() => setTradeModal(false)}
-        ressources={ressources}
-      />
+      <TradeModal showModal={tradeModal} handleClose={() => setTradeModal(false)} player={player} token={token} />
     </div>
   );
 }

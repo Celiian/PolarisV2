@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { ref, onValue, off } from "firebase/database";
 
 import { HexGrid, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
-import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
 import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip, upgradeShip } from "../../utils/utils";
 
@@ -63,23 +63,21 @@ const Map = () => {
 
   const handleZoom = (event) => {
     const newZoom = event.target.value;
-    if (newZoom !== 0) {
-      setScale(parseFloat(newZoom));
-      updateViewBox();
-    } else {
+    if (newZoom > 0.11) {
+      setScale(newZoom);
     }
   };
+
+  useEffect(() => {
+    updateViewBox();
+  }, [scale]);
 
   const updateViewBox = () => {
     const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
     const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
-    if (scale != 0) {
-      var newWidth = 100 / scale;
-      var newHeight = 100 / scale;
-    } else {
-      var newWidth = 100 / 0.1;
-      var newHeight = 100 / 0.1;
-    }
+
+    var newWidth = 100 / scale;
+    var newHeight = 100 / scale;
     const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
 
     setViewBox(newViewBox);
@@ -123,21 +121,6 @@ const Map = () => {
     document.addEventListener("click", playAudio);
   }, []);
 
-  const setMapInDb = async (data, path) => {
-    const databaseRef = ref(db, path);
-    try {
-      const updates = {};
-      data.forEach((doc) => {
-        const docPath = `${doc.coord.q}_${doc.coord.r}_${doc.coord.s}`;
-        updates[docPath] = doc;
-      });
-      await update(databaseRef, updates);
-      console.log("Data saved successfully.");
-    } catch (error) {
-      console.error("Error saving data: ", error);
-    }
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("room_token");
     const databaseRef = ref(db, "/game_room/" + token);
@@ -147,8 +130,9 @@ const Map = () => {
       setMap(data.map);
       if (first) {
         Object.entries(data.map).forEach((hexa, index) => {
-          if (hexa.type == "base" && hexa.fill == localStorage.getItem("player_id")) {
-            const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
+          var player_id = hexa[1].fill;
+          if (hexa[1].type == "base" && player_id == localStorage.getItem("player_id")) {
+            const newViewBox = centerViewBoxAroundCoord(hexa[1].coord.q, hexa[1].coord.r, hexagonSize.x, viewBox);
             setViewBox(newViewBox);
           }
         });
@@ -180,14 +164,13 @@ const Map = () => {
       setPathHexa,
       pathHexa,
       setPathPossibleHexa,
-      setDataInDatabase,
       token,
       turn,
       player,
       shipBuild,
       setShipBuild,
       setSelectedShip,
-      setMapInDb,
+
       mapVisible,
       setMapVisible
     );
@@ -233,16 +216,6 @@ const Map = () => {
     };
   }, [viewBox, speed]);
 
-  const setDataInDatabase = async (data, path) => {
-    const databaseRef = ref(db, path);
-    try {
-      await set(databaseRef, data);
-      console.log("Data saved successfully.");
-    } catch (error) {
-      console.error("Error saving data: ", error);
-    }
-  };
-
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
   };
@@ -251,7 +224,7 @@ const Map = () => {
     setDrawerOpen(false);
   };
 
-  var minZoom = 0.01;
+  var minZoom = 0.02;
 
   return (
     <>
@@ -267,21 +240,15 @@ const Map = () => {
             turn={turn}
             tradeModal={tradeModal}
             setTradeModal={setTradeModal}
+            player={player}
+            token={token}
           ></NavBar>
         )}
         <button className="btn-drawer" onClick={handleDrawerOpen}>
           Chat
         </button>
-        {token && (
-          <ChatDrawer
-            open={drawerOpen}
-            onClose={handleDrawerClose}
-            playerData={player}
-            token={token}
-            setDataInDatabase={setDataInDatabase}
-          />
-        )}
-        <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
+        {token && <ChatDrawer open={drawerOpen} onClose={handleDrawerClose} playerData={player} token={token} />}
+        <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} setScale={setScale} />
         <HexGrid
           width={"100vw"}
           height={"100vh"}
@@ -298,7 +265,7 @@ const Map = () => {
         <div className="controls-container">
           <CyberButton
             message={"Ready"}
-            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn, map, player)}
+            onClick={() => handleNextTurn(players, token, turn, map, player)}
             toolTip={`Turn ${turn} `}
             style={"black"}
           ></CyberButton>
@@ -322,23 +289,22 @@ const Map = () => {
                     selectedHex,
                     player,
                     token,
-                    setMapInDb,
+
                     map,
                     setIsHexModalOpen,
-                    selectedHex.dataButton1.dataSupp,
-                    setDataInDatabase
+                    selectedHex.dataButton1.dataSupp
                   )
               : selectedHex.dataButton1.func == "moveShip"
               ? () => prepareMoveShip(selectedShip, map, setPathPossibleHexa, setIsHexModalOpen)
               : selectedHex.dataButton1.func == "upgradeShip"
-              ? () => upgradeShip(selectedShip, player, map, setMapInDb, token, setDataInDatabase)
+              ? () => upgradeShip(selectedShip, player, map, token)
               : () => {}
           }
           function2={
             selectedHex.dataButton2.func == "addShip"
               ? () => AddShip(selectedHex, map, setIsHexModalOpen, setShipBuild)
               : selectedHex.dataButton2.func == "upgradeShip"
-              ? () => upgradeShip(selectedShip, player, map, setMapInDb, token, setDataInDatabase)
+              ? () => upgradeShip(selectedShip, player, map, token)
               : () => {}
           }
         />
