@@ -110,7 +110,7 @@ const ChatDrawer = ({
                   alt={`ship-player${msg.player_id}`}
                 />
                 <ListItemText
-                  primary={msg.sender}
+                  primary={`${msg.sender} (${playerData.points}pts)`}
                   secondary={msg.message}
                   className={
                     msg.player_id === localStorage.getItem("player_id")

@@ -43,6 +43,7 @@ export default function NavBar({
   ressources,
   setTradeModal,
   tradeModal,
+  turn,
 }) {
   return (
     <div className="navbar">
@@ -66,6 +67,7 @@ export default function NavBar({
           </div>
         ))}
       </div>
+      <p style={{ fontWeight: "bold", color: "white" }}>Turn:{turn}</p>
       <div className="ressources-list-container">
         <div className="ressources-list">
           {ressources &&
@@ -77,7 +79,12 @@ export default function NavBar({
                   alt={key}
                 />
                 <p className="ressources-value">
-                  {key == "shipPart" ? "Ship Part" : key == "shipEngine" ? "Ship Engine" : key} : {value}
+                  {key == "shipPart"
+                    ? "Ship Part"
+                    : key == "shipEngine"
+                    ? "Ship Engine"
+                    : key}{" "}
+                  : {value}
                 </p>
               </div>
             ))}

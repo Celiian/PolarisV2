@@ -4,7 +4,13 @@ import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
 import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
-import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip } from "../../utils/utils";
+import {
+  drawMap,
+  prepareMoveShip,
+  handleNextTurn,
+  AddMiner,
+  AddShip,
+} from "../../utils/utils";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
@@ -69,8 +75,10 @@ const Map = () => {
   };
 
   const updateViewBox = () => {
-    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    const centerX =
+      parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY =
+      parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
     if (scale != 0) {
       var newWidth = 100 / scale;
       var newHeight = 100 / scale;
@@ -85,7 +93,9 @@ const Map = () => {
     if (newWidth == Infinity) {
       newWidth = 100;
     }
-    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
+    const newViewBox = `${centerX - newWidth / 2} ${
+      centerY - newHeight / 2
+    } ${newWidth} ${newHeight}`;
 
     setViewBox(newViewBox);
   };
@@ -105,7 +115,9 @@ const Map = () => {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
+        viewBox.split(" ")[3]
+      }`;
       setViewBox(newViewBox);
     }
   };
@@ -152,8 +164,16 @@ const Map = () => {
       setMap(data.map);
       if (first) {
         Object.entries(data.map).forEach((hexa, index) => {
-          if (hexa.type == "base" && hexa.fill == localStorage.getItem("player_id")) {
-            const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
+          if (
+            hexa.type == "base" &&
+            hexa.fill == localStorage.getItem("player_id")
+          ) {
+            const newViewBox = centerViewBoxAroundCoord(
+              hexa.coord.q,
+              hexa.coord.r,
+              hexagonSize.x,
+              viewBox
+            );
             setViewBox(newViewBox);
           }
         });
@@ -204,24 +224,24 @@ const Map = () => {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
+            viewBox.split(" ")[1]
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${
+            parseFloat(viewBox.split(" ")[1]) - speed
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
+            viewBox.split(" ")[1]
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${
+            parseFloat(viewBox.split(" ")[1]) + speed
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -256,6 +276,8 @@ const Map = () => {
 
   var minZoom = 0.25 / (mapSize / 10);
 
+  console.log(turn);
+
   return (
     <>
       <div className="app">
@@ -263,7 +285,13 @@ const Map = () => {
           <video autoPlay loop muted src={BackGroundVideoMap}></video>
         </div>
 
-        {player && <NavBar players={players} ressources={player.ressources}></NavBar>}
+        {player && (
+          <NavBar
+            players={players}
+            ressources={player.ressources}
+            turn={turn}
+          ></NavBar>
+        )}
         <button className="btn-drawer" onClick={handleDrawerOpen}>
           Chat
         </button>
@@ -285,7 +313,12 @@ const Map = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
-          <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
+          <Layout
+            size={hexagonSize}
+            flat={false}
+            spacing={1}
+            origin={{ x: -6, y: -6 }}
+          >
             {hexagons}
           </Layout>
           <Patterns />
@@ -293,7 +326,16 @@ const Map = () => {
         <div className="controls-container">
           <CyberButton
             message={"Ready"}
-            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn, map, player)}
+            onClick={() =>
+              handleNextTurn(
+                players,
+                setDataInDatabase,
+                token,
+                turn,
+                map,
+                player
+              )
+            }
             toolTip={`Turn ${turn} `}
             style={"black"}
           ></CyberButton>
@@ -323,7 +365,13 @@ const Map = () => {
                     selectedHex.dataButton1.dataSupp
                   )
               : selectedHex.dataButton1.func == "moveShip"
-              ? () => prepareMoveShip(selectedShip, map, setPathPossibleHexa, setIsHexModalOpen)
+              ? () =>
+                  prepareMoveShip(
+                    selectedShip,
+                    map,
+                    setPathPossibleHexa,
+                    setIsHexModalOpen
+                  )
               : () => {}
           }
           function2={
