@@ -141,6 +141,8 @@ const Map = () => {
     const databaseRef = ref(db, "/game_room/" + token + "/turn/");
     onValue(databaseRef, (snapshot) => {
       if (snapshot.val() != null) {
+        setPlayersReady([]);
+
         toast("Turn " + snapshot.val() + " started, check your ressources", {
           position: "top-right",
           autoClose: 2000,
@@ -151,44 +153,12 @@ const Map = () => {
           progress: undefined,
           theme: "dark",
         });
-        setPlayersReady([]);
       }
     });
 
     return () => {
       off(databaseRef);
     };
-  }, []);
-
-  useEffect(() => {
-    if (token) {
-      const databaseRef = ref(db, "/game_room/" + token + "/players/");
-      onValue(databaseRef, (snapshot) => {
-        if (snapshot.val()) {
-          let playersReadyCopy = [...playersReady];
-          players.forEach((player_data) => {
-            if (player_data != player.id && player_data.ready == true && !playersReadyCopy.includes(player_data.id)) {
-              playersReadyCopy.push(player_data.id);
-              setPlayersReady(playersReadyCopy);
-              toast(player_data.name + " is ready for next turn", {
-                position: "top-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "dark",
-              });
-            }
-          });
-        }
-      });
-
-      return () => {
-        off(databaseRef);
-      };
-    }
   }, []);
 
   useEffect(() => {
