@@ -162,30 +162,6 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      const databaseRef = ref(db, "/game_room/" + token + "/chat/");
-      onValue(databaseRef, (snapshot) => {
-        if (snapshot.val()) {
-          toast("New message", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
-        }
-      });
-
-      return () => {
-        off(databaseRef);
-      };
-    }
-  }, []);
-
-  useEffect(() => {
     const token = localStorage.getItem("room_token");
     const databaseRef = ref(db, "/game_room/" + token);
     setToken(token);

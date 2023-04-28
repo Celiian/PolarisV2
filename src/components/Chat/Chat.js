@@ -75,6 +75,16 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
       const databaseRef = ref(db, "/game_room/" + token + "/chat/");
       onValue(databaseRef, (snapshot) => {
         if (snapshot.val()) {
+          toast("New message", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
           setMessages(snapshot.val());
         }
       });
