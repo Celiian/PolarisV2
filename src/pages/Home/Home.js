@@ -46,12 +46,14 @@ const Home = () => {
           {
             name: nameOwnerPlayer,
             id: 1,
+            points: 1,
             ready: false,
+            ship: 0,
             ressources: {
               water: 10,
               foodCan: 10,
-              shipEngine: 10,
-              shipPart: 10,
+              shipEngine: 14,
+              shipPart: 100,
               coins: 10,
               uranium: 10,
               ore: 10,

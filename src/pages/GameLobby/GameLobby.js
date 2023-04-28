@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ref, onValue, off, set } from "firebase/database";
+import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
 import "./GameLobby.css";
 import InviteButton from "../../components/InviteButton/InviteButton";
@@ -68,6 +68,21 @@ const GameLobby = () => {
     await set(databaseRef, data);
   };
 
+  const setMapInDb = async (data, path) => {
+    const databaseRef = ref(db, path);
+    try {
+      const updates = {};
+      data.forEach((doc) => {
+        const docPath = `${doc.coord.q}_${doc.coord.r}_${doc.coord.s}`;
+        updates[docPath] = doc;
+      });
+      await update(databaseRef, updates);
+      console.log("Data saved successfully.");
+    } catch (error) {
+      console.error("Error saving data: ", error);
+    }
+  };
+
   const submitFormJoin = async (event) => {
     event.preventDefault();
     setShowModal(false);
@@ -79,7 +94,9 @@ const GameLobby = () => {
     newData.players.push({
       id: player_id,
       name: namePlayer,
+      points: 1,
       ready: false,
+      ship: 0,
       ressources: {
         water: 10,
         foodCan: 10,
@@ -108,10 +125,15 @@ const GameLobby = () => {
   };
 
   const startGame = async () => {
-    const map = generate_map(40, roomData.players);
-    await setDataInDatabase(map, path + token + "/map/");
     await setDataInDatabase(true, path + token + "/started/");
     window.location.href = "/map";
+  };
+
+  const setMap = async () => {
+    const map = generate_map(40, roomData.players);
+    await setMapInDb(map, path + token + "/map/");
+
+    startGame();
   };
 
   return (
@@ -133,17 +155,9 @@ const GameLobby = () => {
                       {player.name ? (
                         <p className="players_logos_lobby">
                           {player.id == 1 ? (
-                            <img
-                              className="owner_player_logo"
-                              src={CrownAstronautLogo}
-                              alt="Logo Owner Astronaut"
-                            />
+                            <img className="owner_player_logo" src={CrownAstronautLogo} alt="Logo Owner Astronaut" />
                           ) : (
-                            <img
-                              className="players_logo"
-                              src={AstronautLogo}
-                              alt="Logo Astronaut"
-                            />
+                            <img className="players_logo" src={AstronautLogo} alt="Logo Astronaut" />
                           )}
                           {player.name}
                         </p>
@@ -158,13 +172,8 @@ const GameLobby = () => {
               </div>
             </div>
             <div className="main-buttons-actions">
-              <InviteButton
-                message={"Invite"}
-                onClickFunction={copyInviteLink}
-              />
-              {accessStartBtn === true && (
-                <StartButton message={"Launch"} onClickFunction={startGame} />
-              )}
+              <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
+              {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={setMap} />}
             </div>
           </div>
         </div>
@@ -184,10 +193,7 @@ const GameLobby = () => {
               >
                 <div>
                   <div className="mt-3 text-center sm:mt-5">
-                    <h3
-                      className="text-lg leading-6 font-medium text-white"
-                      id="modal-headline"
-                    >
+                    <h3 className="text-lg leading-6 font-medium text-white" id="modal-headline">
                       Join GameRoom
                     </h3>
                     <div className="mt-2">

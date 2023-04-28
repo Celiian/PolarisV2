@@ -47,21 +47,25 @@ export const findPath = memoize((hexStart, hexEnd, map) => {
         return;
       }
 
-      for (let i = 0; i < map.length; i++) {
-        const hex = map[i];
+      let skipNeighbor = false;
+      Object.entries(map).forEach(([index, hex]) => {
         if (hex.coord.q === neighbor.q && hex.coord.r === neighbor.r && hex.coord.s === neighbor.s) {
           if (
             hex.type == "planet" ||
             hex.type == "base" ||
             hex.type == "ship" ||
             hex.type == "miner" ||
-            hex.type == "asteroids"
+            hex.type == "asteroids" ||
+            hex.type == "asteroid" ||
+            hex.type == "sun"
           ) {
-            return;
+            skipNeighbor = true;
           }
         }
+      });
+      if (skipNeighbor) {
+        return;
       }
-
       const tentativeGScore = gScore[`${current.q},${current.r},${current.s}`] + 1;
 
       if (
