@@ -39,6 +39,7 @@ import Base2_45 from "../../../assets/img/ships/ship2/base/base-45.png";
 import Base2_90 from "../../../assets/img/ships/ship2/base/base-90.png";
 import Base2_135 from "../../../assets/img/ships/ship2/base/base-135.png";
 
+import Ship2 from "../../../assets/img/ships/ship2/ship/ship.png";
 import Ship245 from "../../../assets/img/ships/ship2/ship/ship45.png";
 import Ship290 from "../../../assets/img/ships/ship2/ship/ship90.png";
 import Ship2135 from "../../../assets/img/ships/ship2/ship/ship135.png";
@@ -104,12 +105,13 @@ const Patterns = () => (
     <Pattern id="base/2/-90" link={Base2_90} size={{ x: 10, y: 12 }} />
     <Pattern id="base/2/-135" link={Base2_135} size={{ x: 10, y: 12 }} />
 
+    <Pattern id="ship/2" link={Ship2} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/2/45" link={Ship245} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/2/90" link={Ship290} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/2/135" link={Ship2135} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/2/-45" link={Ship2_45} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/-90" link={Ship2_90} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/-135" link={Ship2_135} size={{ x: 10, y: 12 }} />
+    <Pattern id="ship/2/-90" link={Ship2_90} size={{ x: 10, y: 12 }} />
+    <Pattern id="ship/2/-135" link={Ship2_135} size={{ x: 10, y: 12 }} />
 
     <Pattern id="miner/2/45" link={Miner245} size={{ x: 10, y: 12 }} />
     <Pattern id="miner/2/90" link={Miner290} size={{ x: 10, y: 12 }} />
