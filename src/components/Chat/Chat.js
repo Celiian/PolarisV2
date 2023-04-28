@@ -34,13 +34,7 @@ const ships = {
   Base4,
 };
 
-const ChatDrawer = ({
-  open,
-  onClose,
-  playerData,
-  setDataInDatabase,
-  token,
-}) => {
+const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -78,9 +72,9 @@ const ChatDrawer = ({
 
   useEffect(() => {
     if (token) {
-      const databaseRef = ref(db, "/game_room/" + token);
+      const databaseRef = ref(db, "/game_room/" + token + "/chat/");
       onValue(databaseRef, (snapshot) => {
-        if (snapshot.val().chat) {
+        if (snapshot.val()) {
           toast("New message", {
             position: "top-right",
             autoClose: 5000,
@@ -91,7 +85,7 @@ const ChatDrawer = ({
             progress: undefined,
             theme: "dark",
           });
-          setMessages(snapshot.val().chat);
+          setMessages(snapshot.val());
         }
       });
 
@@ -110,11 +104,7 @@ const ChatDrawer = ({
             {messages.map((msg, index) => (
               <ListItem
                 key={index}
-                className={
-                  msg.player_id === localStorage.getItem("player_id")
-                    ? "align-right"
-                    : ""
-                }
+                className={msg.player_id === localStorage.getItem("player_id") ? "align-right" : ""}
               >
                 <img
                   className="img-ship-players"
@@ -124,24 +114,14 @@ const ChatDrawer = ({
                 <ListItemText
                   primary={`${msg.sender} (${playerData.points}pts)`}
                   secondary={msg.message}
-                  className={
-                    msg.player_id === localStorage.getItem("player_id")
-                      ? "align-right-text"
-                      : ""
-                  }
+                  className={msg.player_id === localStorage.getItem("player_id") ? "align-right-text" : ""}
                 />
               </ListItem>
             ))}
           </List>
         </div>
         <div className="sendchat-container">
-          <TextField
-            label="Type your message"
-            variant="outlined"
-            fullWidth
-            value={inputValue}
-            onChange={handleInput}
-          />
+          <TextField label="Type your message" variant="outlined" fullWidth value={inputValue} onChange={handleInput} />
           <IconButton onClick={handleSend}>
             <SendIcon />
           </IconButton>
