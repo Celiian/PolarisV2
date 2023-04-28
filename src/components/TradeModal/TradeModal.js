@@ -85,7 +85,7 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
         setPlayerData(player, token);
         toast("You bought " + quantityTrade + " " + tradeSelected + " for " + quantity + " coins", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -96,7 +96,7 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
       } else {
         toast("You don't have enought coins", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -113,7 +113,7 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
         setPlayerData(player, token);
         toast("You sold " + quantity + " " + tradeSelected + " for " + cost + " coins", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -124,7 +124,7 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
       } else {
         toast("You don't have enought " + ressourceSelected, {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,

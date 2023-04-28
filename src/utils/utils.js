@@ -677,7 +677,7 @@ export const handleNextTurn = async (players, token, turn, map, actualPlayer) =>
   var allReady = true;
   toast("You are ready for next turn", {
     position: "top-right",
-    autoClose: 5000,
+    autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
@@ -764,7 +764,7 @@ export const AddMiner = async (
 
   toast("Miner Built", {
     position: "top-right",
-    autoClose: 5000,
+    autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
@@ -818,7 +818,7 @@ export const BuildShip = async (hexa, player, token, map, setShipBuild, shipBuil
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
   toast("Exploration ship built", {
     position: "top-right",
-    autoClose: 5000,
+    autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,
@@ -876,7 +876,7 @@ export const upgradeShip = async (ship, player, map, token) => {
   if (ship.type == "miner") {
     toast("Miner upgraded", {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -887,7 +887,7 @@ export const upgradeShip = async (ship, player, map, token) => {
   } else {
     toast("Exploration Ship Upgraded", {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,

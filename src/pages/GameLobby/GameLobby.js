@@ -120,7 +120,7 @@ const GameLobby = () => {
         console.log("Lien copié dans le presse-papiers :", linkInvite);
         toast("Invitation Link copied !", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -150,7 +150,7 @@ const GameLobby = () => {
   return (
     <>
       <ToastContainer
-        autoClose={5000}
+        autoClose={2000}
         hideProgressBar={true}
         newestOnTop={false}
         closeOnClick

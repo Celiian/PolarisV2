@@ -31,6 +31,7 @@ const Map = () => {
   const [mapSize, setMapSize] = useState(0);
   const [hexagons, setHexagons] = useState([]);
   const [token, setToken] = useState("");
+  const [playersReady, setPlayersReady] = useState([]);
 
   const [selectedHex, setSelectedHex] = useState(null);
   const [selectedShip, setSelectedShip] = useState(null);
@@ -73,7 +74,7 @@ const Map = () => {
     console.log("gjfkd");
     toast(text, {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -140,9 +141,9 @@ const Map = () => {
     const databaseRef = ref(db, "/game_room/" + token + "/turn/");
     onValue(databaseRef, (snapshot) => {
       if (snapshot.val() != null) {
-        toast("Turn" + snapshot.val() + " started, check your ressources", {
+        toast("Turn " + snapshot.val() + " started, check your ressources", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 2000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -150,6 +151,7 @@ const Map = () => {
           progress: undefined,
           theme: "dark",
         });
+        setPlayersReady([]);
       }
     });
 
@@ -160,12 +162,43 @@ const Map = () => {
 
   useEffect(() => {
     if (token) {
+      const databaseRef = ref(db, "/game_room/" + token + "/players/");
+      onValue(databaseRef, (snapshot) => {
+        if (snapshot.val()) {
+          let playersReadyCopy = [...playersReady];
+          players.forEach((player_data) => {
+            if (player_data != player.id && player_data.ready == true && !playersReadyCopy.includes(player_data.id)) {
+              playersReadyCopy.push(player_data.id);
+              setPlayersReady(playersReadyCopy);
+              toast(player_data.name + " is ready for next turn", {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "dark",
+              });
+            }
+          });
+        }
+      });
+
+      return () => {
+        off(databaseRef);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
       const databaseRef = ref(db, "/game_room/" + token + "/chat/");
       onValue(databaseRef, (snapshot) => {
         if (snapshot.val()) {
           toast("New message", {
             position: "top-right",
-            autoClose: 5000,
+            autoClose: 2000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
@@ -290,7 +323,7 @@ const Map = () => {
   return (
     <>
       <ToastContainer
-        autoClose={5000}
+        autoClose={2000}
         hideProgressBar={true}
         newestOnTop={false}
         closeOnClick
