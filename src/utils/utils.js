@@ -264,10 +264,8 @@ export const drawMap = (
             stroke={stroke}
             fill={fill ? "" : hexa.type + "/" + hexa.fill}
             hexa={hexa.coord}
-            handleClick={
-              pathPossibleHexa.includes(index)
-                ? () => {}
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
+            handleClick={() =>
+              handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
             }
             key={index}
             index={index}
@@ -294,10 +292,12 @@ export const drawMap = (
       Hexagons.push(hexagon);
     }
   });
+
   return Hexagons;
 };
 
 const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn) => {
+  console.log(hexa);
   var hex = SetHexData(hexa, player, map, setSelectedShip, turn);
 
   setSelectedHex(hex);
@@ -329,36 +329,83 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
       "Despite its size, the Mother Ship boasts a sleek and streamlined design, allowing it to navigate even the most challenging environments and protect its inhabitants. Thanks to its advanced manufacturing facilities, the motherShip can also produce smaller spacecraft such as exploration ships, requiring 20 ship parts and 5 ship engines to construct. ";
     img = "https://wallpapercrafter.com/desktop1/540220-action-battlestar-fighting-futuristic-galactica.jpg";
     style = "indu";
-
-    if (hexa.moved < turn) {
+    if (hexa.fill == player.id) {
+      if (hexa.moved < turn) {
+        button1 = true;
+      }
+      button2 = true;
+      dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
+      var btnMsg = "";
+      var func = "";
+      if (player.ressources.shipEngine < 5 || player.ressources.shipPart < 20) {
+        btnMsg = "You don't have enought ressources";
+      } else {
+        btnMsg = "Build Ship";
+        func = "addShip";
+      }
+      dataButton2 = { message: btnMsg, toolTip: "ӨӨƼᕓՆ", func: func, style: "black small", dataSupp: null };
+    }
+  } else if (hexa.type == "miner") {
+    setSelectedShip(hexa);
+    name = "Mining Ship";
+    desc =
+      "Anchored in the void, the mining ship awaits, harvesting bounties as celestial gifts from planetary mates; a sentinel of progress, extracting riches from the skies, transforming cosmic wealth into humanity's prize. If you want to upgrade it it will cost you :" +
+      2 * (hexa.level + 1) +
+      " ship engines and : " +
+      10 * (hexa.level + 1) +
+      " ship parts.";
+    img = "https://pbs.twimg.com/media/Dabg7QvXcAABFRu.jpg:large";
+    style = "indu";
+    if (hexa.fill == player.id) {
       button1 = true;
+      var btnMsg = "Upgrade Ship";
+      var func = "upgradeShip";
+      if (player.ressources.shipEngine < 2 * (hexa.level + 1) || player.ressources.shipPart < 10 * (hexa.level + 1)) {
+        btnMsg = "You don't have enought ressources";
+        func = "";
+      }
+
+      dataButton1 = {
+        message: btnMsg,
+        toolTip: "ӨӨƼᕓՆ",
+        func: func,
+        style: "black small",
+        dataSupp: null,
+      };
     }
-    button2 = true;
-    dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
-    var btnMsg = "";
-    var func = "";
-    if (player.ressources.shipEngine < 5 || player.ressources.shipPart < 20) {
-      btnMsg = "You don't have enought ressources";
-    } else {
-      btnMsg = "Build Ship";
-      func = "addShip";
-    }
-    dataButton2 = { message: btnMsg, toolTip: "ӨӨƼᕓՆ", func: func, style: "black small", dataSupp: null };
   } else if (hexa.type == "ship") {
     setSelectedShip(hexa);
     name = "Exploration Ship";
     desc =
-      "Equipped with cutting-edge propulsion systems and state-of-the-art scientific instruments, the space exploration ship represents humanity's unwavering commitment to unlocking the secrets of the universe. As it voyages through the cosmos, it offers a glimpse into the boundless possibilities of space exploration and the limitless potential of human ingenuity.";
+      "Equipped with cutting-edge propulsion systems and state-of-the-art scientific instruments, the space exploration ship represents humanity's unwavering commitment to unlocking the secrets of the universe. As it voyages through the cosmos, it offers a glimpse into the boundless possibilities of space exploration and the limitless potential of human ingenuity. If you want to upgrade it it will cost you :" +
+      5 * (hexa.level + 1) +
+      " ship engines and : " +
+      20 * (hexa.level + 1) +
+      " ship parts.";
     img =
       "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/e61c74a7-0e3e-40be-8a70-e05a01fef9f7/dct211a-d481ce86-8ddf-40d7-868f-70e8a3bb1640.jpg/v1/fill/w_1210,h_660,q_75,strp/star_wars_terran_scout_ship_by_scifidan96_dct211a-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NjYwIiwicGF0aCI6IlwvZlwvZTYxYzc0YTctMGUzZS00MGJlLThhNzAtZTA1YTAxZmVmOWY3XC9kY3QyMTFhLWQ0ODFjZTg2LThkZGYtNDBkNy04NjhmLTcwZThhM2JiMTY0MC5qcGciLCJ3aWR0aCI6Ijw9MTIxMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.cm-EAnU0hLKNFZhZ99vV53vEuYdUEq7jn2u8XVbqZtc";
     style = "large";
 
-    if (hexa.moved < turn) {
-      button1 = true;
+    if (String(hexa.fill).charAt(0) == player.id) {
+      if (hexa.moved < turn) {
+        button1 = true;
+        dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
+      }
+      button2 = true;
+      var btnMsg = "Upgrade Ship";
+      var func = "upgradeShip";
+      if (player.ressources.shipEngine < 5 * (hexa.level + 1) || player.ressources.shipPart < 20 * (hexa.level + 1)) {
+        btnMsg = "You don't have enought ressources";
+        func = "";
+      }
+      dataButton2 = {
+        message: btnMsg,
+        toolTip: "ӨӨƼᕓՆ",
+        func: func,
+        style: "black small",
+        dataSupp: null,
+      };
     }
-    button2 = true;
-    dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
-    dataButton2 = { message: "Upgrade Ship", toolTip: "ӨӨƼᕓՆ", func: "", style: "black small", dataSupp: null };
   } else if (hexa.fill == "void") {
     name = "Space";
     desc = "Through the endless expanse of space, light travels on and on, a cosmic dance that never ends.";
@@ -474,6 +521,7 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa, setIsHexModalOpe
       pathPossible.push(index);
     }
   });
+
   setPathPossibleHexa(pathPossible);
   setIsHexModalOpen(false);
 };
@@ -705,4 +753,23 @@ const updateHexagon = (mapData, hexa, newProperties) => {
 
 export const SendMessage = async (setDataInDatabase, message, tokenPlayer) => {
   await setDataInDatabase(message, "/game_room/" + tokenPlayer + "/chat/");
+};
+
+export const upgradeShip = async (ship, player, map, setMapInDb, token, setDataInDatabase) => {
+  var newData = [];
+  console.log(ship);
+  const shipKey = `${ship.coord.q}_${ship.coord.r}_${ship.coord.s}`;
+
+  if (map[shipKey].type == "miner") {
+    player.ressources.shipPart -= 10 * (map[shipKey].level + 1);
+    player.ressources.shipEngine -= 2 * (map[shipKey].level + 1);
+  } else {
+    player.ressources.shipPart -= 20 * (map[shipKey].level + 1);
+    player.ressources.shipEngine -= 5 * (map[shipKey].level + 1);
+  }
+  map[shipKey].level += 1;
+
+  newData.push(map[shipKey]);
+  await setMapInDb(newData, "/game_room/" + token + "/map/");
+  await setPlayerData(setDataInDatabase, player, token);
 };

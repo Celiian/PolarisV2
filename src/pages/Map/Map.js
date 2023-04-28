@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 
-import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
+import { HexGrid, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
 import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
-import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip } from "../../utils/utils";
+import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip, upgradeShip } from "../../utils/utils";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
@@ -21,6 +21,7 @@ import "./Map.css";
 
 const Map = () => {
   const [map, setMap] = useState([]);
+  const [mapVisible, setMapVisible] = useState([]);
   const [players, setPlayers] = useState([]);
   const [player, setPlayer] = useState([]);
   const [turn, setTurn] = useState(0);
@@ -78,13 +79,6 @@ const Map = () => {
     } else {
       var newWidth = 100 / 0.1;
       var newHeight = 100 / 0.1;
-    }
-    if (newHeight == Infinity) {
-      console.log(scale);
-      newHeight = 100;
-    }
-    if (newWidth == Infinity) {
-      newWidth = 100;
     }
     const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
 
@@ -193,7 +187,9 @@ const Map = () => {
       shipBuild,
       setShipBuild,
       setSelectedShip,
-      setMapInDb
+      setMapInDb,
+      mapVisible,
+      setMapVisible
     );
     setHexagons(hexas);
   }, [map, player, viewBox, pathPossibleHexa, pathHexa, shipBuild]);
@@ -255,9 +251,7 @@ const Map = () => {
     setDrawerOpen(false);
   };
 
-  var minZoom = 0.25 / (mapSize / 10);
-
-  console.log(turn);
+  var minZoom = 0.01;
 
   return (
     <>
@@ -335,11 +329,15 @@ const Map = () => {
                   )
               : selectedHex.dataButton1.func == "moveShip"
               ? () => prepareMoveShip(selectedShip, map, setPathPossibleHexa, setIsHexModalOpen)
+              : selectedHex.dataButton1.func == "upgradeShip"
+              ? () => upgradeShip(selectedShip, player, map, setMapInDb, token, setDataInDatabase)
               : () => {}
           }
           function2={
             selectedHex.dataButton2.func == "addShip"
               ? () => AddShip(selectedHex, map, setIsHexModalOpen, setShipBuild)
+              : selectedHex.dataButton1.func == "upgradeShip"
+              ? () => upgradeShip(selectedShip, player, map, setMapInDb, token, setDataInDatabase)
               : () => {}
           }
         />
