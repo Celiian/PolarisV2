@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ref, onValue, off } from "firebase/database";
 import db from "../../firebaseConfig";
 import { SendMessage } from "../../utils/utils";
+import { toast } from "react-toastify";
 
 import {
   Drawer,
@@ -33,13 +34,7 @@ const ships = {
   Base4,
 };
 
-const ChatDrawer = ({
-  open,
-  onClose,
-  playerData,
-  setDataInDatabase,
-  token,
-}) => {
+const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -79,6 +74,16 @@ const ChatDrawer = ({
       const databaseRef = ref(db, "/game_room/" + token);
       onValue(databaseRef, (snapshot) => {
         if (snapshot.val().chat) {
+          toast("New message", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
           setMessages(snapshot.val().chat);
         }
       });
@@ -98,11 +103,7 @@ const ChatDrawer = ({
             {messages.map((msg, index) => (
               <ListItem
                 key={index}
-                className={
-                  msg.player_id === localStorage.getItem("player_id")
-                    ? "align-right"
-                    : ""
-                }
+                className={msg.player_id === localStorage.getItem("player_id") ? "align-right" : ""}
               >
                 <img
                   className="img-ship-players"
@@ -112,24 +113,14 @@ const ChatDrawer = ({
                 <ListItemText
                   primary={`${msg.sender} (${playerData.points}pts)`}
                   secondary={msg.message}
-                  className={
-                    msg.player_id === localStorage.getItem("player_id")
-                      ? "align-right-text"
-                      : ""
-                  }
+                  className={msg.player_id === localStorage.getItem("player_id") ? "align-right-text" : ""}
                 />
               </ListItem>
             ))}
           </List>
         </div>
         <div className="sendchat-container">
-          <TextField
-            label="Type your message"
-            variant="outlined"
-            fullWidth
-            value={inputValue}
-            onChange={handleInput}
-          />
+          <TextField label="Type your message" variant="outlined" fullWidth value={inputValue} onChange={handleInput} />
           <IconButton onClick={handleSend}>
             <SendIcon />
           </IconButton>

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { ref, onValue, off } from "firebase/database";
-
+import { ToastContainer, toast } from "react-toastify";
 import { HexGrid, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
 import db from "../../firebaseConfig";
 import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip, upgradeShip } from "../../utils/utils";
+import "react-toastify/dist/ReactToastify.css";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
@@ -66,6 +67,20 @@ const Map = () => {
     if (newZoom > 0.11) {
       setScale(newZoom);
     }
+  };
+
+  const addToast = (text) => {
+    console.log("gjfkd");
+    toast(text, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
   };
 
   useEffect(() => {
@@ -170,9 +185,9 @@ const Map = () => {
       shipBuild,
       setShipBuild,
       setSelectedShip,
-
       mapVisible,
-      setMapVisible
+      setMapVisible,
+      addToast
     );
     setHexagons(hexas);
   }, [map, player, viewBox, pathPossibleHexa, pathHexa, shipBuild]);
@@ -228,6 +243,17 @@ const Map = () => {
 
   return (
     <>
+      <ToastContainer
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="app">
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideoMap}></video>
@@ -249,6 +275,7 @@ const Map = () => {
         </button>
         {token && <ChatDrawer open={drawerOpen} onClose={handleDrawerClose} playerData={player} token={token} />}
         <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} setScale={setScale} />
+
         <HexGrid
           width={"100vw"}
           height={"100vh"}

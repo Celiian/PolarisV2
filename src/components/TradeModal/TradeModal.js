@@ -13,6 +13,7 @@ import ship_part from "../../assets/img/ressources/ship_part.png";
 
 import MenuItem from "@mui/material/MenuItem";
 
+import { toast } from "react-toastify";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { TextField } from "@mui/material";
@@ -82,6 +83,17 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
         player.ressources[tradeSelected] += quantityTrade;
 
         setPlayerData(player, token);
+      } else {
+        toast("You don't have enought coins", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     } else if (ressourceSelected && cost > 0) {
       if (player.ressources[ressourceSelected] <= quantity) {
@@ -89,6 +101,17 @@ const TradeModal = ({ showModal, handleClose, player, token }) => {
         player.ressources.coins += cost;
 
         setPlayerData(player, token);
+      } else {
+        toast("You don't have enought" + ressourceSelected, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     }
   };

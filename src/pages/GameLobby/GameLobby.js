@@ -11,6 +11,7 @@ import AstronautLogo from "../../assets/img/icons/astronaut.png";
 import BackGroundVideo from "../../assets/video/background-home.webm";
 import GameLogo from "../../assets/img/icons/logo.png";
 import backgroundSound from "../../assets/sound/ost.mp3";
+import { RoomRounded } from "@mui/icons-material";
 
 const GameLobby = () => {
   const [roomData, setRoomData] = useState(null);
@@ -51,7 +52,6 @@ const GameLobby = () => {
     const databaseRef = ref(db, path + token);
     onValue(databaseRef, (snapshot) => {
       setRoomData(snapshot.val());
-      console.log(snapshot.val());
       if (snapshot.val().started) {
         window.location.href = "/map";
       }
@@ -173,7 +173,9 @@ const GameLobby = () => {
             </div>
             <div className="main-buttons-actions">
               <InviteButton message={"Invite"} onClickFunction={copyInviteLink} />
-              {accessStartBtn === true && <StartButton message={"Launch"} onClickFunction={setMap} />}
+              {accessStartBtn === true && roomData && roomData.players.length > 1 && (
+                <StartButton message={"Launch"} onClickFunction={setMap} />
+              )}
             </div>
           </div>
         </div>

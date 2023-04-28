@@ -1,5 +1,6 @@
 import Hexagon from "../pages/Map/mapAssets/Hexagons";
 import { HexUtils } from "react-hexgrid";
+import { toast } from "react-toastify";
 import { ref, set, update } from "firebase/database";
 import { findPath, memoize, isVisible, getRotationDegree } from "../pages/Map/CustomHexUtils";
 import db from "../firebaseConfig";
@@ -193,7 +194,8 @@ export const drawMap = (
   player,
   shipBuild,
   setShipBuild,
-  setSelectedShip
+  setSelectedShip,
+  addToast
 ) => {
   var Hexagons = [];
   Object.entries(map).forEach(([index, hexa]) => {
@@ -261,7 +263,17 @@ export const drawMap = (
                     )
                 : shipBuild.includes(index)
                 ? () => BuildShip(hexa, player, token, map, setShipBuild, shipBuild)
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
+                : () =>
+                    handleHexClick(
+                      hexa,
+                      map,
+                      setSelectedHex,
+                      setIsHexModalOpen,
+                      player,
+                      setSelectedShip,
+                      turn,
+                      addToast
+                    )
             }
             key={index}
             index={index}
@@ -290,7 +302,7 @@ export const drawMap = (
             fill={fill ? "" : hexa.type + "/" + hexa.fill}
             hexa={hexa.coord}
             handleClick={() =>
-              handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn)
+              handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn, addToast)
             }
             key={index}
             index={index}
@@ -307,7 +319,7 @@ export const drawMap = (
             handleClick={
               fill || pathPossibleHexa.includes(index)
                 ? () => {}
-                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, turn)
+                : () => handleHexClick(hexa, map, setSelectedHex, setIsHexModalOpen, player, turn, addToast)
             }
             key={index}
             index={index}
@@ -321,8 +333,16 @@ export const drawMap = (
   return Hexagons;
 };
 
-const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn) => {
-  console.log(hexa);
+const handleHexClick = async (
+  hexa,
+  map,
+  setSelectedHex,
+  setIsHexModalOpen,
+  player,
+  setSelectedShip,
+  turn,
+  addToast
+) => {
   var hex = SetHexData(hexa, player, map, setSelectedShip, turn);
 
   setSelectedHex(hex);
@@ -707,7 +727,6 @@ export const AddMiner = async (
   setIsHexModalOpen,
   dataSupp
 ) => {
-  console.log(hexa);
   setIsHexModalOpen(false);
   var newData = [];
   player.ressources.shipEngine -= 2;
@@ -734,6 +753,16 @@ export const AddMiner = async (
     newData.push(map[key]);
   });
 
+  toast("Miner Built", {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
   await setMapInDb(newData, "/game_room/" + token + "/map/");
 };
 
@@ -778,6 +807,16 @@ export const BuildShip = async (hexa, player, token, map, setShipBuild, shipBuil
   player.ship += 1;
   var newMap = updateHexagon(map, hexa, newHexa);
   await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
+  toast("Exploration ship built", {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
+  });
   await setPlayerData(player, token);
 };
 
@@ -825,7 +864,29 @@ export const upgradeShip = async (ship, player, map, token) => {
   modified.forEach((key) => {
     newData.push(map[key]);
   });
-
+  if (ship.type == "miner") {
+    toast("Miner upgraded", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  } else {
+    toast("Exploration Ship Upgraded", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  }
   await setMapInDb(newData, "/game_room/" + token + "/map/");
   await setPlayerData(player, token);
 };
