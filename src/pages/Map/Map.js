@@ -288,7 +288,9 @@ const Map = () => {
           button2={selectedHex.button2}
           dataButton2={selectedHex.dataButton2}
           function1={
-            selectedHex.dataButton1.func == "addMiner"
+            selectedHex.dataButton1.func == "addMiner" &&
+            player.ressources.shipEngine >= 2 &&
+            player.ressources.shipPart >= 10
               ? () =>
                   AddMiner(
                     selectedHex,

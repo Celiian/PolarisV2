@@ -46,6 +46,7 @@ const Home = () => {
           {
             name: nameOwnerPlayer,
             id: 1,
+            points: 1,
             ready: false,
             ship: 0,
             ressources: {

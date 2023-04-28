@@ -284,3 +284,8 @@ h1 {
 .btn-miner:hover {
   background-color: #0056b3;
 }
+
+.btn-contianer {
+  display: flex;
+  justify-content: space-around;
+}

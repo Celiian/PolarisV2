@@ -328,7 +328,15 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
     }
     button2 = true;
     dataButton1 = { message: "Move", toolTip: "ƼᕓӨӨՆ", func: "moveShip", style: "black small", dataSupp: null };
-    dataButton2 = { message: "Build Ship", toolTip: "ӨӨƼᕓՆ", func: "addShip", style: "black small", dataSupp: null };
+    var btnMsg = "";
+    var func = "";
+    if (player.ressources.shipEngine < 5 || player.ressources.shipPart < 20) {
+      btnMsg = "You don't have enought ressources";
+    } else {
+      btnMsg = "Build Ship";
+      func = "addShip";
+    }
+    dataButton2 = { message: btnMsg, toolTip: "ӨӨƼᕓՆ", func: func, style: "black small", dataSupp: null };
   } else if (hexa.type == "ship") {
     setSelectedShip(hexa);
     name = "Exploration Ship";
@@ -377,7 +385,11 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
     if (miner) {
       button1 = false;
     } else if (button1 == true) {
-      dataButton1.message = "Build Miner";
+      if (player.ressources.shipEngine < 2 || player.ressources.shipPart < 10) {
+        dataButton1.message = "You don't have enought ressources";
+      } else {
+        dataButton1.message = "Build Miner";
+      }
       dataButton1.toolTip = "ƼᕓӨӨՆ";
       dataButton1.func = "addMiner";
       dataButton1.style = "black small";
@@ -604,6 +616,11 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn, ma
 export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setIsHexModalOpen, dataSupp) => {
   setIsHexModalOpen(false);
 
+  player.ressources.shipEngine -= 2;
+  player.ressources.shipPart -= 10;
+  player.points += 1;
+  await setPlayerData(setDataInDatabase, player, token);
+
   const newHexa = {
     coord: hexa.coord,
     type: "miner",
@@ -637,6 +654,11 @@ export const AddShip = async (hexa, map, setIsHexModalOpen, setShipBuild) => {
 };
 
 export const BuildShip = async (hexa, player, token, setDataInDatabase, map, setShipBuild, shipBuild) => {
+  player.ressources.shipEngine -= 5;
+  player.ressources.shipPart -= 20;
+  player.points += 1;
+  await setPlayerData(setDataInDatabase, player, token);
+
   setShipBuild([]);
   shipBuild = [];
 

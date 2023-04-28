@@ -93,6 +93,7 @@ const GameLobby = () => {
     newData.players.push({
       id: player_id,
       name: namePlayer,
+      points: 1,
       ready: false,
       ship: 0,
       ressources: {
