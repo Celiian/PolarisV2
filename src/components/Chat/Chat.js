@@ -74,7 +74,7 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
     if (token) {
       const databaseRef = ref(db, "/game_room/" + token + "/chat/");
       onValue(databaseRef, (snapshot) => {
-        if (snapshot.val()) {
+        if (snapshot.val() != messages) {
           toast("New message", {
             position: "top-right",
             autoClose: 2000,
