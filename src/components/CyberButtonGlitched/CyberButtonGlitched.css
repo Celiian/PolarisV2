@@ -2,6 +2,15 @@ body .cybr-btn+.cybr-btn {
     margin-top: 2rem;
 }
 
+button.cybr-btn {
+    display: flex;
+    justify-content: center;
+    min-width: 140px;
+    font-size: 15px;
+    height: 50px;
+    align-items: center;
+}
+
 .cybr-btn {
     --primary: hsl(var(--primary-hue), 85%, calc(var(--primary-lightness, 50) * 1%));
     --shadow-primary: hsl(var(--shadow-primary-hue), 90%, 50%);

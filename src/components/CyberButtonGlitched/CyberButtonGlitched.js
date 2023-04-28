@@ -5,16 +5,13 @@ export default function CyberButtonGlitched({ message, onClick, color }) {
     <>
       <button
         className="cybr-btn"
-        onClick={onClick}
+        onClick={() => onClick()}
         style={{ backgroundColor: color }}
       >
         {message}
-        <span aria-hidden="">_</span>
-        <span aria-hidden class="cybr-btn__glitch">
+        <span aria-hidden="true">_</span>
+        <span aria-hidden className="cybr-btn__glitch">
           {message}_
-        </span>
-        <span aria-hidden class="cybr-btn__tag">
-          R25
         </span>
       </button>
     </>

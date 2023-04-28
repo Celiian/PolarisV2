@@ -56,6 +56,7 @@ export const findPath = memoize((hexStart, hexEnd, map) => {
             hex.type == "ship" ||
             hex.type == "miner" ||
             hex.type == "asteroids" ||
+            hex.type == "asteroid" ||
             hex.type == "sun"
           ) {
             skipNeighbor = true;

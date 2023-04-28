@@ -2,18 +2,25 @@ import React, { useState, useEffect } from "react";
 
 import { Hex, HexGrid, HexUtils, Layout } from "react-hexgrid";
 import { centerViewBoxAroundCoord } from "./CustomHexUtils";
-import { ref, onValue, off, set, update } from "firebase/database";
+import { ref, onValue, off, set } from "firebase/database";
 import db from "../../firebaseConfig";
-import { drawMap, prepareMoveShip, handleNextTurn, AddMiner, AddShip } from "../../utils/utils";
+import {
+  drawMap,
+  prepareMoveShip,
+  handleNextTurn,
+  AddMiner,
+} from "../../utils/utils";
 
 import Controls from "./mapAssets/Controls";
 import Patterns from "./mapAssets/Patterns";
 
 import HexModal from "../../components/HexModal/HexModal";
-import ChatDrawer from "../../components/Chat/Chat";
+import ShipModal from "../../components/ShipModal/ShipModal";
 
 import CyberButton from "../../components/cyberButton/CyberButton";
 import NavBar from "../../components/NavBar/NavBar";
+import ChatDrawer from "../../components/Chat/Chat";
+
 import BackGroundVideoMap from "../../assets/video/background-map.mp4";
 import backgroundSound from "../../assets/sound/ost-map.mp3";
 
@@ -38,14 +45,12 @@ const Map = () => {
 
   const [pathPossibleHexa, setPathPossibleHexa] = useState([]);
   const [pathHexa, setPathHexa] = useState([]);
-  const [shipBuild, setShipBuild] = useState([]);
 
   const [mouseDown, setMouseDown] = useState(false);
   const [lastMouseX, setLastMouseX] = useState(null);
   const [lastMouseY, setLastMouseY] = useState(null);
+  const [tradeModal, setTradeModal] = useState(false);
   const [first, setFist] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
   const hexagonSize = { x: 12, y: 12 };
 
   const screenWidth = window.innerWidth;
@@ -58,34 +63,41 @@ const Map = () => {
 
   const initialViewBox = `${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`;
   const [viewBox, setViewBox] = useState(initialViewBox);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
 
   const handleZoom = (event) => {
     const newZoom = event.target.value;
     if (newZoom !== 0) {
-      setScale(parseFloat(newZoom));
+      setScale(newZoom);
       updateViewBox();
-    } else {
     }
   };
 
   const updateViewBox = () => {
-    const centerX = parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
-    const centerY = parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
-    if (scale != 0) {
-      var newWidth = 100 / scale;
-      var newHeight = 100 / scale;
-    } else {
-      var newWidth = 100 / 0.1;
-      var newHeight = 100 / 0.1;
-    }
+    const centerX =
+      parseFloat(viewBox.split(" ")[0]) + parseFloat(viewBox.split(" ")[2]) / 2;
+    const centerY =
+      parseFloat(viewBox.split(" ")[1]) + parseFloat(viewBox.split(" ")[3]) / 2;
+    var newWidth = 100 / scale;
+    var newHeight = 100 / scale;
+
     if (newHeight == Infinity) {
-      console.log(scale);
       newHeight = 100;
     }
     if (newWidth == Infinity) {
       newWidth = 100;
     }
-    const newViewBox = `${centerX - newWidth / 2} ${centerY - newHeight / 2} ${newWidth} ${newHeight}`;
+    const newViewBox = `${centerX - newWidth / 2} ${
+      centerY - newHeight / 2
+    } ${newWidth} ${newHeight}`;
 
     setViewBox(newViewBox);
   };
@@ -105,7 +117,9 @@ const Map = () => {
 
       const newX = parseFloat(viewBox.split(" ")[0]) - deltaX;
       const newY = parseFloat(viewBox.split(" ")[1]) - deltaY;
-      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
+      const newViewBox = `${newX} ${newY} ${viewBox.split(" ")[2]} ${
+        viewBox.split(" ")[3]
+      }`;
       setViewBox(newViewBox);
     }
   };
@@ -128,21 +142,6 @@ const Map = () => {
     document.addEventListener("click", playAudio);
   }, []);
 
-  const setMapInDb = async (data, path) => {
-    const databaseRef = ref(db, path);
-    try {
-      const updates = {};
-      data.forEach((doc) => {
-        const docPath = `${doc.coord.q}_${doc.coord.r}_${doc.coord.s}`;
-        updates[docPath] = doc;
-      });
-      await update(databaseRef, updates);
-      console.log("Data saved successfully.");
-    } catch (error) {
-      console.error("Error saving data: ", error);
-    }
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("room_token");
     const databaseRef = ref(db, "/game_room/" + token);
@@ -151,9 +150,17 @@ const Map = () => {
       var data = snapshot.val();
       setMap(data.map);
       if (first) {
-        Object.entries(data.map).forEach((hexa, index) => {
-          if (hexa.type == "base" && hexa.fill == localStorage.getItem("player_id")) {
-            const newViewBox = centerViewBoxAroundCoord(hexa.coord.q, hexa.coord.r, hexagonSize.x, viewBox);
+        data.map.forEach((hexa, index) => {
+          if (
+            hexa.type == "base" &&
+            hexa.fill == localStorage.getItem("player_id")
+          ) {
+            const newViewBox = centerViewBoxAroundCoord(
+              hexa.coord.q,
+              hexa.coord.r,
+              hexagonSize.x,
+              viewBox
+            );
             setViewBox(newViewBox);
           }
         });
@@ -178,8 +185,11 @@ const Map = () => {
       map,
       hexagonSize,
       viewBox,
+      localStorage.getItem("player_id"),
       setSelectedHex,
       setIsHexModalOpen,
+      setSelectedShip,
+      setIsShipModalOpen,
       pathPossibleHexa,
       selectedShip,
       setPathHexa,
@@ -188,14 +198,10 @@ const Map = () => {
       setDataInDatabase,
       token,
       turn,
-      player,
-      shipBuild,
-      setShipBuild,
-      setSelectedShip,
-      setMapInDb
+      player
     );
     setHexagons(hexas);
-  }, [map, player, viewBox, pathPossibleHexa, pathHexa, shipBuild]);
+  }, [map, viewBox, pathPossibleHexa, pathHexa]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -204,24 +210,24 @@ const Map = () => {
       let newViewBox = viewBox;
       switch (keyCode) {
         case 37: // Left arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) - speed} ${
+            viewBox.split(" ")[1]
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 38: // Up arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) - speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${
+            parseFloat(viewBox.split(" ")[1]) - speed
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 39: // Right arrow key
-          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${viewBox.split(" ")[1]} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${parseFloat(viewBox.split(" ")[0]) + speed} ${
+            viewBox.split(" ")[1]
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         case 40: // Down arrow key
-          newViewBox = `${viewBox.split(" ")[0]} ${parseFloat(viewBox.split(" ")[1]) + speed} ${
-            viewBox.split(" ")[2]
-          } ${viewBox.split(" ")[3]}`;
+          newViewBox = `${viewBox.split(" ")[0]} ${
+            parseFloat(viewBox.split(" ")[1]) + speed
+          } ${viewBox.split(" ")[2]} ${viewBox.split(" ")[3]}`;
           break;
         default:
           break;
@@ -246,14 +252,6 @@ const Map = () => {
     }
   };
 
-  const handleDrawerOpen = () => {
-    setDrawerOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setDrawerOpen(false);
-  };
-
   var minZoom = 0.25 / (mapSize / 10);
 
   return (
@@ -263,7 +261,14 @@ const Map = () => {
           <video autoPlay loop muted src={BackGroundVideoMap}></video>
         </div>
 
-        {player && <NavBar players={players} ressources={player.ressources}></NavBar>}
+        {player && (
+          <NavBar
+            players={players}
+            ressources={player.ressources}
+            setTradeModal={setTradeModal}
+            tradeModal={tradeModal}
+          ></NavBar>
+        )}
         <button className="btn-drawer" onClick={handleDrawerOpen}>
           Chat
         </button>
@@ -276,6 +281,7 @@ const Map = () => {
             setDataInDatabase={setDataInDatabase}
           />
         )}
+
         <Controls minZoom={minZoom} scale={scale} handleZoom={handleZoom} />
         <HexGrid
           width={"100vw"}
@@ -285,7 +291,12 @@ const Map = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
         >
-          <Layout size={hexagonSize} flat={false} spacing={1} origin={{ x: -6, y: -6 }}>
+          <Layout
+            size={hexagonSize}
+            flat={false}
+            spacing={1}
+            origin={{ x: -6, y: -6 }}
+          >
             {hexagons}
           </Layout>
           <Patterns />
@@ -293,12 +304,35 @@ const Map = () => {
         <div className="controls-container">
           <CyberButton
             message={"Ready"}
-            onClick={() => handleNextTurn(players, setDataInDatabase, token, turn, map, player)}
+            onClick={() =>
+              handleNextTurn(
+                players,
+                setDataInDatabase,
+                token,
+                turn,
+                map,
+                player
+              )
+            }
             toolTip={`Turn ${turn} `}
             style={"black"}
           ></CyberButton>
         </div>
       </div>
+      {isShipModalOpen && selectedShip ? (
+        <ShipModal
+          ship={selectedShip}
+          handleMove={() => {
+            prepareMoveShip(selectedShip, map, setPathPossibleHexa);
+          }}
+          handleClose={() => {
+            setIsShipModalOpen(false);
+          }}
+          handleBuild={() => {}}
+        />
+      ) : (
+        <></>
+      )}
       {isHexModalOpen && (
         <HexModal
           hexa={selectedHex}
@@ -306,12 +340,8 @@ const Map = () => {
           handleModalClose={() => setIsHexModalOpen(false)}
           button1={selectedHex.button1}
           dataButton1={selectedHex.dataButton1}
-          button2={selectedHex.button2}
-          dataButton2={selectedHex.dataButton2}
           function1={
-            selectedHex.dataButton1.func == "addMiner" &&
-            player.ressources.shipEngine >= 2 &&
-            player.ressources.shipPart >= 10
+            selectedHex.dataButton1.func == "addMiner"
               ? () =>
                   AddMiner(
                     selectedHex,
@@ -322,13 +352,6 @@ const Map = () => {
                     setIsHexModalOpen,
                     selectedHex.dataButton1.dataSupp
                   )
-              : selectedHex.dataButton1.func == "moveShip"
-              ? () => prepareMoveShip(selectedShip, map, setPathPossibleHexa, setIsHexModalOpen)
-              : () => {}
-          }
-          function2={
-            selectedHex.dataButton2.func == "addShip"
-              ? () => AddShip(selectedHex, map, setIsHexModalOpen, setShipBuild)
               : () => {}
           }
         />

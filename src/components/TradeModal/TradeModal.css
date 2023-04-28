@@ -1,0 +1,11 @@
+.trade-main-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+button.btn-close-trade {
+    display: flex;
+    color: white;
+    font-weight: bold;
+}

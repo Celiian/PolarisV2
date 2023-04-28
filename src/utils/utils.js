@@ -299,6 +299,7 @@ export const drawMap = (
 
 const handleHexClick = async (hexa, map, setSelectedHex, setIsHexModalOpen, player, setSelectedShip, turn) => {
   var hex = SetHexData(hexa, player, map, setSelectedShip, turn);
+
   setSelectedHex(hex);
   setIsHexModalOpen(true);
 };
@@ -311,7 +312,13 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
   var miner = false;
   var dataMiner = { planets_type: [], ressource_prod: [] };
   var button1 = false;
-  var dataButton1 = { message: "", toolTip: "", func: "", style: "", dataSupp: null };
+  var dataButton1 = {
+    message: "",
+    toolTip: "",
+    func: "",
+    style: "",
+    dataSupp: null,
+  };
   var button2 = false;
   var dataButton2 = { message: "", toolTip: "", func: "", style: "", dataSupp: null };
 
@@ -512,7 +519,6 @@ const moveShip = async (ship, map, pathHexa, setMapInDb, setPathPossibleHexa, se
     });
 
     await setMapInDb(hexaListToUpdate, `/game_room/${token}/map/`);
-    await delay(50);
   }
 };
 
@@ -695,4 +701,8 @@ const updateHexagon = (mapData, hexa, newProperties) => {
   mapData[indexToUpdate] = objToUpdate;
 
   return mapData;
+};
+
+export const SendMessage = async (setDataInDatabase, message, tokenPlayer) => {
+  await setDataInDatabase(message, "/game_room/" + tokenPlayer + "/chat/");
 };

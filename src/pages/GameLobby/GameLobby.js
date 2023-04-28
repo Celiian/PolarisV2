@@ -51,6 +51,7 @@ const GameLobby = () => {
     const databaseRef = ref(db, path + token);
     onValue(databaseRef, (snapshot) => {
       setRoomData(snapshot.val());
+      console.log(snapshot.val());
       if (snapshot.val().started) {
         window.location.href = "/map";
       }
