@@ -101,9 +101,9 @@ const GameLobby = () => {
       ressources: {
         water: 10,
         foodCan: 10,
-        shipEngine: 10,
-        shipPart: 10,
-        coins: 10,
+        shipEngine: 20,
+        shipPart: 60,
+        coins: 100,
         uranium: 10,
         ore: 10,
         crystal: 10,
