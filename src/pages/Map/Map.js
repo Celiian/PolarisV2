@@ -27,7 +27,7 @@ const Map = () => {
   const [player, setPlayer] = useState([]);
   const [turn, setTurn] = useState(0);
   const [speed, setSpeed] = useState(100);
-  const [scale, setScale] = useState(0.6);
+  const [scale, setScale] = useState(0.8);
   const [mapSize, setMapSize] = useState(0);
   const [hexagons, setHexagons] = useState([]);
   const [token, setToken] = useState("");

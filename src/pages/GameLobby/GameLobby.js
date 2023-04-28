@@ -136,6 +136,7 @@ const GameLobby = () => {
   };
 
   const startGame = async () => {
+    console.log("starting");
     await setDataInDatabase(true, path + token + "/started/");
     window.location.href = "/map";
   };

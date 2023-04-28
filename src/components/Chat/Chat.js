@@ -74,7 +74,7 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
     if (token) {
       const databaseRef = ref(db, "/game_room/" + token + "/chat/");
       onValue(databaseRef, (snapshot) => {
-        if (snapshot.val() != messages) {
+        if (snapshot.val() != null) {
           toast("New message", {
             position: "top-right",
             autoClose: 2000,
@@ -101,23 +101,24 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
         <div className="chat-container">
           <h1>GameChat</h1>
           <List>
-            {messages.map((msg, index) => (
-              <ListItem
-                key={index}
-                className={msg.player_id === localStorage.getItem("player_id") ? "align-right" : ""}
-              >
-                <img
-                  className="img-ship-players"
-                  src={ships[`Base${msg.player_id}`]}
-                  alt={`ship-player${msg.player_id}`}
-                />
-                <ListItemText
-                  primary={`${msg.sender} (${playerData.points}pts)`}
-                  secondary={msg.message}
-                  className={msg.player_id === localStorage.getItem("player_id") ? "align-right-text" : ""}
-                />
-              </ListItem>
-            ))}
+            {messages &&
+              messages.map((msg, index) => (
+                <ListItem
+                  key={index}
+                  className={msg.player_id === localStorage.getItem("player_id") ? "align-right" : ""}
+                >
+                  <img
+                    className="img-ship-players"
+                    src={ships[`Base${msg.player_id}`]}
+                    alt={`ship-player${msg.player_id}`}
+                  />
+                  <ListItemText
+                    primary={`${msg.sender} (${playerData.points}pts)`}
+                    secondary={msg.message}
+                    className={msg.player_id === localStorage.getItem("player_id") ? "align-right-text" : ""}
+                  />
+                </ListItem>
+              ))}
           </List>
         </div>
         <div className="sendchat-container">
