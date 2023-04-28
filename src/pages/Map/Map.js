@@ -322,10 +322,11 @@ const Map = () => {
                     selectedHex,
                     player,
                     token,
-                    setDataInDatabase,
+                    setMapInDb,
                     map,
                     setIsHexModalOpen,
-                    selectedHex.dataButton1.dataSupp
+                    selectedHex.dataButton1.dataSupp,
+                    setDataInDatabase
                   )
               : selectedHex.dataButton1.func == "moveShip"
               ? () => prepareMoveShip(selectedShip, map, setPathPossibleHexa, setIsHexModalOpen)
@@ -336,7 +337,7 @@ const Map = () => {
           function2={
             selectedHex.dataButton2.func == "addShip"
               ? () => AddShip(selectedHex, map, setIsHexModalOpen, setShipBuild)
-              : selectedHex.dataButton1.func == "upgradeShip"
+              : selectedHex.dataButton2.func == "upgradeShip"
               ? () => upgradeShip(selectedShip, player, map, setMapInDb, token, setDataInDatabase)
               : () => {}
           }

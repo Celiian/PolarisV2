@@ -502,6 +502,7 @@ export const SetHexData = (hexa, player, map, setSelectedShip, turn) => {
     dataButton1: dataButton1,
     button2: button2,
     dataButton2: dataButton2,
+    data_players: hexa.data_players,
   };
 };
 
@@ -511,7 +512,7 @@ export const prepareMoveShip = (ship, map, setPathPossibleHexa, setIsHexModalOpe
   if (ship.type == "base") {
     distanceMax = 2;
   } else if (ship.type == "ship") {
-    distanceMax = 5;
+    distanceMax = 3 + 2 * ship.level;
   }
   Object.entries(map).forEach(([index, hexa]) => {
     var actualDistance = HexUtils.distance(hexa.coord, ship.coord);
@@ -572,7 +573,12 @@ const moveShip = async (ship, map, pathHexa, setMapInDb, setPathPossibleHexa, se
 
 const updateVisible = (ship, map) => {
   const player_id = parseInt(localStorage.getItem("player_id")) - 1;
-  const distanceMax = ship.type === "base" ? 10 : 5;
+  var distanceMax = 0;
+  if (ship.type === "base") {
+    distanceMax = 10;
+  } else {
+    distanceMax = 3 + 2 * ship.level;
+  }
   var modified = [];
   Object.entries(map).forEach(([key, hex]) => {
     const actualDistance = HexUtils.distance(hex.coord, ship.coord);
@@ -582,12 +588,12 @@ const updateVisible = (ship, map) => {
       if (player_data.ship != "miner") {
         if (player_data.status != "visible") {
           modified.push(key);
-          player_data.ship = "ship";
+          player_data.ship = ship.type;
           player_data.shipId = ship.id;
           player_data.status = "visible";
         } else if (player_data.shipId == -1) {
           modified.push(key);
-          player_data.ship = "ship";
+          player_data.ship = ship.type;
           player_data.shipId = ship.id;
           player_data.status = "visible";
         }
@@ -667,24 +673,44 @@ export const handleNextTurn = async (players, setDataInDatabase, token, turn, ma
   await setDataInDatabase(newPlayers, "/game_room/" + token + "/players/");
 };
 
-export const AddMiner = async (hexa, player, token, setDataInDatabase, map, setIsHexModalOpen, dataSupp) => {
+export const AddMiner = async (
+  hexa,
+  player,
+  token,
+  setMapInDb,
+  map,
+  setIsHexModalOpen,
+  dataSupp,
+  setDataInDatabase
+) => {
+  console.log(hexa);
   setIsHexModalOpen(false);
-
+  var newData = [];
   player.ressources.shipEngine -= 2;
   player.ressources.shipPart -= 10;
   player.points += 1;
-  await setPlayerData(setDataInDatabase, player, token);
+  //await setPlayerData(setDataInDatabase, player, token);
 
-  const newHexa = {
+  var hexaKey = `${hexa.coord.q}_${hexa.coord.r}_${hexa.coord.s}`;
+
+  map[hexaKey] = {
     coord: hexa.coord,
     type: "miner",
     fill: player.id,
     planets: dataSupp.planets_type,
     ressources: dataSupp.ressource_prod,
     level: 1,
+    id: 0,
+    data_players: hexa.data_players,
   };
-  var newMap = updateHexagon(map, hexa, newHexa);
-  await setDataInDatabase(newMap, "/game_room/" + token + "/map/");
+  newData.push(map[hexaKey]);
+  console.log(map[hexaKey]);
+  var modified = updateVisible(map[hexaKey], map, player);
+  modified.forEach((key) => {
+    newData.push(map[key]);
+  });
+
+  await setMapInDb(newData, "/game_room/" + token + "/map/");
 };
 
 export const AddShip = async (hexa, map, setIsHexModalOpen, setShipBuild) => {
@@ -757,7 +783,7 @@ export const SendMessage = async (setDataInDatabase, message, tokenPlayer) => {
 
 export const upgradeShip = async (ship, player, map, setMapInDb, token, setDataInDatabase) => {
   var newData = [];
-  console.log(ship);
+
   const shipKey = `${ship.coord.q}_${ship.coord.r}_${ship.coord.s}`;
 
   if (map[shipKey].type == "miner") {
@@ -770,6 +796,12 @@ export const upgradeShip = async (ship, player, map, setMapInDb, token, setDataI
   map[shipKey].level += 1;
 
   newData.push(map[shipKey]);
+
+  const modified = updateVisible(ship, map, player);
+  modified.forEach((key) => {
+    newData.push(map[key]);
+  });
+
   await setMapInDb(newData, "/game_room/" + token + "/map/");
   await setPlayerData(setDataInDatabase, player, token);
 };
