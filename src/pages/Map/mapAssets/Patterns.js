@@ -97,12 +97,12 @@ const Patterns = () => (
 
     */}
     <Pattern id="base/2" link={Base2} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/-45" link={Base245} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/-90" link={Base290} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/-135" link={Base2135} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/45" link={Base2_45} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/90" link={Base2_90} size={{ x: 10, y: 12 }} />
-    <Pattern id="base/2/135" link={Base2_135} size={{ x: 10, y: 12 }} />
+    <Pattern id="base/2/45" link={Base245} size={{ x: 10, y: 12 }} />
+    <Pattern id="base/2/90" link={Base290} size={{ x: 10, y: 12 }} />
+    <Pattern id="base/2/135" link={Base2135} size={{ x: 10, y: 12 }} />
+    <Pattern id="base/2/-45" link={Base2_45} size={{ x: 10, y: 12 }} />
+    <Pattern id="base/2/-90" link={Base2_90} size={{ x: 10, y: 12 }} />
+    <Pattern id="base/2/-135" link={Base2_135} size={{ x: 10, y: 12 }} />
 
     <Pattern id="ship/2/45" link={Ship245} size={{ x: 10, y: 12 }} />
     <Pattern id="ship/2/90" link={Ship290} size={{ x: 10, y: 12 }} />
