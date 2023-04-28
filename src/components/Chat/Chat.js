@@ -34,7 +34,13 @@ const ships = {
   Base4,
 };
 
-const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => {
+const ChatDrawer = ({
+  open,
+  onClose,
+  playerData,
+  setDataInDatabase,
+  token,
+}) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -49,7 +55,8 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
         sender: `${playerData.name}`,
         player_id: `${playerData.id}`,
       });
-      await SendMessage(setDataInDatabase, messages, token);
+      console.log(messages);
+      await SendMessage(messages, token);
       setInputValue("");
     }
   };
@@ -103,7 +110,11 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
             {messages.map((msg, index) => (
               <ListItem
                 key={index}
-                className={msg.player_id === localStorage.getItem("player_id") ? "align-right" : ""}
+                className={
+                  msg.player_id === localStorage.getItem("player_id")
+                    ? "align-right"
+                    : ""
+                }
               >
                 <img
                   className="img-ship-players"
@@ -113,14 +124,24 @@ const ChatDrawer = ({ open, onClose, playerData, setDataInDatabase, token }) => 
                 <ListItemText
                   primary={`${msg.sender} (${playerData.points}pts)`}
                   secondary={msg.message}
-                  className={msg.player_id === localStorage.getItem("player_id") ? "align-right-text" : ""}
+                  className={
+                    msg.player_id === localStorage.getItem("player_id")
+                      ? "align-right-text"
+                      : ""
+                  }
                 />
               </ListItem>
             ))}
           </List>
         </div>
         <div className="sendchat-container">
-          <TextField label="Type your message" variant="outlined" fullWidth value={inputValue} onChange={handleInput} />
+          <TextField
+            label="Type your message"
+            variant="outlined"
+            fullWidth
+            value={inputValue}
+            onChange={handleInput}
+          />
           <IconButton onClick={handleSend}>
             <SendIcon />
           </IconButton>
