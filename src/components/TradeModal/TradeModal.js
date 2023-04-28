@@ -73,6 +73,12 @@ const TradeModal = ({ showModal, handleClose, ressources, handleTrade }) => {
                         </MenuItem>
                       ))}
                     </Select>
+                    <TextField
+                      id="outlined-basic"
+                      label="CoinsNumber"
+                      inputProps={{ type: "number" }}
+                      variant="outlined"
+                    />
                   </FormControl>
                   {showQuantityRessources === true ? (
                     <p>
@@ -114,6 +120,12 @@ const TradeModal = ({ showModal, handleClose, ressources, handleTrade }) => {
                             </MenuItem>
                           ))}
                       </Select>
+                      <TextField
+                        id="outlined-basic"
+                        label="CoinsNumber"
+                        inputProps={{ type: "number" }}
+                        variant="outlined"
+                      />
                     </FormControl>
                   ) : (
                     <>
@@ -121,12 +133,6 @@ const TradeModal = ({ showModal, handleClose, ressources, handleTrade }) => {
                         className="coins-trading-container"
                         style={{ padding: "10px" }}
                       >
-                        <TextField
-                          id="outlined-basic"
-                          label="CoinsNumber"
-                          inputProps={{ type: "number" }}
-                          variant="outlined"
-                        />
                         <div className="coins-container">
                           <img
                             className="ressource-img"
