@@ -103,7 +103,7 @@ export const generate_map = (MAP_SIZE, players) => {
                   id: players_spot[indexSpot].id,
                   status: "visible",
                   ship: "base",
-                  shipId: 0,
+                  shipId: -2,
                 });
               } else {
                 data_players.push({
