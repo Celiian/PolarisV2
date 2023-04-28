@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
 import { ref, onValue, off, set, update } from "firebase/database";
 import db from "../../firebaseConfig";
 import "./GameLobby.css";
@@ -117,6 +118,16 @@ const GameLobby = () => {
     navigator.clipboard.writeText(linkInvite).then(
       () => {
         console.log("Lien copié dans le presse-papiers :", linkInvite);
+        toast("Invitation Link copied !", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       },
       () => {
         console.error("Erreur lors de la copie du lien dans le presse-papiers");
@@ -138,6 +149,17 @@ const GameLobby = () => {
 
   return (
     <>
+      <ToastContainer
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="gameroom-container">
         <div className="video-wrapper">
           <video autoPlay loop muted src={BackGroundVideo}></video>
